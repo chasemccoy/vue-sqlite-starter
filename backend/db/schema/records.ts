@@ -11,7 +11,7 @@ const recordTypeEnum: [string, ...string[]] = [
 
 export const records = sqliteTable('records', {
 	id: int().primaryKey({ autoIncrement: true }),
-	slug: text().unique(),
+	slug: text().unique().notNull(),
 	type: text({ enum: recordTypeEnum }).default('artifact'),
 	title: text().notNull(),
 	url: text(),
@@ -57,10 +57,12 @@ export const linkRelations = relations(links, ({ one }) => ({
 	source: one(records, {
 		fields: [links.sourceId],
 		references: [records.id],
+		relationName: 'source',
 	}),
 	target: one(records, {
 		fields: [links.targetId],
 		references: [records.id],
+		relationName: 'target',
 	}),
 	predicate: one(predicates, {
 		fields: [links.predicateId],
