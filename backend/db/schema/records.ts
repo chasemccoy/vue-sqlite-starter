@@ -1,5 +1,5 @@
 import { sqliteTable, text, int, type AnySQLiteColumn } from 'drizzle-orm/sqlite-core';
-import { databaseTimestamps } from './utils';
+import { contentTimestamps, databaseTimestamps } from './utils';
 import { relations } from 'drizzle-orm';
 import { media } from './media';
 
@@ -7,7 +7,7 @@ const recordTypeEnum: [string, ...string[]] = [
 	'entity', // an actor in the world, has will
 	'concept', // a category, idea, or abstraction
 	'artifact', // physical or digital objects, content, or media
-];
+] as const;
 
 export const records = sqliteTable('records', {
 	id: int().primaryKey({ autoIncrement: true }),
@@ -16,6 +16,9 @@ export const records = sqliteTable('records', {
 	title: text().notNull(),
 	url: text(),
 	isCurated: int({ mode: 'boolean' }).notNull().default(false),
+	summary: text(),
+	content: text(),
+	notes: text(),
 	...databaseTimestamps
 });
 
@@ -47,7 +50,8 @@ export const links = sqliteTable('links', {
 		onUpdate: 'cascade',
 	}).notNull(),
 	notes: text(),
-	...databaseTimestamps
+	...databaseTimestamps,
+	...contentTimestamps
 });
 
 export type LinkSelect = typeof links.$inferSelect;
@@ -77,7 +81,7 @@ const predicateTypeEnum: [string, ...string[]] = [
 	'association', // related_to, similar_to …
 	'reference', // cites, responds_to …
 	'identity', // instance_of, same_as …
-];
+] as const;
 
 export const predicates = sqliteTable('predicates', {
 	id: int().primaryKey({ autoIncrement: true }),

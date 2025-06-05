@@ -11,6 +11,7 @@
 		"lint": "prettier --write . && eslint . --fix && vue-tsc --noEmit",
 		"dev:app": "vite",
 		"dev:backend": "tsx watch backend/api/index.ts",
+		"dev:backend:bun": "bun --watch backend/api/index.ts",
 		"dev": "concurrently \"npm run dev:app\" \"npm run dev:backend\"",
 		"build": "vue-tsc -b && vite build",
 		"preview": "vite preview",
@@ -30,6 +31,7 @@
 	"devDependencies": {
 		"@eslint/js": "^9.28.0",
 		"@types/better-sqlite3": "^7.6.13",
+		"@types/bun": "^1.2.15",
 		"@vitejs/plugin-vue": "^5.2.3",
 		"@vue/tsconfig": "^0.7.0",
 		"concurrently": "^9.1.2",

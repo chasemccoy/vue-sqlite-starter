@@ -13,3 +13,11 @@ export const databaseTimestamps = {
   recordCreatedAt,
   recordUpdatedAt,
 };
+
+const contentCreatedAt = text();
+const contentUpdatedAt = text();
+
+export const contentTimestamps = {
+  contentCreatedAt,
+  contentUpdatedAt,
+};

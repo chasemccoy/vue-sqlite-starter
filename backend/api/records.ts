@@ -1,5 +1,5 @@
 import { inArray, sql } from "drizzle-orm";
-import { db } from ".";
+import { db } from "./db";
 import { records, type RecordInsert, type RecordSelect } from "../db/schema";
 
 export const getRecord = (recordId: RecordSelect['id']) => {

@@ -1,5 +1,5 @@
 import { eq } from "drizzle-orm";
-import { db } from ".";
+import { db } from "./db";
 import { links, type LinkSelect, type RecordSelect } from "../db/schema";
 
 export const linksForRecord = async (recordId: RecordSelect['id']) => {
