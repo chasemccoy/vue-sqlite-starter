@@ -1,7 +1,6 @@
 import { sqliteTable, text, int } from 'drizzle-orm/sqlite-core';
 import { databaseTimestamps } from './utils';
 import { records } from './records';
-import { relations } from 'drizzle-orm';
 
 const mediaTypeEnum: [string, ...string[]] = [
   'application', // application or binary data
@@ -37,10 +36,3 @@ export const media = sqliteTable('media', {
 
 export type MediaSelect = typeof media.$inferSelect;
 export type MediaInsert = typeof media.$inferInsert;
-
-export const mediaRelations = relations(media, ({ one }) => ({
-  record: one(records, {
-    fields: [media.recordId],
-    references: [records.id],
-  }),
-}));

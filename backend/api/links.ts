@@ -7,7 +7,9 @@ export const linksForRecord = async (recordId: RecordSelect['id']) => {
     columns: {
       id: true,
     },
-    where: (records, { eq }) => eq(records.id, recordId),
+    where: {
+      id: recordId
+    },
     with: {
       outgoingLinks: true,
       incomingLinks: true,

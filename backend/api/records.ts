@@ -4,7 +4,9 @@ import { records, type RecordInsert, type RecordSelect } from "../db/schema";
 
 export const getRecord = (recordId: RecordSelect['id']) => {
   return db.query.records.findFirst({
-    where: (records, { eq }) => eq(records.id, recordId),
+    where: {
+      id: recordId,
+    }
   })
 }
 

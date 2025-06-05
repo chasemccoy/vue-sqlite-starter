@@ -1,7 +1,5 @@
 import { sqliteTable, text, int, type AnySQLiteColumn } from 'drizzle-orm/sqlite-core';
 import { contentTimestamps, databaseTimestamps } from './utils';
-import { relations } from 'drizzle-orm';
-import { media } from './media';
 
 const recordTypeEnum: [string, ...string[]] = [
 	'entity', // an actor in the world, has will
@@ -25,16 +23,6 @@ export const records = sqliteTable('records', {
 export type RecordSelect = typeof records.$inferSelect;
 export type RecordInsert = typeof records.$inferInsert;
 
-export const recordRelations = relations(records, ({ many }) => ({
-	media: many(media),
-	outgoingLinks: many(links, {
-		relationName: 'source',
-	}),
-	incomingLinks: many(links, {
-		relationName: 'target',
-	}),
-}));
-
 export const links = sqliteTable('links', {
 	id: int().primaryKey({ autoIncrement: true }),
 	sourceId: int().references(() => records.id, {
@@ -56,23 +44,6 @@ export const links = sqliteTable('links', {
 
 export type LinkSelect = typeof links.$inferSelect;
 export type LinkInsert = typeof links.$inferInsert;
-
-export const linkRelations = relations(links, ({ one }) => ({
-	source: one(records, {
-		fields: [links.sourceId],
-		references: [records.id],
-		relationName: 'source',
-	}),
-	target: one(records, {
-		fields: [links.targetId],
-		references: [records.id],
-		relationName: 'target',
-	}),
-	predicate: one(predicates, {
-		fields: [links.predicateId],
-		references: [predicates.id],
-	}),
-}));
 
 const predicateTypeEnum: [string, ...string[]] = [
 	'creation', // authorship, ownership …
@@ -99,11 +70,3 @@ export const predicates = sqliteTable('predicates', {
 
 export type PredicateSelect = typeof predicates.$inferSelect;
 export type PredicateInsert = typeof predicates.$inferInsert;
-
-export const predicateRelations = relations(predicates, ({ one, many }) => ({
-	links: many(links),
-	inverse: one(predicates, {
-		fields: [predicates.inverseSlug],
-		references: [predicates.slug],
-	}),
-}));
