@@ -28,7 +28,7 @@ export const readwiseDocuments = sqliteTable('readwise_documents', {
   sourceUrl: text(),
   title: text(),
   author: text(),
-  authorId: text().references(() => readwiseAuthors.id, {
+  authorId: int().references(() => readwiseAuthors.id, {
     onDelete: 'set null',
     onUpdate: 'cascade',
   }),
@@ -37,7 +37,7 @@ export const readwiseDocuments = sqliteTable('readwise_documents', {
   htmlContent: text(),
   category: text({ enum: readwiseCategoryEnum }),
   location: text({ enum: readwiseLocationEnum }),
-  // tags: text().array(),
+  tags: text({ mode: 'json' }).$type<string[]>(),
   siteName: text(),
   wordCount: int(),
   notes: text(),

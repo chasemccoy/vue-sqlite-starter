@@ -1,10 +1,8 @@
 import { requireEnv } from "../utils/env";
-import { createIntegrationLogger } from "../utils/log";
+import { logger } from "./utils";
 
 const API_BASE_URL = 'https://readwise.io/api/v3/list/';
 const READWISE_TOKEN = requireEnv('READWISE_TOKEN');
-
-const logger = createIntegrationLogger('readwise', 'sync');
 
 /**
  * Main execution function when run as a standalone script

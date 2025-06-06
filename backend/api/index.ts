@@ -1,9 +1,19 @@
-import { getRecord } from './records';
-import { getFamilyTree } from './tree';
+import 'dotenv/config';
+import express from 'express';
+import { recordRoutes } from './records';
+import { treeRoutes } from './tree';
+import { linkRoutes } from './links';
+import { errorHandler } from './error-handler';
 
-const record = await getRecord(1);
+const PORT = process.env.PORT;
 
-const tree = await getFamilyTree(1)
+const app = express();
 
-console.log(record);
-console.log(tree);
+app.use(errorHandler);
+app.use(recordRoutes);
+app.use(treeRoutes);
+app.use(linkRoutes);
+
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});

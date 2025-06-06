@@ -1,5 +1,9 @@
 import { db } from "./db";
 import { type RecordSelect } from "../db/schema";
+import { Router } from "express";
+import { IdParamSchema } from "@shared/types/api";
+
+export const treeRoutes = Router()
 
 export const getFamilyTree = async (recordId: RecordSelect['id']) => {
   const family = await db.query.records.findFirst({
@@ -116,3 +120,13 @@ export const getFamilyTree = async (recordId: RecordSelect['id']) => {
 
   return family;
 }
+
+treeRoutes.get('/tree/:id', async (req, res, next) => {
+  try {
+    const { id } = IdParamSchema.parse(req.params);
+    const tree = await getFamilyTree(id)
+    res.json(tree);
+  } catch (error) {
+    next(error)
+  }
+})

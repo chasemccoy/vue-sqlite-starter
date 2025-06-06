@@ -1,0 +1,15 @@
+{
+	"editor.formatOnSave": true,
+	"eslint.workingDirectories": ["."],
+	"editor.codeActionsOnSave": {
+		"source.fixAll": "always",
+		"source.fixAll.eslint": "explicit",
+		"source.removeUnusedImports": "always"
+	},
+	"vue.complete.casing.props": "camel",
+	"vue.complete.casing.tags": "pascal",
+	"editor.defaultFormatter": "esbenp.prettier-vscode",
+	"[typescript]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
+	}
+}

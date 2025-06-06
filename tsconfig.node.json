@@ -4,7 +4,6 @@
 		"target": "ES2022",
 		"lib": ["ES2023"],
 		"module": "ESNext",
-		"skipLibCheck": true,
 
 		/* Bundler mode */
 		"moduleResolution": "bundler",
@@ -12,14 +11,11 @@
 		"verbatimModuleSyntax": true,
 		"moduleDetection": "force",
 		"noEmit": true,
-
-		/* Linting */
-		"strict": true,
-		"noUnusedLocals": true,
-		"noUnusedParameters": true,
-		/* "erasableSyntaxOnly": true, */
-		"noFallthroughCasesInSwitch": true,
-		"noUncheckedSideEffectImports": true
+		"baseUrl": ".",
+		"paths": {
+			"@db/*": ["./backend/db/*"],
+			"@shared/*": ["./shared/*"]
+		}
 	},
-	"include": ["vite.config.ts", "backend/**/*.ts", "backend/**/*.tsx"]
+	"include": ["vite.config.ts", "backend/**/*.ts", "backend/**/*.tsx", "shared/**/*.ts"]
 }

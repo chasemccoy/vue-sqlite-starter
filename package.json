@@ -25,16 +25,22 @@
 	"dependencies": {
 		"better-sqlite3": "^11.10.0",
 		"drizzle-orm": "1.0.0-beta.1-c0277c0",
-		"vue": "^3.5.13"
+		"drizzle-zod": "^0.8.2",
+		"express": "^5.1.0",
+		"vue": "^3.5.13",
+		"zod": "^3.25.42"
 	},
 	"devDependencies": {
-		"drizzle-kit": "1.0.0-beta.1-c0277c0",
 		"@eslint/js": "^9.28.0",
 		"@types/better-sqlite3": "^7.6.13",
 		"@types/bun": "^1.2.15",
+		"@types/express": "^5.0.2",
+		"@types/node": "^22.15.30",
 		"@vitejs/plugin-vue": "^5.2.3",
 		"@vue/tsconfig": "^0.7.0",
 		"concurrently": "^9.1.2",
+		"dotenv": "^16.5.0",
+		"drizzle-kit": "1.0.0-beta.1-c0277c0",
 		"eslint": "^9.28.0",
 		"eslint-config-prettier": "^10.1.5",
 		"eslint-plugin-vue": "^10.1.0",

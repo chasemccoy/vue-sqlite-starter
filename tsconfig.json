@@ -10,6 +10,12 @@
 		/* "erasableSyntaxOnly": true, */
 		"noFallthroughCasesInSwitch": true,
 		"noUncheckedSideEffectImports": true,
-		"moduleResolution": "node16"
+		"moduleResolution": "node16",
+		"forceConsistentCasingInFileNames": true,
+		"baseUrl": ".",
+		"paths": {
+			"@db/*": ["./backend/db/*"],
+			"@shared/*": ["./shared/*"]
+		}
 	}
 }
