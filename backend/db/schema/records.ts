@@ -3,20 +3,12 @@ import { contentTimestamps, databaseTimestamps } from './utils';
 import z from 'zod/v4';
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 import { emptyStringToNull } from '@shared/lib/formatting';
-
-const recordTypeEnum: [string, ...string[]] = [
-	'entity', // an actor in the world, has will
-	'concept', // a category, idea, or abstraction
-	'artifact', // physical or digital objects, content, or media
-] as const;
-
-export const RecordTypeSchema = z.enum(recordTypeEnum);
-export type RecordType = z.infer<typeof RecordTypeSchema>;
+import { recordTypeEnum } from '@shared/types';
 
 export const records = sqliteTable('records', {
 	id: int().primaryKey({ autoIncrement: true }),
 	slug: text().unique().notNull(),
-	type: text({ enum: recordTypeEnum }).default('artifact'),
+	type: text({ enum: recordTypeEnum }).notNull().default('artifact'),
 	title: text().notNull(),
 	url: text(),
 	isCurated: int({ mode: 'boolean' }).notNull().default(false),

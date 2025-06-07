@@ -21,6 +21,9 @@ export const listRecords = async (input: ListRecordsInput = {}) => {
 	const rows = await db.query.records.findMany({
 		columns: {
 			id: true,
+			title: true,
+			url: true,
+			recordCreatedAt: true,
 		},
 		where: {
 			type,
@@ -89,9 +92,11 @@ export const listRecords = async (input: ListRecordsInput = {}) => {
 		},
 	});
 
-	return {
-		ids: rows.map((row) => ({ id: row.id })),
-	};
+	return rows;
+
+	// return {
+	// 	ids: rows.map((row) => ({ id: row.id })),
+	// };
 };
 
 export type ListRecordsAPIResponse = APIResponse<typeof listRecords>;
@@ -119,6 +124,8 @@ export const upsertRecord = async (record: RecordInsert) => {
 
 	return modifiedRecord;
 };
+
+export type UpsertRecordAPIResponse = APIResponse<typeof upsertRecord>;
 
 export const markAsCurated = async (recordIds: Array<RecordSelect['id']>) => {
 	const updatedRecords = await db
@@ -152,6 +159,7 @@ export const deleteRecord = async (recordIds: Array<RecordSelect['id']>) => {
 
 	if (recordsToDelete.length !== recordIds.length) {
 		const notFound = recordIds.filter((id) => !recordsToDelete.some((r) => r.id === id));
+		// eslint-disable-next-line no-console
 		console.warn(`Some records were not found: ${notFound.join(', ')}`);
 	}
 

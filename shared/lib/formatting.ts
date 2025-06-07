@@ -20,4 +20,6 @@ export const toTitleCase = (str: string) => str.replace(/\b\w/g, (char) => char.
  * // '' -> null, 'value' -> 'value'
  */
 export const emptyStringToNull = <T extends z.ZodTypeAny>(schema: T) =>
-  z.preprocess((val) => (val === '' ? null : val), schema.nullable());
+	z.preprocess((val) => (val === '' ? null : val), schema.nullable());
+
+export const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);

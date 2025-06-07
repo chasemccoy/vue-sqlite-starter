@@ -13,6 +13,8 @@ app.use(PrimeVue, {
 	},
 });
 
-app.use(VueQueryPlugin);
+app.use(VueQueryPlugin, {
+	enableDevtoolsV6Plugin: true,
+});
 
 app.mount('#app');

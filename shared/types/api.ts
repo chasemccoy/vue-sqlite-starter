@@ -1,4 +1,4 @@
-import { RecordTypeSchema } from '@db/schema';
+import { RecordTypeSchema } from '@shared/types';
 import { z } from 'zod/v4';
 
 export const DEFAULT_LIMIT = 50;

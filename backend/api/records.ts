@@ -58,6 +58,7 @@ recordRoutes.get('/records', async (req, res, next) => {
 recordRoutes.put('/record', async (req, res, next) => {
 	try {
 		const record = RecordInsertSchema.parse(req.body);
+		// @ts-expect-error - Bug with drizzle-zod
 		const updatedRecord = await upsertRecord(record);
 		res.json(updatedRecord);
 	} catch (error) {
