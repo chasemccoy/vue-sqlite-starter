@@ -3,13 +3,25 @@ export enum ApiEndpoints {
 }
 
 const { BACKEND_PORT } = import.meta.env;
+const baseUrl = `http://localhost:${BACKEND_PORT}`;
 
 export default function useApiClient() {
-	const baseUrl = `http://localhost:${BACKEND_PORT}`;
-
-	async function fetch<T>(endpoint: ApiEndpoints, options?: RequestInit) {
+	async function fetch<T>(endpoint: ApiEndpoints | string, options?: RequestInit): Promise<T> {
 		const url = new URL(endpoint, baseUrl);
-		return window.fetch(url, options).then<T>((res) => res.json());
+		let response;
+
+		try {
+			response = await window.fetch(url, options);
+		} catch (error) {
+			throw new Error(`Error in useApiClient: ${error}`);
+		}
+
+		if (!response.ok) {
+			const body = await response.text();
+			throw new Error(`HTTP response error in useApiClient: ${response.status}, ${body}`);
+		}
+
+		return response.json();
 	}
 
 	return {

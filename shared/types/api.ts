@@ -3,6 +3,10 @@ import { z } from 'zod/v4';
 
 export const DEFAULT_LIMIT = 50;
 
+export type APIResponse<T extends (...args: any) => any> = Awaited<
+	Promise<PromiseLike<ReturnType<T>>>
+>;
+
 export const IdSchema = z.coerce.number().int().positive();
 export const IdParamSchema = z.object({ id: IdSchema });
 
