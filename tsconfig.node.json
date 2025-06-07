@@ -14,7 +14,8 @@
 		"baseUrl": ".",
 		"paths": {
 			"@db/*": ["./backend/db/*"],
-			"@shared/*": ["./shared/*"]
+			"@shared/*": ["./shared/*"],
+			"@app/*": ["./app/*"]
 		}
 	},
 	"include": ["vite.config.ts", "backend/**/*.ts", "backend/**/*.tsx", "shared/**/*.ts"]

@@ -1,11 +1,11 @@
-import { links, predicates, records, type PredicateInsert, type RecordInsert } from './schema/records';
-import { drizzle } from 'drizzle-orm/better-sqlite3';
-import Database from 'better-sqlite3';
-
-const sqlite = new Database('enchiridion.db');
-sqlite.pragma('journal_mode = WAL');
-
-export const db = drizzle({ client: sqlite, casing: 'snake_case' });
+import {
+	links,
+	predicates,
+	records,
+	type PredicateInsert,
+	type RecordInsert,
+} from './schema/records';
+import { db } from '.';
 
 export const recordSeed: RecordInsert[] = [
 	{
@@ -191,15 +191,18 @@ export const predicateSeed: PredicateInsert[] = [
 	},
 ];
 
-const insertedPredicates = await db.insert(predicates).values(predicateSeed).returning({ id: predicates.id, slug: predicates.slug });
+const insertedPredicates = await db
+	.insert(predicates)
+	.values(predicateSeed)
+	.returning({ id: predicates.id, slug: predicates.slug });
 
-const createdByPredicate = insertedPredicates.find(p => p.slug === 'creator_of');
+const createdByPredicate = insertedPredicates.find((p) => p.slug === 'creator_of');
 
 if (createdByPredicate) {
 	await db.insert(links).values({
 		sourceId: insertedRecords[0].id,
 		targetId: insertedRecords[1].id,
 		predicateId: createdByPredicate!.id,
-		notes: 'Created during initial seeding'
+		notes: 'Created during initial seeding',
 	});
 }

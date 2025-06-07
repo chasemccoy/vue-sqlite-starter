@@ -1,4 +1,15 @@
+import '@app/assets/css/global.css';
 import { createApp } from 'vue';
-import App from './App.vue';
+import App from '@app/App.vue';
+import PrimeVue from 'primevue/config';
+import { Theme } from '@app/utils/theme';
 
-createApp(App).mount('#app');
+const app = createApp(App);
+
+app.use(PrimeVue, {
+	theme: {
+		preset: Theme,
+	},
+});
+
+app.mount('#app');

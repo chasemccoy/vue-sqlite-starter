@@ -1,8 +1,14 @@
-import { eq, sql } from "drizzle-orm";
-import { db } from "../../api/db";
-import { readwiseAuthors, readwiseDocuments, type ReadwiseAuthorSelect, type ReadwiseDocumentInsert, type RecordInsert } from "../../db/schema";
-import { requireEnv } from "../utils/env";
-import { createIntegrationLogger } from "../utils/log";
+import { eq, sql } from 'drizzle-orm';
+import { db } from '@db/index';
+import {
+	readwiseAuthors,
+	readwiseDocuments,
+	type ReadwiseAuthorSelect,
+	type ReadwiseDocumentInsert,
+	type RecordInsert,
+} from '../../db/schema';
+import { requireEnv } from '../utils/env';
+import { createIntegrationLogger } from '../utils/log';
 
 const API_BASE_URL = 'https://readwise.io/api/v3/list/';
 const RETRY_DELAY_BASE = 1000; // 1 second in milliseconds
@@ -18,25 +24,25 @@ export const logger = createIntegrationLogger('readwise', 'sync');
  * @returns The date of the most recently updated document, or null if none exists
  */
 export async function getMostRecentUpdateTime(): Promise<Date | null> {
-  const mostRecent = await db.query.readwiseDocuments.findFirst({
-    columns: {
-      contentUpdatedAt: true,
-    },
-    orderBy: {
-      contentUpdatedAt: 'desc',
-    },
-  });
+	const mostRecent = await db.query.readwiseDocuments.findFirst({
+		columns: {
+			contentUpdatedAt: true,
+		},
+		orderBy: {
+			contentUpdatedAt: 'desc',
+		},
+	});
 
-  if (mostRecent) {
-    logger.info(
-      `Last known readwise date: ${mostRecent.contentUpdatedAt?.toLocaleString() ?? 'none'}`
-    );
+	if (mostRecent) {
+		logger.info(
+			`Last known readwise date: ${mostRecent.contentUpdatedAt?.toLocaleString() ?? 'none'}`,
+		);
 
-    return new Date(mostRecent.contentUpdatedAt);
-  }
+		return new Date(mostRecent.contentUpdatedAt);
+	}
 
-  logger.info('No existing documents found');
-  return null;
+	logger.info('No existing documents found');
+	return null;
 }
 
 /**
@@ -50,49 +56,49 @@ export async function getMostRecentUpdateTime(): Promise<Date | null> {
  * @throws Error if the API request fails
  */
 export async function fetchReadwiseDocuments(
-  pageCursor?: string,
-  updatedAfter?: Date
+	pageCursor?: string,
+	updatedAfter?: Date,
 ): Promise<ReadwiseArticlesResponse> {
-  const params = new URLSearchParams();
-  if (pageCursor) params.append('pageCursor', pageCursor);
-  if (updatedAfter) {
-    const afterDate = new Date(updatedAfter.getTime() + 1);
-    params.append('updatedAfter', afterDate.toISOString());
-  }
-  params.append('withHtmlContent', 'true');
+	const params = new URLSearchParams();
+	if (pageCursor) params.append('pageCursor', pageCursor);
+	if (updatedAfter) {
+		const afterDate = new Date(updatedAfter.getTime() + 1);
+		params.append('updatedAfter', afterDate.toISOString());
+	}
+	params.append('withHtmlContent', 'true');
 
-  let attempt = 0;
-  while (true) {
-    logger.info(`Fetching Readwise documents${pageCursor ? ' (with cursor)' : ''}`);
-    const response = await fetch(`${API_BASE_URL}?${params.toString()}`, {
-      headers: {
-        Authorization: `Token ${READWISE_TOKEN}`,
-        'Content-Type': 'application/json',
-      },
-    });
+	let attempt = 0;
+	while (true) {
+		logger.info(`Fetching Readwise documents${pageCursor ? ' (with cursor)' : ''}`);
+		const response = await fetch(`${API_BASE_URL}?${params.toString()}`, {
+			headers: {
+				Authorization: `Token ${READWISE_TOKEN}`,
+				'Content-Type': 'application/json',
+			},
+		});
 
-    if (response.ok) {
-      const data = await response.json();
-      return ReadwiseArticlesResponseSchema.parse(data);
-    }
+		if (response.ok) {
+			const data = await response.json();
+			return ReadwiseArticlesResponseSchema.parse(data);
+		}
 
-    if (response.status === 429) {
-      const retryAfter = parseInt(response.headers.get('Retry-After') || '60', 10);
-      logger.warn(`Rate limit hit, waiting ${retryAfter} seconds before retrying...`);
-      await new Promise((r) => setTimeout(r, retryAfter * RETRY_DELAY_BASE));
-      continue;
-    }
+		if (response.status === 429) {
+			const retryAfter = parseInt(response.headers.get('Retry-After') || '60', 10);
+			logger.warn(`Rate limit hit, waiting ${retryAfter} seconds before retrying...`);
+			await new Promise((r) => setTimeout(r, retryAfter * RETRY_DELAY_BASE));
+			continue;
+		}
 
-    attempt++;
-    if (attempt >= 3) {
-      throw new Error(
-        `Failed to fetch Readwise documents: ${response.statusText} (${response.status})`
-      );
-    }
+		attempt++;
+		if (attempt >= 3) {
+			throw new Error(
+				`Failed to fetch Readwise documents: ${response.statusText} (${response.status})`,
+			);
+		}
 
-    logger.warn(`Request failed with status ${response.status}, retrying...`);
-    await new Promise((r) => setTimeout(r, RETRY_DELAY_BASE));
-  }
+		logger.warn(`Request failed with status ${response.status}, retrying...`);
+		await new Promise((r) => setTimeout(r, RETRY_DELAY_BASE));
+	}
 }
 
 /**
@@ -104,59 +110,59 @@ export async function fetchReadwiseDocuments(
  * @returns A document object ready for database insertion
  */
 export const mapReadwiseArticleToDocument = (article: ReadwiseArticle): ReadwiseDocumentInsert => {
-  let validSourceUrl: string | null = null;
-  if (article.source_url) {
-    try {
-      if (/^https?:\/\//.test(article.source_url)) {
-        new URL(article.source_url);
-        validSourceUrl = article.source_url;
-      }
-    } catch {
-      logger.warn(`Skipping invalid source_url: ${article.source_url}`);
-    }
-  }
+	let validSourceUrl: string | null = null;
+	if (article.source_url) {
+		try {
+			if (/^https?:\/\//.test(article.source_url)) {
+				new URL(article.source_url);
+				validSourceUrl = article.source_url;
+			}
+		} catch {
+			logger.warn(`Skipping invalid source_url: ${article.source_url}`);
+		}
+	}
 
-  let validImageUrl: string | null = null;
-  if (article.image_url) {
-    try {
-      if (/^https?:\/\//.test(article.image_url)) {
-        new URL(article.image_url);
-        validImageUrl = article.image_url;
-      }
-    } catch {
-      logger.warn(`Skipping invalid image_url: ${article.image_url}`);
-    }
-  }
+	let validImageUrl: string | null = null;
+	if (article.image_url) {
+		try {
+			if (/^https?:\/\//.test(article.image_url)) {
+				new URL(article.image_url);
+				validImageUrl = article.image_url;
+			}
+		} catch {
+			logger.warn(`Skipping invalid image_url: ${article.image_url}`);
+		}
+	}
 
-  return {
-    id: article.id,
-    parentId: article.parent_id,
-    url: article.url,
-    title: article.title || null,
-    author: article.author || null,
-    source: article.source,
-    category: article.category,
-    location: article.location,
-    tags: article.tags,
-    siteName: article.site_name || null,
-    wordCount: article.word_count,
-    summary: article.summary || null,
-    content: article.content || null,
-    htmlContent: article.html_content || null,
-    notes: article.notes || null,
-    imageUrl: validImageUrl,
-    sourceUrl: validSourceUrl,
-    readingProgress: article.reading_progress.toString(),
-    firstOpenedAt: article.first_opened_at,
-    lastOpenedAt: article.last_opened_at,
-    savedAt: article.saved_at,
-    lastMovedAt: article.last_moved_at,
-    publishedDate: article.published_date
-      ? article.published_date.toISOString().split('T')[0]
-      : null,
-    contentCreatedAt: article.created_at,
-    contentUpdatedAt: article.updated_at,
-  };
+	return {
+		id: article.id,
+		parentId: article.parent_id,
+		url: article.url,
+		title: article.title || null,
+		author: article.author || null,
+		source: article.source,
+		category: article.category,
+		location: article.location,
+		tags: article.tags,
+		siteName: article.site_name || null,
+		wordCount: article.word_count,
+		summary: article.summary || null,
+		content: article.content || null,
+		htmlContent: article.html_content || null,
+		notes: article.notes || null,
+		imageUrl: validImageUrl,
+		sourceUrl: validSourceUrl,
+		readingProgress: article.reading_progress.toString(),
+		firstOpenedAt: article.first_opened_at,
+		lastOpenedAt: article.last_opened_at,
+		savedAt: article.saved_at,
+		lastMovedAt: article.last_moved_at,
+		publishedDate: article.published_date
+			? article.published_date.toISOString().split('T')[0]
+			: null,
+		contentCreatedAt: article.created_at,
+		contentUpdatedAt: article.updated_at,
+	};
 };
 
 /**
@@ -168,102 +174,102 @@ export const mapReadwiseArticleToDocument = (article: ReadwiseArticle): Readwise
  * @returns Sorted array of documents
  */
 export function sortDocumentsByHierarchy(documents: ReadwiseArticle[]): ReadwiseArticle[] {
-  // Create a map of id to document for quick lookup
-  const idToDocument = new Map(documents.map((doc) => [doc.id, doc]));
+	// Create a map of id to document for quick lookup
+	const idToDocument = new Map(documents.map((doc) => [doc.id, doc]));
 
-  // Helper function to get the ancestry chain for a document
-  function getAncestryChain(doc: ReadwiseArticle): string[] {
-    const chain: string[] = [];
-    let current = doc;
-    while (current.parent_id) {
-      const parent = idToDocument.get(current.parent_id);
-      if (!parent) break;
-      chain.push(current.parent_id);
-      current = parent;
-    }
-    return chain;
-  }
+	// Helper function to get the ancestry chain for a document
+	function getAncestryChain(doc: ReadwiseArticle): string[] {
+		const chain: string[] = [];
+		let current = doc;
+		while (current.parent_id) {
+			const parent = idToDocument.get(current.parent_id);
+			if (!parent) break;
+			chain.push(current.parent_id);
+			current = parent;
+		}
+		return chain;
+	}
 
-  // Sort by ancestry chain length (parents first), then by creation date
-  return [...documents].sort((a, b) => {
-    const aChain = getAncestryChain(a);
-    const bChain = getAncestryChain(b);
-    if (aChain.length !== bChain.length) {
-      return aChain.length - bChain.length;
-    }
-    return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
-  });
+	// Sort by ancestry chain length (parents first), then by creation date
+	return [...documents].sort((a, b) => {
+		const aChain = getAncestryChain(a);
+		const bChain = getAncestryChain(b);
+		if (aChain.length !== bChain.length) {
+			return aChain.length - bChain.length;
+		}
+		return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+	});
 }
 
 /**
  * Creates authors from Readwise documents that don't have associated authors yet
  */
 export async function createReadwiseAuthors() {
-  logger.start('Creating authors from Readwise documents');
+	logger.start('Creating authors from Readwise documents');
 
-  const documentsWithoutAuthors = await db.query.readwiseDocuments.findMany({
-    where: {
-      author: {
-        isNotNull: true,
-      },
-      authorId: {
-        isNull: true,
-      },
-    },
-  });
-  if (documentsWithoutAuthors.length === 0) {
-    logger.skip('No documents without authors found');
-    return;
-  }
+	const documentsWithoutAuthors = await db.query.readwiseDocuments.findMany({
+		where: {
+			author: {
+				isNotNull: true,
+			},
+			authorId: {
+				isNull: true,
+			},
+		},
+	});
+	if (documentsWithoutAuthors.length === 0) {
+		logger.skip('No documents without authors found');
+		return;
+	}
 
-  logger.info(`Found ${documentsWithoutAuthors.length} documents without authors`);
+	logger.info(`Found ${documentsWithoutAuthors.length} documents without authors`);
 
-  for (const document of documentsWithoutAuthors) {
-    if (!document.author) {
-      logger.warn(`Document ${document.id} has no author`);
-      continue;
-    }
+	for (const document of documentsWithoutAuthors) {
+		if (!document.author) {
+			logger.warn(`Document ${document.id} has no author`);
+			continue;
+		}
 
-    let origin: string | null = null;
+		let origin: string | null = null;
 
-    try {
-      if (document.sourceUrl) {
-        const url = new URL(document.sourceUrl);
-        origin = url.origin;
-      }
-    } catch {
-      logger.warn(`Skipping invalid author: ${document.author}`);
-      continue;
-    }
+		try {
+			if (document.sourceUrl) {
+				const url = new URL(document.sourceUrl);
+				origin = url.origin;
+			}
+		} catch {
+			logger.warn(`Skipping invalid author: ${document.author}`);
+			continue;
+		}
 
-    const [newRecord] = await db
-      .insert(readwiseAuthors)
-      .values({
-        name: document.author,
-        origin,
-      })
-      .onConflictDoUpdate({
-        target: [readwiseAuthors.name, readwiseAuthors.origin],
-        set: {
-          recordUpdatedAt: sql`CURRENT_TIMESTAMP`,
-        },
-      })
-      .returning();
+		const [newRecord] = await db
+			.insert(readwiseAuthors)
+			.values({
+				name: document.author,
+				origin,
+			})
+			.onConflictDoUpdate({
+				target: [readwiseAuthors.name, readwiseAuthors.origin],
+				set: {
+					recordUpdatedAt: sql`CURRENT_TIMESTAMP`,
+				},
+			})
+			.returning();
 
-    if (!newRecord) {
-      logger.error(`Failed to create author ${document.author}`);
-      continue;
-    }
+		if (!newRecord) {
+			logger.error(`Failed to create author ${document.author}`);
+			continue;
+		}
 
-    logger.info(`Linked document ${document.id} to author ${newRecord.id}`);
+		logger.info(`Linked document ${document.id} to author ${newRecord.id}`);
 
-    await db
-      .update(readwiseDocuments)
-      .set({ authorId: newRecord.id })
-      .where(eq(readwiseDocuments.id, document.id));
-  }
+		await db
+			.update(readwiseDocuments)
+			.set({ authorId: newRecord.id })
+			.where(eq(readwiseDocuments.id, document.id));
+	}
 
-  logger.complete(`Processed ${documentsWithoutAuthors.length} documents without authors`);
+	logger.complete(`Processed ${documentsWithoutAuthors.length} documents without authors`);
 }
 
 /**
@@ -273,16 +279,16 @@ export async function createReadwiseAuthors() {
  * @returns A record insert object
  */
 export const mapReadwiseAuthorToRecord = (author: ReadwiseAuthorSelect): RecordInsert => {
-  return {
-    id: author.recordId ?? undefined,
-    type: 'entity',
-    title: author.name,
-    // TODO: add url
-    // url: author.origin ? mapUrl(author.origin) : undefined,
-    // sources: ['readwise'],
-    isCurated: false,
-    // isPrivate: false,
-    recordCreatedAt: author.recordCreatedAt,
-    recordUpdatedAt: author.recordUpdatedAt,
-  };
+	return {
+		id: author.recordId ?? undefined,
+		type: 'entity',
+		title: author.name,
+		// TODO: add url
+		// url: author.origin ? mapUrl(author.origin) : undefined,
+		// sources: ['readwise'],
+		isCurated: false,
+		// isPrivate: false,
+		recordCreatedAt: author.recordCreatedAt,
+		recordUpdatedAt: author.recordUpdatedAt,
+	};
 };

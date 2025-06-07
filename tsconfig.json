@@ -15,7 +15,8 @@
 		"baseUrl": ".",
 		"paths": {
 			"@db/*": ["./backend/db/*"],
-			"@shared/*": ["./shared/*"]
+			"@shared/*": ["./shared/*"],
+			"@app/*": ["./app/*"]
 		}
 	}
 }

@@ -1,7 +1,26 @@
 <template>
-  <HelloWorld msg="Vite + Vue" />
+  <Button label="Click" />
+
+  <DataTable :value="products" table-style="min-width: 50rem">
+    <Column field="code" header="Code" />
+    <Column field="name" header="Name" />
+    <Column field="category" header="Category" />
+    <Column field="quantity" header="Quantity" />
+  </DataTable>
 </template>
 
 <script setup lang="ts">
-import HelloWorld from './components/HelloWorld.vue';
+import Button from 'primevue/button';
+import DataTable from 'primevue/datatable';
+import Column from 'primevue/column';
+import { ref } from 'vue';
+
+const products = ref([
+  {
+    code: '1',
+    name: 'Product 1',
+    category: 'Category 1',
+    quantity: 10,
+  },
+]);
 </script>

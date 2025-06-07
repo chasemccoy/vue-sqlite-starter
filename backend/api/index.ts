@@ -5,7 +5,7 @@ import { treeRoutes } from './tree';
 import { linkRoutes } from './links';
 import { errorHandler } from './error-handler';
 
-const PORT = process.env.PORT;
+const PORT = process.env.BACKEND_PORT;
 
 const app = express();
 
@@ -15,5 +15,5 @@ app.use(treeRoutes);
 app.use(linkRoutes);
 
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+	console.log(`Server running on port ${PORT}`);
 });

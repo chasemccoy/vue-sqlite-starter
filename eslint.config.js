@@ -8,8 +8,8 @@ import prettier from 'eslint-config-prettier';
 export default defineConfig([
 	js.configs.recommended,
 	...tseslint.configs.recommended,
-	prettier,
 	pluginVue.configs['flat/strongly-recommended'],
+	prettier,
 	{
 		files: ['**/*.{js,ts,vue}'],
 		plugins: { js },

@@ -24,7 +24,7 @@ export const records = sqliteTable('records', {
 	content: text(),
 	notes: text(),
 	...databaseTimestamps,
-	...contentTimestamps
+	...contentTimestamps,
 });
 
 // export const RecordSelectSchema = createSelectSchema(records);
@@ -36,18 +36,24 @@ export type RecordInsert = typeof records.$inferInsert;
 
 export const links = sqliteTable('links', {
 	id: int().primaryKey({ autoIncrement: true }),
-	sourceId: int().references(() => records.id, {
-		onDelete: 'cascade',
-		onUpdate: 'cascade',
-	}).notNull(),
-	targetId: int().references(() => records.id, {
-		onDelete: 'cascade',
-		onUpdate: 'cascade',
-	}).notNull(),
-	predicateId: int().references(() => predicates.id, {
-		onDelete: 'cascade',
-		onUpdate: 'cascade',
-	}).notNull(),
+	sourceId: int()
+		.references(() => records.id, {
+			onDelete: 'cascade',
+			onUpdate: 'cascade',
+		})
+		.notNull(),
+	targetId: int()
+		.references(() => records.id, {
+			onDelete: 'cascade',
+			onUpdate: 'cascade',
+		})
+		.notNull(),
+	predicateId: int()
+		.references(() => predicates.id, {
+			onDelete: 'cascade',
+			onUpdate: 'cascade',
+		})
+		.notNull(),
 	notes: text(),
 	...databaseTimestamps,
 });
@@ -81,10 +87,10 @@ export const predicates = sqliteTable('predicates', {
 		onUpdate: 'cascade',
 	}),
 	canonical: int({ mode: 'boolean' }).notNull().default(true),
-	...databaseTimestamps
+	...databaseTimestamps,
 });
 
 // export const PredicateSelectSchema = createSelectSchema(predicates);
 // export type PredicateSelect = typeof predicates.$inferSelect;
 // export const PredicateInsertSchema = createInsertSchema(predicates);
-// export type PredicateInsert = typeof predicates.$inferInsert;
+export type PredicateInsert = typeof predicates.$inferInsert;

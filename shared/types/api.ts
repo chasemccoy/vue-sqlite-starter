@@ -58,34 +58,34 @@ export const ListRecordsInputSchema = z.object({
 
 export type ListRecordsInput = z.infer<typeof ListRecordsInputSchema>;
 
-export const defaultQueueOptions: ListRecordsInput = {
-	filters: {
-		isCurated: false,
-		hasParent: false,
-	},
-	limit: 50,
-	offset: 0,
-	orderBy: [
-		{
-			field: 'recordCreatedAt',
-			direction: 'desc',
-		},
-		{
-			field: 'id',
-			direction: 'desc',
-		},
-	],
-};
+// export const defaultQueueOptions: ListRecordsInput = {
+// 	filters: {
+// 		isCurated: false,
+// 		hasParent: false,
+// 	},
+// 	limit: 50,
+// 	offset: 0,
+// 	orderBy: [
+// 		{
+// 			field: 'recordCreatedAt',
+// 			direction: 'desc',
+// 		},
+// 		{
+// 			field: 'id',
+// 			direction: 'desc',
+// 		},
+// 	],
+// };
 
-export const SearchRecordsInputSchema = z.object({
-	query: z.string(),
-	filters: z
-		.object({
-			recordType: RecordTypeSchema.optional(),
-		})
-		.optional()
-		.default({}),
-	limit: LimitSchema.optional().default(10),
-});
+// export const SearchRecordsInputSchema = z.object({
+// 	query: z.string(),
+// 	filters: z
+// 		.object({
+// 			recordType: RecordTypeSchema.optional(),
+// 		})
+// 		.optional()
+// 		.default({}),
+// 	limit: LimitSchema.optional().default(10),
+// });
 
-export type SearchRecordsInput = z.infer<typeof SearchRecordsInputSchema>;
+// export type SearchRecordsInput = z.infer<typeof SearchRecordsInputSchema>;
