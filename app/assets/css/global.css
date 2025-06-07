@@ -37,6 +37,7 @@ html {
 	-webkit-text-size-adjust: none;
 	text-size-adjust: none;
 	-webkit-font-smoothing: antialiased;
+	font-size: 14px;
 }
 
 body {

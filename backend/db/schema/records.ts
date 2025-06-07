@@ -1,29 +1,33 @@
-import { sqliteTable, text, int, type AnySQLiteColumn } from 'drizzle-orm/sqlite-core';
+import { sqliteTable, text, int, type AnySQLiteColumn, check } from 'drizzle-orm/sqlite-core';
 import { contentTimestamps, databaseTimestamps } from './utils';
-import z from 'zod/v4';
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
-import { emptyStringToNull } from '@shared/lib/formatting';
 import { recordTypeEnum } from '@shared/types';
+import { sql } from 'drizzle-orm';
 
-export const records = sqliteTable('records', {
-	id: int().primaryKey({ autoIncrement: true }),
-	slug: text().unique().notNull(),
-	type: text({ enum: recordTypeEnum }).notNull().default('artifact'),
-	title: text().notNull(),
-	url: text(),
-	isCurated: int({ mode: 'boolean' }).notNull().default(false),
-	summary: text(),
-	content: text(),
-	notes: text(),
-	...databaseTimestamps,
-	...contentTimestamps,
-});
+export const records = sqliteTable(
+	'records',
+	{
+		id: int().primaryKey({ autoIncrement: true }),
+		slug: text().unique().notNull(),
+		type: text({ enum: recordTypeEnum }).notNull().default('artifact'),
+		title: text().notNull(),
+		url: text(),
+		isCurated: int({ mode: 'boolean' }).notNull().default(false),
+		summary: text(),
+		content: text(),
+		notes: text(),
+		...databaseTimestamps,
+		...contentTimestamps,
+	},
+	(table) => [
+		check('title_not_empty', sql`${table.title} != ''`),
+		check('slug_not_empty', sql`${table.slug} != ''`),
+	],
+);
 
 // export const RecordSelectSchema = createSelectSchema(records);
 export type RecordSelect = typeof records.$inferSelect;
-export const RecordInsertSchema = createInsertSchema(records).extend({
-	url: emptyStringToNull(z.url()).optional(),
-});
+export const RecordInsertSchema = createInsertSchema(records);
 export type RecordInsert = typeof records.$inferInsert;
 
 export const links = sqliteTable('links', {

@@ -21,6 +21,7 @@ export const listRecords = async (input: ListRecordsInput = {}) => {
 	const rows = await db.query.records.findMany({
 		columns: {
 			id: true,
+			slug: true,
 			title: true,
 			url: true,
 			recordCreatedAt: true,

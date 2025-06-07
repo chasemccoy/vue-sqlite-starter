@@ -16,7 +16,6 @@ export default defineConfig([
 				...globals.node,
 			},
 		},
-		rules: { 'no-console': 'error' },
 	},
 	{
 		files: ['**/*.vue'],
@@ -30,4 +29,8 @@ export default defineConfig([
 	tseslint.configs.recommended,
 	pluginVue.configs['flat/strongly-recommended'],
 	prettier,
+	{
+		files: ['**/*.{js,ts,vue}'],
+		rules: { 'no-console': 'error', 'vue/attribute-hyphenation': 'off' },
+	},
 ]);
