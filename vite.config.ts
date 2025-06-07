@@ -4,18 +4,22 @@ import vue from '@vitejs/plugin-vue';
 import { z } from 'zod';
 import path from 'path';
 
-const PORT = z.coerce.number().parse(process.env.FRONTEND_PORT);
+const FRONTEND_PORT = z.coerce.number().parse(process.env.FRONTEND_PORT);
+const BACKEND_PORT = z.coerce.number().parse(process.env.BACKEND_PORT);
 
 // https://vite.dev/config/
 export default defineConfig({
 	root: 'app',
 	plugins: [vue()],
 	server: {
-		port: PORT,
+		port: FRONTEND_PORT,
 	},
 	resolve: {
 		alias: {
 			'@app': path.resolve(__dirname, './app'),
 		},
+	},
+	define: {
+		'import.meta.env.BACKEND_PORT': BACKEND_PORT,
 	},
 });

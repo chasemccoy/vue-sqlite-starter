@@ -19,7 +19,6 @@ const OrderByFieldSchema = z.enum([
 	'title',
 	'contentCreatedAt',
 	'contentUpdatedAt',
-	'rating',
 	'id',
 ]);
 
@@ -56,7 +55,7 @@ export const ListRecordsInputSchema = z.object({
 	orderBy: OrderBySchema.optional().default([{ field: 'recordCreatedAt', direction: 'desc' }]),
 });
 
-export type ListRecordsInput = z.infer<typeof ListRecordsInputSchema>;
+export type ListRecordsInput = z.input<typeof ListRecordsInputSchema>;
 
 // export const defaultQueueOptions: ListRecordsInput = {
 // 	filters: {

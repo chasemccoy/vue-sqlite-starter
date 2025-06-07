@@ -1,7 +1,7 @@
 import { inArray, sql } from 'drizzle-orm';
 import { db } from '@db/index';
 import { records, type RecordInsert, type RecordSelect } from '@db/schema';
-import { type ListRecordsInput } from '@shared/types/api';
+import { ListRecordsInputSchema, type ListRecordsInput } from '@shared/types/api';
 
 export const getRecord = (recordId: RecordSelect['id']) => {
 	return db.query.records.findFirst({
@@ -11,13 +11,10 @@ export const getRecord = (recordId: RecordSelect['id']) => {
 	});
 };
 
-export const listRecords = async (input: ListRecordsInput) => {
-	const {
-		filters: { type, title, text, url: domain, hasParent, isCurated, hasMedia },
-		limit,
-		offset,
-		orderBy,
-	} = input;
+export const listRecords = async (input: ListRecordsInput = {}) => {
+	const { filters, limit, offset, orderBy } = ListRecordsInputSchema.parse(input);
+
+	const { type, title, text, url: domain, hasParent, isCurated, hasMedia } = filters || {};
 
 	const rows = await db.query.records.findMany({
 		columns: {

@@ -10,6 +10,7 @@ export default defineConfig([
 	...tseslint.configs.recommended,
 	pluginVue.configs['flat/strongly-recommended'],
 	prettier,
+	globals.browser,
 	{
 		files: ['**/*.{js,ts,vue}'],
 		plugins: { js },

@@ -24,7 +24,9 @@
 	},
 	"dependencies": {
 		"@primeuix/themes": "^1.1.1",
+		"@tanstack/vue-query": "^5.80.6",
 		"better-sqlite3": "^11.10.0",
+		"cors": "^2.8.5",
 		"drizzle-orm": "1.0.0-beta.1-c0277c0",
 		"drizzle-zod": "^0.8.2",
 		"express": "^5.1.0",
