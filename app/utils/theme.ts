@@ -30,6 +30,11 @@ export const Theme = definePreset(Aura, {
 					color: '#ffffff',
 					focusColor: '#ffffff',
 				},
+				formField: {
+					focusBorderColor: '{violet.400}',
+					shadow: '0 1px 3px 0 #0000001a, 0 1px 2px -1px #0000001a',
+					focusRingShadow: '0 1px 3px 0 #0000001a, 0 1px 2px -1px #0000001a',
+				},
 			},
 			dark: {
 				primary: {

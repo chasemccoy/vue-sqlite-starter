@@ -10,10 +10,11 @@
 import EditRecordForm from '@app/components/EditRecordForm.vue';
 import useRecord from '@app/composables/useRecord';
 import type { RecordInsert, RecordSelect } from '@db/schema';
-import type { DbId } from '@shared/types/api';
-import { ref, toRaw, watch } from 'vue';
+import { computed, ref, toRaw, watch } from 'vue';
+import { useRoute } from 'vue-router';
 
-const recordId = defineModel<DbId>({ required: true });
+const route = useRoute()
+const recordId = computed(() => parseInt(route.params.id as string))
 
 const { getRecord, upsertRecord } = useRecord();
 
@@ -25,8 +26,7 @@ const { mutate } = upsertRecord();
 watch(data, () => {
   if (!data.value) return;
   record.value = structuredClone(toRaw(data.value));
-});
-
+}, { immediate: true });
 
 function handleSubmit(data: RecordInsert) {
   mutate(data);

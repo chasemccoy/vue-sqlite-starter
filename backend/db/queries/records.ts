@@ -25,6 +25,7 @@ export const listRecords = async (input: ListRecordsInput = {}) => {
 			title: true,
 			url: true,
 			recordCreatedAt: true,
+			recordUpdatedAt: true,
 		},
 		where: {
 			type,

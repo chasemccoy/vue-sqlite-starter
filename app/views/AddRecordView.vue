@@ -11,6 +11,7 @@ import type { RecordInsert } from '@db/schema';
 import { ref } from 'vue';
 
 const emptyRecord: RecordInsert = {
+	type: 'artifact',
 	title: '',
 	slug: '',
 }

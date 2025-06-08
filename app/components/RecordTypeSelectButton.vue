@@ -9,5 +9,7 @@ import SelectButton from 'primevue/selectbutton';
 
 const modelValue = defineModel<RecordType>({ required: true });
 
-const options = recordTypeEnum.map((type) => ({ label: capitalize(type), value: type }));
+const options = [...recordTypeEnum]
+	.sort()
+	.map((type) => ({ label: capitalize(type), value: type }));
 </script>
