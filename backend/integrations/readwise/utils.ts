@@ -1,14 +1,18 @@
-import { eq, sql } from 'drizzle-orm';
+import { eq, inArray, sql } from 'drizzle-orm';
 import { db } from '@db/index';
 import {
 	readwiseAuthors,
 	readwiseDocuments,
+	readwiseDocumentTags,
+	readwiseTags,
 	type ReadwiseAuthorSelect,
 	type ReadwiseDocumentInsert,
-	type RecordInsert,
-} from '../../db/schema';
+} from '@db/schema';
 import { requireEnv } from '../utils/env';
 import { createIntegrationLogger } from '../utils/log';
+import type { ReadwiseArticle, ReadwiseArticlesResponse } from './types';
+import { ReadwiseArticlesResponseSchema } from './types';
+import { formatDateToDbString } from '@shared/lib/formatting';
 
 const API_BASE_URL = 'https://readwise.io/api/v3/list/';
 const RETRY_DELAY_BASE = 1000; // 1 second in milliseconds
@@ -107,9 +111,13 @@ export async function fetchReadwiseDocuments(
  * This function validates URLs and handles null values appropriately.
  *
  * @param article - The Readwise article to map
+ * @param integrationRunId - The ID of the current integration run
  * @returns A document object ready for database insertion
  */
-export const mapReadwiseArticleToDocument = (article: ReadwiseArticle): ReadwiseDocumentInsert => {
+export const mapReadwiseArticleToDocument = (
+	article: ReadwiseArticle,
+	integrationRunId: number,
+): ReadwiseDocumentInsert => {
 	let validSourceUrl: string | null = null;
 	if (article.source_url) {
 		try {
@@ -152,16 +160,17 @@ export const mapReadwiseArticleToDocument = (article: ReadwiseArticle): Readwise
 		notes: article.notes || null,
 		imageUrl: validImageUrl,
 		sourceUrl: validSourceUrl,
-		readingProgress: article.reading_progress.toString(),
-		firstOpenedAt: article.first_opened_at,
-		lastOpenedAt: article.last_opened_at,
-		savedAt: article.saved_at,
-		lastMovedAt: article.last_moved_at,
+		readingProgress: article.reading_progress,
+		firstOpenedAt: formatDateToDbString(article.first_opened_at),
+		lastOpenedAt: formatDateToDbString(article.last_opened_at),
+		savedAt: formatDateToDbString(article.saved_at),
+		lastMovedAt: formatDateToDbString(article.last_moved_at),
 		publishedDate: article.published_date
 			? article.published_date.toISOString().split('T')[0]
 			: null,
-		contentCreatedAt: article.created_at,
-		contentUpdatedAt: article.updated_at,
+		contentCreatedAt: formatDateToDbString(article.created_at),
+		contentUpdatedAt: formatDateToDbString(article.updated_at),
+		integrationRunId,
 	};
 };
 
@@ -217,6 +226,7 @@ export async function createReadwiseAuthors() {
 			},
 		},
 	});
+
 	if (documentsWithoutAuthors.length === 0) {
 		logger.skip('No documents without authors found');
 		return;
@@ -242,30 +252,39 @@ export async function createReadwiseAuthors() {
 			continue;
 		}
 
-		const [newRecord] = await db
-			.insert(readwiseAuthors)
-			.values({
-				name: document.author,
-				origin,
-			})
-			.onConflictDoUpdate({
-				target: [readwiseAuthors.name, readwiseAuthors.origin],
-				set: {
-					recordUpdatedAt: sql`CURRENT_TIMESTAMP`,
-				},
-			})
-			.returning();
+		let insertedRecord: ReadwiseAuthorSelect | null = null;
 
-		if (!newRecord) {
+		try {
+			const [newRecord] = await db
+				.insert(readwiseAuthors)
+				.values({
+					name: document.author,
+					origin,
+				})
+				.onConflictDoUpdate({
+					target: [readwiseAuthors.name, readwiseAuthors.origin],
+					set: {
+						recordUpdatedAt: sql`(CURRENT_TIMESTAMP)`,
+					},
+				})
+				.returning();
+
+			insertedRecord = newRecord;
+		} catch (error) {
+			logger.error(`Failed to create author ${document.author} with error: ${error}`);
+			continue;
+		}
+
+		if (!insertedRecord) {
 			logger.error(`Failed to create author ${document.author}`);
 			continue;
 		}
 
-		logger.info(`Linked document ${document.id} to author ${newRecord.id}`);
+		logger.info(`Linked document ${document.id} to author ${insertedRecord.id}`);
 
 		await db
 			.update(readwiseDocuments)
-			.set({ authorId: newRecord.id })
+			.set({ authorId: insertedRecord.id })
 			.where(eq(readwiseDocuments.id, document.id));
 	}
 
@@ -273,22 +292,97 @@ export async function createReadwiseAuthors() {
 }
 
 /**
- * Maps a Readwise author to a record
+ * Creates tags from Readwise documents and links them to documents
  *
- * @param author - The Readwise author to map
- * @returns A record insert object
+ * @param integrationRunId - Optional integration run ID to limit processing
+ * @returns A promise resolving to the processed documents
  */
-export const mapReadwiseAuthorToRecord = (author: ReadwiseAuthorSelect): RecordInsert => {
-	return {
-		id: author.recordId ?? undefined,
-		type: 'entity',
-		title: author.name,
-		// TODO: add url
-		// url: author.origin ? mapUrl(author.origin) : undefined,
-		// sources: ['readwise'],
-		isCurated: false,
-		// isPrivate: false,
-		recordCreatedAt: author.recordCreatedAt,
-		recordUpdatedAt: author.recordUpdatedAt,
-	};
-};
+export async function createReadwiseTags(integrationRunId) {
+	logger.start('Processing document tags');
+
+	const documents = await db.query.readwiseDocuments.findMany({
+		where: {
+			tags: {
+				isNotNull: true,
+			},
+			integrationRunId,
+		},
+	});
+
+	if (documents.length === 0) {
+		logger.skip('No new or updated tags to process');
+		return;
+	}
+
+	logger.info(`Found ${documents.length} documents with tags to process`);
+
+	// Extract unique tags from all documents
+	const uniqueTags = [...new Set(documents.map((document) => document.tags).flat())].filter(
+		(tag): tag is string => tag !== null,
+	);
+
+	// Insert or update tags
+	const insertedTags = await db
+		.insert(readwiseTags)
+		.values(uniqueTags.map((tag) => ({ tag })))
+		.onConflictDoUpdate({
+			target: readwiseTags.tag,
+			set: {
+				recordUpdatedAt: sql`(CURRENT_TIMESTAMP)`,
+			},
+		})
+		.returning();
+
+	logger.info(`Upserted ${insertedTags.length} tags`);
+
+	// Create a map of tag names to tag IDs
+	const tagMap = new Map(insertedTags.map((tag) => [tag.tag, tag.id]));
+
+	// Clear existing document-tag relationships
+	logger.info('Clearing existing document tags');
+
+	if (integrationRunId) {
+		const documentIds = documents.map((document) => document.id);
+		const deletedDocumentTags = await db
+			.delete(readwiseDocumentTags)
+			.where(inArray(readwiseDocumentTags.documentId, documentIds))
+			.returning();
+
+		logger.info(
+			`Deleted ${deletedDocumentTags.length} document tags for ${documents.length} documents in integration run ${integrationRunId}`,
+		);
+	} else {
+		logger.info('No integration run id provided, deleting all document tags');
+		await db.delete(readwiseDocumentTags);
+	}
+
+	// Create new document-tag relationships
+	const documentTagPromises = documents.flatMap((document) => {
+		if (!document.tags) return [];
+
+		return document.tags.map(async (tag) => {
+			const tagId = tagMap.get(tag);
+			if (!tagId) return undefined;
+
+			const [documentTag] = await db
+				.insert(readwiseDocumentTags)
+				.values({
+					documentId: document.id,
+					tagId,
+				})
+				.onConflictDoUpdate({
+					target: [readwiseDocumentTags.documentId, readwiseDocumentTags.tagId],
+					set: { recordUpdatedAt: sql`(CURRENT_TIMESTAMP)` },
+				})
+				.returning();
+
+			return documentTag;
+		});
+	});
+
+	const newDocumentTags = (await Promise.all(documentTagPromises)).filter(Boolean);
+	logger.info(`Inserted ${newDocumentTags.length} document tags`);
+
+	logger.complete(`Processed tags for ${documents.length} documents`);
+	return documents;
+}
