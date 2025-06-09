@@ -1,3 +1,5 @@
+import 'dotenv/config';
+
 /**
  * Ensures that a required environment variable is set.
  *

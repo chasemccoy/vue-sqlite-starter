@@ -1,3 +1,5 @@
+/* eslint-disable no-console */
+
 /**
  * Creates a logger with a specific prefix for integration processes
  *

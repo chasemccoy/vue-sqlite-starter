@@ -18,7 +18,7 @@ export const records = sqliteTable(
 		id: int().primaryKey({ autoIncrement: true }),
 		slug: text().unique().notNull(),
 		type: text({ enum: recordTypeEnum }).notNull().default('artifact'),
-		title: text().notNull(),
+		title: text(),
 		url: text(),
 		isCurated: int({ mode: 'boolean' }).notNull().default(false),
 		summary: text(),
@@ -28,7 +28,6 @@ export const records = sqliteTable(
 		...contentTimestamps,
 	},
 	(table) => [
-		check('title_not_empty', sql`${table.title} != ''`),
 		check('slug_not_empty', sql`${table.slug} != ''`),
 		index('records_type_title_url_idx').on(table.type, table.title, table.url),
 		index('records_slug_idx').on(table.slug),
