@@ -60,10 +60,10 @@ export const relations = defineRelations(schema, (r) => ({
 		}),
 	},
 	readwiseDocuments: {
-		// integrationRun: r.one.integrationRuns({
-		//   from: r.readwiseDocuments.integrationRunId,
-		//   to: r.integrationRuns.id,
-		// }),
+		integrationRun: r.one.integrationRuns({
+			from: r.readwiseDocuments.integrationRunId,
+			to: r.integrationRuns.id,
+		}),
 		record: r.one.records({
 			from: r.readwiseDocuments.recordId,
 			to: r.records.id,

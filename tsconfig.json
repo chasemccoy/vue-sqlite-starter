@@ -17,7 +17,8 @@
 		"paths": {
 			"@db/*": ["./backend/db/*"],
 			"@shared/*": ["./shared/*"],
-			"@app/*": ["./app/*"]
+			"@app/*": ["./app/*"],
+			"@integrations/*": ["./backend/integrations/*"]
 		}
 	}
 }

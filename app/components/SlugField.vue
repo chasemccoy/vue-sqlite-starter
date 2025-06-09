@@ -7,7 +7,7 @@
 <script setup lang="ts">
 import InputText from 'primevue/inputtext';
 import FormField from '@app/components/FormField.vue';
-import slugify from 'slugify';
+import { slugify } from '@shared/lib/formatting';
 
 const modelValue = defineModel<string>({
   required: true,

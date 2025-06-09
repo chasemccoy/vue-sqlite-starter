@@ -7,3 +7,5 @@ const sqlite = new Database('enchiridion.db');
 sqlite.pragma('journal_mode = WAL');
 
 export const db = drizzle({ client: sqlite, schema, relations, casing: 'snake_case' });
+
+export type Db = typeof db;

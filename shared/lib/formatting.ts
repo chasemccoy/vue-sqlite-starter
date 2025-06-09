@@ -1,4 +1,5 @@
 import { z } from 'zod/v4';
+import slugifyLib from 'slugify';
 
 /**
  * Converts string to title case (first letter of each word capitalized)
@@ -23,3 +24,28 @@ export const emptyStringToNull = <T extends z.ZodTypeAny>(schema: T) =>
 	z.preprocess((val) => (val === '' ? null : val), schema.nullable());
 
 export const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
+
+export const formatDateToDbString = (date?: Date) => {
+	if (!date) return null;
+
+	const pad = (n: number) => n.toString().padStart(2, '0');
+
+	const year = date.getUTCFullYear();
+	const month = pad(date.getUTCMonth() + 1);
+	const day = pad(date.getUTCDate());
+
+	const hours = pad(date.getUTCHours());
+	const minutes = pad(date.getUTCMinutes());
+	const seconds = pad(date.getUTCSeconds());
+
+	return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+};
+
+export const slugify = (str: string) => {
+	return slugifyLib(str, {
+		lower: true,
+		strict: true,
+		locale: 'en',
+		trim: true,
+	});
+};

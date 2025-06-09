@@ -38,7 +38,7 @@ import FormField from '@app/components/FormField.vue';
 import Textarea from 'primevue/textarea';
 import { computed, ref, useTemplateRef, watch } from 'vue';
 import SlugField from '@app/components/SlugField.vue';
-import slugify from 'slugify';
+import { slugify } from '@shared/lib/formatting';
 
 const modelValue = defineModel<RecordSelect | RecordInsert>({ required: true });
 

@@ -41,7 +41,11 @@ recordRoutes.get('/record/:id/links', async (req, res, next) => {
 	}
 });
 
-recordRoutes.get('/records', async (req, res, next) => {
+// ============================================================================
+// POST
+// ============================================================================
+
+recordRoutes.post('/records', async (req, res, next) => {
 	try {
 		const input = ListRecordsInputSchema.parse(req.body || {});
 		const records = await listRecords(input);

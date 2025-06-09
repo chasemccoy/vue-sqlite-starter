@@ -15,7 +15,8 @@
 		"paths": {
 			"@db/*": ["./backend/db/*"],
 			"@shared/*": ["./shared/*"],
-			"@app/*": ["./app/*"]
+			"@app/*": ["./app/*"],
+			"@integrations/*": ["./backend/integrations/*"]
 		}
 	},
 	"include": ["vite.config.ts", "backend/**/*.ts", "backend/**/*.tsx", "shared/**/*.ts"]
