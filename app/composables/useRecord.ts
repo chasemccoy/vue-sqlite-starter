@@ -1,7 +1,11 @@
 import useApiClient from '@app/composables/useApiClient';
 import { useMutation, useQuery } from '@tanstack/vue-query';
-import type { GetRecordAPIResponse, UpsertRecordAPIResponse } from '@db/queries/records';
-import type { Ref } from 'vue';
+import type {
+	GetRecordAPIResponse,
+	LinksForRecordAPIResponse,
+	UpsertRecordAPIResponse,
+} from '@db/queries/records';
+import { toValue, type MaybeRef, type Ref } from 'vue';
 import type { DbId } from '@shared/types/api';
 import type { RecordInsert } from '@db/schema';
 
@@ -12,6 +16,29 @@ export default function useRecord() {
 		return useQuery({
 			queryKey: ['get-record', id],
 			queryFn: () => fetch<GetRecordAPIResponse>(`/record/${id.value}`),
+		});
+	}
+
+	function getRecordBySlug(slug: Ref<string>) {
+		return useQuery({
+			queryKey: ['get-record-by-slug', slug],
+			queryFn: () => fetch<GetRecordAPIResponse>(`/record/slug/${slug.value}`),
+		});
+	}
+
+	function getRecordTree(id: MaybeRef<DbId>, enabled: MaybeRef<boolean>) {
+		return useQuery({
+			queryKey: ['get-record-tree', id],
+			queryFn: () => fetch<GetRecordAPIResponse>(`/record/${toValue(id)}/tree`),
+			enabled,
+		});
+	}
+
+	function getRecordLinks(id: MaybeRef<DbId>, enabled: MaybeRef<boolean>) {
+		return useQuery({
+			queryKey: ['get-record-links', id],
+			queryFn: () => fetch<LinksForRecordAPIResponse>(`/record/${toValue(id)}/links`),
+			enabled,
 		});
 	}
 
@@ -27,6 +54,9 @@ export default function useRecord() {
 
 	return {
 		getRecord,
+		getRecordBySlug,
+		getRecordTree,
+		getRecordLinks,
 		upsertRecord,
 	};
 }

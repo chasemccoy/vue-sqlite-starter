@@ -7,7 +7,7 @@ import {
 	index,
 	unique,
 } from 'drizzle-orm/sqlite-core';
-import { contentTimestamps, databaseTimestamps } from './utils';
+import { contentTimestamps, databaseTimestamps, integrationTypeEnum } from './utils';
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 import { recordTypeEnum } from '@shared/types';
 import { sql } from 'drizzle-orm';
@@ -24,6 +24,7 @@ export const records = sqliteTable(
 		summary: text(),
 		content: text(),
 		notes: text(),
+		source: text({ enum: integrationTypeEnum }),
 		...databaseTimestamps,
 		...contentTimestamps,
 	},

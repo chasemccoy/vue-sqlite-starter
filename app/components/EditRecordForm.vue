@@ -3,7 +3,7 @@
     <RecordTypeSelectButton v-if="modelValue.type" v-model="modelValue.type" />
 
     <FormField label="Title">
-      <InputText type="text" v-model.trim="modelValue.title" required />
+      <InputText type="text" v-model.trim="modelValue.title" />
     </FormField>
 
     <SlugField v-model="slug" />
@@ -51,7 +51,11 @@ const formRef = useTemplateRef('formRef')
 const isDirty = ref(false)
 
 const slug = computed(() => {
-  return modelValue.value.slug || slugify(modelValue.value.title)
+  const { slug, title } = modelValue.value
+
+  if (slug) return slug
+  else if (title) return slugify(title)
+  else return ''
 })
 
 watch(() => modelValue, () => {

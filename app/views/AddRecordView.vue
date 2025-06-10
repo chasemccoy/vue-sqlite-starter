@@ -14,6 +14,7 @@ const emptyRecord: RecordInsert = {
 	type: 'artifact',
 	title: '',
 	slug: '',
+	source: 'manual',
 }
 
 const record = ref<RecordInsert>(emptyRecord);

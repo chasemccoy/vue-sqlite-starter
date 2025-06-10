@@ -14,13 +14,13 @@ import { computed, ref, toRaw, watch } from 'vue';
 import { useRoute } from 'vue-router';
 
 const route = useRoute()
-const recordId = computed(() => parseInt(route.params.id as string))
-
 const { getRecord, upsertRecord } = useRecord();
 
-const { data, error, isError } = getRecord(recordId);
 const record = ref<RecordSelect>();
 
+const recordId = computed(() => parseInt(route.params.id as string))
+
+const { data, error, isError } = getRecord(recordId);
 const { mutate } = upsertRecord();
 
 watch(data, () => {

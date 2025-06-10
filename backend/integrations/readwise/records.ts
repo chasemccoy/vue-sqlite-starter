@@ -36,6 +36,7 @@ const mapReadwiseAuthorToRecord = (author: ReadwiseAuthorSelect): RecordInsert =
 		slug: slugify(author.name || author.recordId.toString()),
 		url: author.origin,
 		isCurated: false,
+		source: 'readwise',
 		recordCreatedAt: author.recordCreatedAt,
 		recordUpdatedAt: author.recordUpdatedAt,
 	};
@@ -126,6 +127,7 @@ const mapReadwiseTagToRecord = (tag: ReadwiseTagSelect): RecordInsert => {
 		title: tag.tag,
 		slug: slugify(tag.tag || tag.id.toString()),
 		isCurated: false,
+		source: 'readwise',
 		recordCreatedAt: tag.recordCreatedAt,
 		recordUpdatedAt: tag.recordUpdatedAt,
 	};
@@ -240,6 +242,7 @@ export const mapReadwiseDocumentToRecord = (
 		summary: document.summary || null,
 		notes: notes || null,
 		isCurated: false,
+		source: 'readwise',
 		recordCreatedAt: document.recordCreatedAt,
 		recordUpdatedAt: document.recordUpdatedAt,
 		contentCreatedAt: document.contentCreatedAt,
@@ -258,9 +261,12 @@ export async function createRecordsFromReadwiseDocuments() {
 	const documents = await db.query.readwiseDocuments.findMany({
 		with: {
 			children: true,
+			// TODO: copy URls from parent to children if null
+			parent: true,
 		},
 		where: {
 			OR: [
+				// Either highlights (no location set) in archive
 				{
 					location: {
 						isNull: true,
@@ -269,16 +275,38 @@ export async function createRecordsFromReadwiseDocuments() {
 						location: ReadwiseLocation.enum.archive,
 					},
 				},
+				// OR documents in archive with tags, notes, or highlights (children)
 				{
 					location: ReadwiseLocation.enum.archive,
+					OR: [
+						{
+							tags: {
+								isNotNull: true,
+							},
+						},
+						{
+							children: {
+								id: {
+									isNotNull: true,
+								},
+							},
+						},
+						{
+							notes: {
+								isNotNull: true,
+							},
+						},
+					],
 				},
 			],
 			recordId: {
 				isNull: true,
 			},
+			// Exclude notes. TODO: I get document notes via the property on the parent document, but I don't currently get notes attached to highlights
 			category: {
 				ne: 'note',
 			},
+			// Exclude old Instapaper imports
 			source: {
 				ne: 'instapaper',
 			},

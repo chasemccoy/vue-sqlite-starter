@@ -9,13 +9,14 @@ export const getFamilyTree = async (recordId: RecordSelect['id']) => {
 		columns: {
 			id: true,
 			title: true,
+			slug: true,
 			recordCreatedAt: true,
 		},
 		with: {
 			outgoingLinks: {
 				where: {
 					predicate: {
-						type: 'containment',
+						OR: [{ type: 'containment' }, { type: 'description' }],
 					},
 				},
 				columns: {
@@ -26,13 +27,14 @@ export const getFamilyTree = async (recordId: RecordSelect['id']) => {
 						columns: {
 							id: true, // Parent
 							title: true,
+							slug: true,
 							recordCreatedAt: true,
 						},
 						with: {
 							outgoingLinks: {
 								where: {
 									predicate: {
-										type: 'containment',
+										OR: [{ type: 'containment' }, { type: 'description' }],
 									},
 								},
 								columns: {
@@ -43,6 +45,7 @@ export const getFamilyTree = async (recordId: RecordSelect['id']) => {
 										columns: {
 											id: true, // Grandparent
 											title: true,
+											slug: true,
 											recordCreatedAt: true,
 										},
 									},
@@ -51,7 +54,7 @@ export const getFamilyTree = async (recordId: RecordSelect['id']) => {
 							incomingLinks: {
 								where: {
 									predicate: {
-										type: 'containment',
+										OR: [{ type: 'containment' }, { type: 'description' }],
 									},
 								},
 								columns: {
@@ -62,6 +65,7 @@ export const getFamilyTree = async (recordId: RecordSelect['id']) => {
 										columns: {
 											id: true, // Siblings
 											title: true,
+											slug: true,
 											recordCreatedAt: true,
 										},
 									},
@@ -74,7 +78,7 @@ export const getFamilyTree = async (recordId: RecordSelect['id']) => {
 			incomingLinks: {
 				where: {
 					predicate: {
-						type: 'containment',
+						OR: [{ type: 'containment' }, { type: 'description' }],
 					},
 				},
 				columns: {
@@ -85,13 +89,14 @@ export const getFamilyTree = async (recordId: RecordSelect['id']) => {
 						columns: {
 							id: true, // Children
 							title: true,
+							slug: true,
 							recordCreatedAt: true,
 						},
 						with: {
 							outgoingLinks: {
 								where: {
 									predicate: {
-										type: 'containment',
+										OR: [{ type: 'containment' }, { type: 'description' }],
 									},
 								},
 								columns: {
@@ -102,6 +107,7 @@ export const getFamilyTree = async (recordId: RecordSelect['id']) => {
 										columns: {
 											id: true, // Grandchildren
 											title: true,
+											slug: true,
 											recordCreatedAt: true,
 										},
 									},

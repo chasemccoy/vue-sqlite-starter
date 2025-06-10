@@ -7,7 +7,9 @@ import {
 	upsertRecord,
 	deleteRecord,
 	linksForRecord,
+	getRecordBySlug,
 } from '@db/queries/records';
+import { getFamilyTree } from '@db/queries/tree';
 
 export const recordRoutes = Router();
 
@@ -31,11 +33,31 @@ recordRoutes.get('/record/:id', async (req, res, next) => {
 	}
 });
 
+recordRoutes.get('/record/slug/:slug', async (req, res, next) => {
+	try {
+		const { slug } = req.params;
+		const record = await getRecordBySlug(slug);
+		res.json(record);
+	} catch (error) {
+		next(error);
+	}
+});
+
 recordRoutes.get('/record/:id/links', async (req, res, next) => {
 	try {
 		const { id } = IdParamSchema.parse(req.params);
 		const links = await linksForRecord(id);
 		res.json(links);
+	} catch (error) {
+		next(error);
+	}
+});
+
+recordRoutes.get('/record/:id/tree', async (req, res, next) => {
+	try {
+		const { id } = IdParamSchema.parse(req.params);
+		const tree = await getFamilyTree(id);
+		res.json(tree);
 	} catch (error) {
 		next(error);
 	}

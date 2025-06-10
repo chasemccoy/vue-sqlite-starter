@@ -13,6 +13,16 @@ export const getRecord = (recordId: RecordSelect['id']) => {
 
 export type GetRecordAPIResponse = APIResponse<typeof getRecord>;
 
+export const getRecordBySlug = (slug: RecordSelect['slug']) => {
+	return db.query.records.findFirst({
+		where: {
+			slug,
+		},
+	});
+};
+
+export type GetRecordBySlugAPIResponse = APIResponse<typeof getRecordBySlug>;
+
 export const listRecords = async (input: ListRecordsInput = {}) => {
 	const { filters, limit, offset, orderBy } = ListRecordsInputSchema.parse(input);
 
@@ -24,6 +34,8 @@ export const listRecords = async (input: ListRecordsInput = {}) => {
 			slug: true,
 			title: true,
 			url: true,
+			type: true,
+			content: true,
 			recordCreatedAt: true,
 			recordUpdatedAt: true,
 		},
@@ -182,3 +194,5 @@ export const linksForRecord = async (recordId: RecordSelect['id']) => {
 		},
 	});
 };
+
+export type LinksForRecordAPIResponse = APIResponse<typeof linksForRecord>;
