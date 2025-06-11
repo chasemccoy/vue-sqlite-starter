@@ -1,3 +1,12 @@
+@import url('https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,100..900;1,100..900&display=block');
+
+@import 'tailwindcss';
+@import '@nuxt/ui';
+
+@theme {
+	--font-sans: 'Public Sans', sans-serif;
+}
+
 :root {
 	--font-weight-medium: 500;
 
@@ -5,4 +14,9 @@
 
 	/* --color-surface: oklch(97% 0 0); */
 	--color-surface: white;
+}
+
+html,
+body {
+	background-color: var(--ui-bg);
 }

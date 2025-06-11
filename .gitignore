@@ -24,3 +24,6 @@ dist-ssr
 *.db-shm
 *.db-wal
 .env
+
+auto-imports.d.ts
+components.d.ts

@@ -2,40 +2,33 @@
   <form class="EditRecordForm" ref="formRef">
     <RecordTypeSelectButton v-if="modelValue.type" v-model="modelValue.type" />
 
-    <FormField label="Title">
-      <InputText type="text" v-model.trim="modelValue.title" />
-    </FormField>
+    <UFormField label="Title">
+      <UInput type="text" v-model.trim="modelValue.title" size="lg" />
+    </UFormField>
 
     <SlugField v-model="slug" />
 
-    <FormField label="URL">
-      <InputText type="url" v-model.trim="modelValue.url" placeholder="https://" />
-    </FormField>
+    <UFormField label="URL">
+      <UInput type="url" v-model.trim="modelValue.url" size="lg" placeholder="https://" />
+    </UFormField>
 
-    <FormField label="Curated?">
-      <Checkbox v-model="modelValue.isCurated" binary />
-    </FormField>
+    <UCheckbox label="Curated?" v-model="modelValue.isCurated" />
 
-    <FormField label="Summary">
-      <Textarea v-model="modelValue.summary" rows="3" placeholder="A brief summary of this record" />
-    </FormField>
+    <UFormField label="Summary">
+      <UTextarea v-model.trim="modelValue.summary" size="lg" placeholder="A brief summary of this record" :rows="3" />
+    </UFormField>
 
-    <FormField label="Content">
-      <Textarea v-model="modelValue.content" placeholder="Main content of the record" />
-    </FormField>
+    <UFormField label="Content">
+      <UTextarea v-model.trim="modelValue.content" size="lg" placeholder="Main content of the record" :rows="6" />
+    </UFormField>
 
-    <Button type="submit" label="Save" @click="handleSubmit" :disabled="!isDirty" size="large" />
+    <UButton type="submit" @click="handleSubmit" :disabled="!isDirty" size="xl" block>Save</UButton>
   </form>
 </template>
 
 <script setup lang="ts">
 import RecordTypeSelectButton from '@app/components/RecordTypeSelectButton.vue';
 import type { RecordInsert, RecordSelect } from '@db/schema';
-import Button from 'primevue/button';
-import InputText from 'primevue/inputtext';
-import Checkbox from 'primevue/checkbox';
-import FormField from '@app/components/FormField.vue';
-import Textarea from 'primevue/textarea';
 import { computed, ref, useTemplateRef, watch } from 'vue';
 import SlugField from '@app/components/SlugField.vue';
 import { slugify } from '@shared/lib/formatting';

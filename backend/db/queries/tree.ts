@@ -1,5 +1,6 @@
 import { db } from '@db/index';
 import { type RecordSelect } from '@db/schema';
+import type { APIResponse } from '@shared/types/api';
 
 export const getFamilyTree = async (recordId: RecordSelect['id']) => {
 	const family = await db.query.records.findFirst({
@@ -122,3 +123,5 @@ export const getFamilyTree = async (recordId: RecordSelect['id']) => {
 
 	return family;
 };
+
+export type GetFamilyTreeAPIResponse = APIResponse<typeof getFamilyTree>;

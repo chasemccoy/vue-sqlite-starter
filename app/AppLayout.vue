@@ -1,28 +1,28 @@
 <template>
-	<div class="App">
-		<Toolbar>
-			<template #start>
-				<RouterLink to="/">Enchiridion</RouterLink>
-			</template>
-
-			<template #end>
-				<Button icon="pi pi-plus" class="mr-2" severity="secondary" text @click="handleAddRecord" />
-			</template>
-		</Toolbar>
-		<RouterView />
-	</div>
+	<UApp>
+		<div class="App">
+			<UNavigationMenu color="neutral" :items="navItems" />
+			<RouterView />
+		</div>
+	</UApp>
 </template>
 
 <script async setup lang="ts">
-import Toolbar from 'primevue/toolbar';
-import Button from 'primevue/button';
-import { RouterLink, useRouter } from 'vue-router';
-
-const router = useRouter()
-
-function handleAddRecord() {
-	router.push({ path: '/add' })
-}
+const navItems = [
+	[
+		{
+			label: 'Enchiridion',
+			to: '/'
+		}
+	],
+	[
+		{
+			label: 'Add record',
+			to: '/add',
+			icon: 'i-lucide-plus',
+		}
+	]
+]
 </script>
 
 <style scoped>

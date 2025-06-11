@@ -37,17 +37,17 @@ html {
 	-webkit-text-size-adjust: none;
 	text-size-adjust: none;
 	-webkit-font-smoothing: antialiased;
-	font-size: 14px;
+	/* font-size: 16px; */
 }
 
 body {
 	min-height: 100vh;
-	line-height: 1.5;
+	/* line-height: 1.5; */
 	text-decoration-skip-ink: auto;
-	font-family:
+	/* font-family:
 		system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji',
-		'Segoe UI Emoji', 'Segoe UI Symbol';
-	background-color: var(--color-surface);
+		'Segoe UI Emoji', 'Segoe UI Symbol'; */
+	/* background-color: var(--color-surface); */
 }
 
 h1,
@@ -59,7 +59,7 @@ h6,
 button,
 input,
 label {
-	line-height: 1.2;
+	/* line-height: 1.2; */
 }
 
 h1,

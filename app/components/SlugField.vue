@@ -1,12 +1,10 @@
 <template>
-  <FormField label="Slug">
-    <InputText type="text" v-model.trim="modelValue" required />
-  </FormField>
+  <UFormField label="Slug">
+    <UInput type="text" v-model.trim="modelValue" size="lg" required />
+  </UFormField>
 </template>
 
 <script setup lang="ts">
-import InputText from 'primevue/inputtext';
-import FormField from '@app/components/FormField.vue';
 import { slugify } from '@shared/lib/formatting';
 
 const modelValue = defineModel<string>({

@@ -1,10 +1,13 @@
 import { db } from '@db/index';
 import { links, type LinkInsert, type LinkSelect } from '@db/schema';
+import type { APIResponse } from '@shared/types/api';
 import { eq, sql } from 'drizzle-orm';
 
 export const predicates = async () => {
 	return db.query.predicates.findMany();
 };
+
+export type GetPredicatesAPIResponse = APIResponse<typeof predicates>;
 
 export const deleteLink = async (linkId: LinkSelect['id']) => {
 	return db.delete(links).where(eq(links.id, linkId)).returning();
