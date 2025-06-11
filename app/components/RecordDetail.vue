@@ -1,5 +1,16 @@
 <template>
   <div v-if="modelValue" class="RecordDetail">
+    <div class="RecordDetail__badges">
+      <UBadge color="neutral" variant="outline" :icon="iconForType[modelValue.type]" class="RecordDetail__badge">
+        {{ capitalize(modelValue.type) }}
+      </UBadge>
+
+      <UBadge v-if="modelValue.source && modelValue.source !== 'manual'" color="neutral" variant="outline"
+        class="RecordDetail__badge">
+        {{ capitalize(modelValue.source) }}
+      </UBadge>
+    </div>
+
     <h1 v-if="modelValue.title" class="RecordDetail__title">
       {{ modelValue.title }} ({{ modelValue.id }})
     </h1>
@@ -10,31 +21,39 @@
 
     <p v-if="modelValue.notes">{{ modelValue.notes }}</p>
 
-    <UBadge v-if="modelValue.source" color="neutral" variant="outline" class="RecordDetail__badge">
-      {{ capitalize(modelValue.source) }}
+    <UBadge v-if="modelValue.url" color="neutral" variant="outline" class="RecordDetail__badge">
+      {{ modelValue.url }}
     </UBadge>
 
     <div v-if="modelValue.content">
       {{ modelValue.content }}
     </div>
 
-    <div v-if="incomingLinks && incomingLinks.length > 0" class="RecordDetail__section">
-      <h2 class="RecordDetail__sectionTitle">Incoming links</h2>
-      <ul>
-        <li v-for="link in incomingLinks" :key="link.id">
-          <RecordLink :model-value="link.sourceId" />
-        </li>
-      </ul>
+    <div class="RecordDetail__links">
+      <div v-if="incomingLinks && incomingLinks.length > 0" class="RecordDetail__section">
+        <h2 class="RecordDetail__sectionTitle">
+          <UIcon name="i-lucide-arrow-left" /> Incoming links ({{ incomingLinks.length }})
+        </h2>
+        <ul class="RecordDetail__list">
+          <li v-for="link in incomingLinks" :key="link.id">
+            <RecordLink :model-value="link.sourceId" :relationship="link.predicate.inverse?.name" />
+          </li>
+        </ul>
+      </div>
+
+      <div v-if="outgoingLinks && outgoingLinks.length > 0" class="RecordDetail__section">
+        <h2 class="RecordDetail__sectionTitle">
+          <UIcon name="i-lucide-arrow-right" /> Outgoing links ({{ outgoingLinks.length }})
+        </h2>
+        <ul class="RecordDetail__list">
+          <li v-for="link in outgoingLinks" :key="link.id">
+            <RecordLink :model-value="link.targetId" :relationship="link.predicate.name" />
+          </li>
+        </ul>
+      </div>
+
     </div>
 
-    <div v-if="outgoingLinks && outgoingLinks.length > 0" class="RecordDetail__section">
-      <h2 class="RecordDetail__sectionTitle">Outgoing links</h2>
-      <ul>
-        <li v-for="link in outgoingLinks" :key="link.id">
-          <RecordLink :model-value="link.targetId" />
-        </li>
-      </ul>
-    </div>
   </div>
 </template>
 
@@ -52,6 +71,12 @@ const { links } = defineProps<{
 
 const incomingLinks = computed(() => links?.incomingLinks ?? null)
 const outgoingLinks = computed(() => links?.outgoingLinks ?? null)
+
+const iconForType = {
+  'entity': 'i-lucide-user',
+  'artifact': 'i-lucide-box',
+  'concept': 'i-lucide-brain',
+}
 </script>
 
 <style scoped>
@@ -60,8 +85,20 @@ const outgoingLinks = computed(() => links?.outgoingLinks ?? null)
   gap: 1rem;
 }
 
+.RecordDetail__badges {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
 .RecordDetail__title {
   font-size: 1.5rem;
+}
+
+.RecordDetail__links {
+  margin-top: 2rem;
+  display: grid;
+  gap: 2rem;
 }
 
 .RecordDetail__section {
@@ -72,9 +109,27 @@ const outgoingLinks = computed(() => links?.outgoingLinks ?? null)
 .RecordDetail__sectionTitle {
   font-size: 0.75rem;
   text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  border-bottom: 1px solid var(--ui-border);
+  padding-bottom: 0.5rem;
+  margin-bottom: 0.5rem;
 }
 
 .RecordDetail__badge {
   width: fit-content;
+
+  & :deep(svg) {
+    width: 12px;
+    height: 12px;
+    color: var(--ui-text-muted);
+  }
+}
+
+.RecordDetail__list {
+  li+li {
+    margin-top: 1rem;
+  }
 }
 </style>

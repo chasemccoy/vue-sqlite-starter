@@ -52,6 +52,28 @@ export async function createRecordsFromReadwiseAuthors() {
 		where: {
 			documents: {
 				location: ReadwiseLocation.enum.archive, // Only map authors with at least one document in the archive.
+				source: {
+					ne: 'instapaper',
+				},
+				OR: [
+					{
+						tags: {
+							isNotNull: true,
+						},
+					},
+					{
+						children: {
+							id: {
+								isNotNull: true,
+							},
+						},
+					},
+					{
+						notes: {
+							isNotNull: true,
+						},
+					},
+				],
 			},
 			recordId: {
 				isNull: true,
@@ -146,6 +168,9 @@ export async function createRecordsFromReadwiseTags() {
 			},
 			deletedAt: {
 				isNull: true,
+			},
+			tag: {
+				ne: 'instapaper-favorites',
 			},
 		},
 		with: {
@@ -400,7 +425,6 @@ export async function createRecordsFromReadwiseDocuments() {
 
 	// Step 3: Link records to index entries via recordCreators (for authors) and recordCategories (for tags).
 
-	// Build a map for authors.
 	const authorIdsSet = new Set<number>();
 
 	for (const doc of documents) {
@@ -420,14 +444,15 @@ export async function createRecordsFromReadwiseDocuments() {
 	});
 
 	const authorIndexMap = new Map<number, number>();
+
 	for (const row of authorsRows) {
 		if (row.recordId) {
 			authorIndexMap.set(row.id, row.recordId);
 		}
 	}
 
-	// Build a map for tags.
 	const tagSet = new Set<string>();
+
 	for (const doc of documents) {
 		if (doc.tags) {
 			doc.tags.forEach((tag) => tagSet.add(tag));
@@ -435,6 +460,7 @@ export async function createRecordsFromReadwiseDocuments() {
 	}
 
 	const tagsArray = Array.from(tagSet);
+
 	const tagRows = await db.query.readwiseTags.findMany({
 		where: {
 			tag: {
@@ -445,6 +471,7 @@ export async function createRecordsFromReadwiseDocuments() {
 	});
 
 	const tagIndexMap = new Map<string, number>();
+
 	for (const row of tagRows) {
 		if (row.recordId) {
 			tagIndexMap.set(row.tag, row.recordId);

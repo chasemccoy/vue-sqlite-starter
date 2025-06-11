@@ -51,6 +51,7 @@ export async function linkRecords(
 	db: Db,
 ): Promise<void> {
 	const predicateId = await getPredicateId(predicateSlug, db);
+
 	try {
 		await db
 			.insert(links)
@@ -66,9 +67,9 @@ export async function linkRecords(
 				},
 			});
 
-		logger.info(
-			`Linked record ${sourceId} to record ${targetId} with relation type ${predicateSlug} (${predicateId})`,
-		);
+		// logger.info(
+		// 	`Linked record ${sourceId} to record ${targetId} with relation type ${predicateSlug} (${predicateId})`,
+		// );
 	} catch (error) {
 		logger.error(`Failed to link record ${sourceId} to record ${targetId}`, error);
 		throw error;

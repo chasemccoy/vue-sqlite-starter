@@ -15,7 +15,6 @@ import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 import { Head } from '@unhead/vue/components';
 
-
 const route = useRoute()
 const { getRecordBySlug, getRecordLinks } = useRecord();
 

@@ -1,7 +1,7 @@
 import { RecordTypeSchema } from '@shared/types';
 import { z } from 'zod/v4';
 
-export const DEFAULT_LIMIT = 50;
+export const DEFAULT_LIMIT = 100;
 
 export type APIResponse<T extends (...args: any) => any> = Awaited<
 	Promise<PromiseLike<ReturnType<T>>>
@@ -39,12 +39,7 @@ export const RecordFiltersSchema = z.object({
 	text: z.string().nullable().optional(),
 	url: z.string().nullable().optional(),
 	hasParent: z.boolean().optional(),
-	minRating: z.number().int().gte(0).optional(),
-	maxRating: z.number().int().lte(3).optional(),
-	isPrivate: z.boolean().optional(),
 	isCurated: z.boolean().optional(),
-	hasReminder: z.boolean().optional(),
-	hasEmbedding: z.boolean().optional(),
 	hasMedia: z.boolean().optional(),
 });
 
