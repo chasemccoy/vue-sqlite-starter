@@ -1,53 +1,101 @@
 <template>
-  <div v-if="modelValue" class="RecordDetail">
+  <div
+    v-if="modelValue"
+    class="RecordDetail"
+  >
     <div class="RecordDetail__badges">
-      <UBadge color="neutral" variant="outline" :icon="iconForType[modelValue.type]" class="RecordDetail__badge">
+      <UBadge
+        color="neutral"
+        variant="outline"
+        class="RecordDetail__badge"
+        :icon="iconForType[modelValue.type]"
+      >
         {{ capitalize(modelValue.type) }}
       </UBadge>
 
-      <UBadge v-if="modelValue.source && modelValue.source !== 'manual'" color="neutral" variant="outline"
-        class="RecordDetail__badge">
+      <UBadge
+        v-if="modelValue.source && modelValue.source !== 'manual'"
+        color="neutral"
+        variant="outline"
+        class="RecordDetail__badge"
+      >
         {{ capitalize(modelValue.source) }}
       </UBadge>
     </div>
 
-    <h1 v-if="modelValue.title" class="RecordDetail__title">
+    <h1
+      v-if="modelValue.title"
+      class="RecordDetail__title"
+    >
       {{ modelValue.title }} ({{ modelValue.id }})
     </h1>
 
     <p v-if="modelValue.summary">{{ modelValue.summary }}</p>
 
-    <a v-if="modelValue.url" :href="modelValue.url" target="_blank">{{ modelValue.url }}</a>
+    <UButtonGroup
+      size="sm"
+      class="RecordDetail__buttonGroup"
+    >
+      <UBadge
+        color="neutral"
+        variant="outline"
+        size="lg"
+        label="URL"
+        icon="i-lucide-link"
+      />
+
+      <UInput
+        v-model="modelValue.url"
+        color="neutral"
+        variant="outline"
+        placeholder="example.com"
+        readonly
+      />
+    </UButtonGroup>
 
     <p v-if="modelValue.notes">{{ modelValue.notes }}</p>
-
-    <UBadge v-if="modelValue.url" color="neutral" variant="outline" class="RecordDetail__badge">
-      {{ modelValue.url }}
-    </UBadge>
 
     <div v-if="modelValue.content">
       {{ modelValue.content }}
     </div>
 
     <div class="RecordDetail__links">
-      <div v-if="incomingLinks && incomingLinks.length > 0" class="RecordDetail__section">
+      <div
+        v-if="incomingLinks && incomingLinks.length > 0"
+        class="RecordDetail__section"
+      >
         <h2 class="RecordDetail__sectionTitle">
           <UIcon name="i-lucide-arrow-left" /> Incoming links ({{ incomingLinks.length }})
         </h2>
         <ul class="RecordDetail__list">
-          <li v-for="link in incomingLinks" :key="link.id">
-            <RecordLink :model-value="link.sourceId" :relationship="link.predicate.inverse?.name" />
+          <li
+            v-for="link in incomingLinks"
+            :key="link.id"
+          >
+            <RecordLink
+              :model-value="link.sourceId"
+              :relationship="link.predicate.inverse?.name"
+            />
           </li>
         </ul>
       </div>
 
-      <div v-if="outgoingLinks && outgoingLinks.length > 0" class="RecordDetail__section">
+      <div
+        v-if="outgoingLinks && outgoingLinks.length > 0"
+        class="RecordDetail__section"
+      >
         <h2 class="RecordDetail__sectionTitle">
           <UIcon name="i-lucide-arrow-right" /> Outgoing links ({{ outgoingLinks.length }})
         </h2>
         <ul class="RecordDetail__list">
-          <li v-for="link in outgoingLinks" :key="link.id">
-            <RecordLink :model-value="link.targetId" :relationship="link.predicate.name" />
+          <li
+            v-for="link in outgoingLinks"
+            :key="link.id"
+          >
+            <RecordLink
+              :model-value="link.targetId"
+              :relationship="link.predicate.name"
+            />
           </li>
         </ul>
       </div>
@@ -87,7 +135,7 @@ const iconForType = {
 
 .RecordDetail__badges {
   display: flex;
-  gap: 0.5rem;
+  gap: 6px;
   flex-wrap: wrap;
 }
 
@@ -130,6 +178,14 @@ const iconForType = {
 .RecordDetail__list {
   li+li {
     margin-top: 1rem;
+  }
+}
+
+.RecordDetail__buttonGroup {
+  & :deep(svg) {
+    width: 16px;
+    height: 16px;
+    color: var(--ui-text-muted);
   }
 }
 </style>

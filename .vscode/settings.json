@@ -16,5 +16,6 @@
 	"javascript.preferences.importModuleSpecifierEnding": "minimal",
 	"typescript.preferences.importModuleSpecifierEnding": "minimal",
 	"typescript.preferences.importModuleSpecifier": "non-relative",
-	"editor.suggestSelection": "recentlyUsed"
+	"editor.suggestSelection": "recentlyUsed",
+	"html.format.wrapAttributes": "force-expand-multiline"
 }

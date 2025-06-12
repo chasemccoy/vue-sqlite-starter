@@ -1,9 +1,18 @@
 <template>
 	<UApp>
 		<div class="App">
-			<UNavigationMenu color="neutral" :items="navItems" class="App__nav" />
+			<UNavigationMenu
+				color="neutral"
+				class="App__nav"
+				:items="navItems"
+			/>
 
 			<div class="App__content">
+				<RecordSearch
+					v-model="searchQuery"
+					:searchResultItems="searchResultItems"
+				/>
+
 				<RouterView />
 			</div>
 		</div>
@@ -11,10 +20,16 @@
 </template>
 
 <script async setup lang="ts">
+import RecordSearch from '@app/components/RecordSearch.vue';
+import useSearch from '@app/composables/useSearch';
+import { computed, ref } from 'vue';
+
+const searchQuery = ref('');
+const shouldSearch = computed(() => searchQuery.value !== '');
+
 const navItems = [
 	[
 		{
-			label: 'Enchiridion',
 			to: '/',
 			icon: 'i-lucide-home',
 		},
@@ -36,12 +51,29 @@ const navItems = [
 	],
 	[
 		{
-			label: 'Add record',
 			to: '/add',
 			icon: 'i-lucide-plus',
 		}
 	]
 ]
+
+const iconForType = {
+	'entity': 'i-lucide-user',
+	'artifact': 'i-lucide-box',
+	'concept': 'i-lucide-brain',
+}
+
+const { data: searchResults } = useSearch(searchQuery, shouldSearch);
+
+const searchResultItems = computed(() => {
+	if (!searchResults.value) return undefined;
+
+	return searchResults.value.map((result) => ({
+		label: result.title || result.content || result.slug,
+		id: result.slug,
+		icon: iconForType[result.type],
+	}));
+});
 </script>
 
 <style scoped>
@@ -61,5 +93,7 @@ const navItems = [
 
 .App__content {
 	padding: 1rem;
+	display: grid;
+	gap: 2rem;
 }
 </style>

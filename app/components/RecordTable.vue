@@ -1,6 +1,24 @@
 <template>
-	<UTable v-if="modelValue" :data="modelValue" :columns="columns" :columnVisibility="columnVisibility"
-		@select="handleRowSelect" />
+	<UTable
+		v-if="modelValue"
+		:data="modelValue"
+		:columns="columns"
+		:columnVisibility="columnVisibility"
+		@select="handleRowSelect"
+	>
+		<template #url-cell="{ row }">
+			<a
+				v-if="row.getValue('url')"
+				target="_blank"
+				:href="row.getValue('url')"
+			>
+				<UIcon
+					name="i-lucide-link"
+					class="RecordLink__icon"
+				/>
+			</a>
+		</template>
+	</UTable>
 </template>
 
 <script setup lang="ts">
@@ -10,22 +28,25 @@ import { capitalize } from '@shared/lib/formatting';
 import { computed, h, resolveComponent } from 'vue';
 import { useRouter } from 'vue-router';
 
-const modelValue = defineModel<ListRecordsQueryResponse>({ required: true })
+const modelValue = defineModel<ListRecordsQueryResponse>({ required: true });
 
 const props = defineProps<{
-	hideColumns?: string[]
-}>()
+	hideColumns?: string[];
+}>();
 
-const router = useRouter()
+const router = useRouter();
 
-const UBadge = resolveComponent('UBadge')
+const UBadge = resolveComponent('UBadge');
 
 const columnVisibility = computed(() => {
-	return props.hideColumns?.reduce((acc, column) => {
-		acc[column] = false
-		return acc
-	}, { slug: false, id: false, summary: false } as Record<string, boolean>)
-})
+	return props.hideColumns?.reduce(
+		(acc, column) => {
+			acc[column] = false;
+			return acc;
+		},
+		{ slug: false, id: false, summary: false } as Record<string, boolean>,
+	);
+});
 
 const columns = [
 	{
@@ -36,11 +57,15 @@ const columns = [
 		accessorKey: 'type',
 		header: 'Type',
 		cell: ({ row }: { row: TableRow<ListRecordsQueryResponse[number]> }) => {
-			return h(UBadge, {
-				color: 'neutral',
-				size: 'sm',
-				variant: 'subtle',
-			}, () => capitalize(row.getValue('type') as string))
+			return h(
+				UBadge,
+				{
+					color: 'neutral',
+					size: 'sm',
+					variant: 'subtle',
+				},
+				() => capitalize(row.getValue('type') as string),
+			);
 		},
 	},
 	{
@@ -50,6 +75,11 @@ const columns = [
 	{
 		accessorKey: 'title',
 		header: 'Title',
+		meta: {
+			class: {
+				td: 'RecordTable__titleCell',
+			},
+		},
 	},
 	{
 		accessorKey: 'url',
@@ -59,13 +89,13 @@ const columns = [
 		accessorKey: 'content',
 		header: 'Content',
 		cell: ({ row }: { row: TableRow<ListRecordsQueryResponse[number]> }) => {
-			return row.getValue('content') || row.getValue('summary')
+			return row.getValue('content') || row.getValue('summary');
 		},
 		meta: {
 			class: {
 				td: 'RecordTable__contentCell',
-			}
-		}
+			},
+		},
 	},
 	{
 		accessorKey: 'summary',
@@ -74,11 +104,11 @@ const columns = [
 	{
 		accessorKey: 'recordCreatedAt',
 		header: 'Created',
-	}
-]
+	},
+];
 
 function handleRowSelect(row: TableRow<ListRecordsQueryResponse[number]>) {
-	router.push(`/${row.getValue('slug')}`)
+	router.push(`/${row.getValue('slug')}`);
 }
 </script>
 
@@ -86,8 +116,10 @@ function handleRowSelect(row: TableRow<ListRecordsQueryResponse[number]>) {
 :deep(.RecordTable__contentCell) {
 	max-width: 400px;
 	text-wrap: auto;
-	/* overflow: hidden;
-	text-overflow: ellipsis;
-	white-space: nowrap; */
+}
+
+:deep(.RecordTable__titleCell) {
+	max-width: 400px;
+	text-wrap: auto;
 }
 </style>

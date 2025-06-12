@@ -262,7 +262,7 @@ export const mapReadwiseDocumentToRecord = (
 		type: 'artifact',
 		title: document.title || null,
 		slug: slugify(document.title || document.id.toString()),
-		url: document.sourceUrl,
+		url: document.sourceUrl || document.url,
 		content: document.content ? document.content.replace(/(?<!\n)\n(?!\n)/g, '\n\n') : null, // Normalize newlines: add extra newlines between paragraphs but keep existing double newlines.
 		summary: document.summary || null,
 		notes: notes || null,

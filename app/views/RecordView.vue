@@ -2,10 +2,14 @@
   <div v-if="isError">Error: {{ error }}</div>
 
   <Head>
-    <title v-if="record">{{ record.title }} | Enchiridion</title>
+    <title v-if="record?.title">{{ record.title }} | Enchiridion</title>
   </Head>
 
-  <RecordDetail v-if="record" :modelValue="record" :links="links" />
+  <RecordDetail
+    v-if="record"
+    :modelValue="record"
+    :links="links"
+  />
 </template>
 
 <script setup lang="ts">

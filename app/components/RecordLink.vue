@@ -1,24 +1,47 @@
 <template>
-  <div class='RecordLink' :class="{ 'RecordLink--loading': isLoading }">
+  <div
+    class='RecordLink'
+    :class="{ 'RecordLink--loading': isLoading }"
+  >
     <div v-if="isError">Error: {{ error }}</div>
 
     <div class="RecordLink__header">
-      <RouterLink v-if="record" :to="`/${record.slug}`" class="RecordLink__title">
+      <RouterLink
+        v-if="record"
+        class="RecordLink__title"
+        :to="`/${record.slug}`"
+      >
         {{ title }}
       </RouterLink>
 
       <div class="RecordLink__headerMeta">
-        <a :href="record.url" v-if="record?.url" target="_blank">
-          <UIcon name="i-lucide-link" class="RecordLink__icon" />
+        <a
+          v-if="record?.url"
+          target="_blank"
+          :href="record.url"
+        >
+          <UIcon
+            name="i-lucide-link"
+            class="RecordLink__icon"
+          />
         </a>
 
-        <UBadge v-if="relationship" color="neutral" variant="soft" class="RecordLink__badge" size="sm">
+        <UBadge
+          v-if="relationship"
+          color="neutral"
+          variant="soft"
+          class="RecordLink__badge"
+          size="sm"
+        >
           {{ capitalize(relationship) }}
         </UBadge>
       </div>
     </div>
 
-    <div v-if="record?.summary || record?.content" class="RecordLink__summary">
+    <div
+      v-if="record?.summary || record?.content"
+      class="RecordLink__summary"
+    >
       {{ record.summary || record.content }}
     </div>
   </div>
@@ -119,6 +142,12 @@ const title = computed(() => {
   font-size: 0.875rem;
   display: block;
   flex-grow: 1;
+  text-decoration-color: var(--ui-border-accented);
+  transition: text-decoration-color 0.15s ease-in-out;
+
+  &:hover {
+    text-decoration-color: currentColor;
+  }
 }
 
 .RecordLink__headerMeta {
@@ -135,5 +164,10 @@ const title = computed(() => {
   font-size: 0.875rem;
   line-height: 1.25rem;
   color: var(--ui-text-muted);
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
 }
 </style>

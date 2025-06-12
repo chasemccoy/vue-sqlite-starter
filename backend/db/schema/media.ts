@@ -22,7 +22,7 @@ export const media = sqliteTable('media', {
 	}),
 	url: text().notNull(),
 	altText: text(),
-	format: text({ enum: mediaTypeEnum }).default('application'),
+	type: text({ enum: mediaTypeEnum }).default('application'),
 	contentTypeString: text().notNull().default('application/octet-stream'),
 	fileSize: int(),
 	width: int(),
