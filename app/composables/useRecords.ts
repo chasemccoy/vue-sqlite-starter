@@ -7,7 +7,7 @@ export default function useRecords(options?: ListRecordsInput) {
 	const { fetch } = useApiClient();
 
 	return useQuery({
-		queryKey: ['list-records'],
+		queryKey: ['list-records', options],
 		queryFn: () =>
 			fetch<ListRecordsAPIResponse>(ApiEndpoints.records, {
 				method: 'POST',

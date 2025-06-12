@@ -21,37 +21,52 @@
       >
         {{ capitalize(modelValue.source) }}
       </UBadge>
+
+      <UBadge
+        v-if="modelValue"
+        color="neutral"
+        variant="outline"
+        class="RecordDetail__badge"
+        icon="i-lucide-hash"
+      >
+        {{ modelValue.id }}
+      </UBadge>
     </div>
 
     <h1
       v-if="modelValue.title"
       class="RecordDetail__title"
     >
-      {{ modelValue.title }} ({{ modelValue.id }})
+      {{ modelValue.title }}
     </h1>
 
     <p v-if="modelValue.summary">{{ modelValue.summary }}</p>
 
-    <UButtonGroup
-      size="sm"
-      class="RecordDetail__buttonGroup"
-    >
-      <UBadge
-        color="neutral"
-        variant="outline"
-        size="lg"
-        label="URL"
-        icon="i-lucide-link"
-      />
 
-      <UInput
-        v-model="modelValue.url"
-        color="neutral"
-        variant="outline"
-        placeholder="example.com"
-        readonly
-      />
-    </UButtonGroup>
+    <UInput
+      v-model="modelValue.url"
+      class="RecordDetail__input"
+      color="neutral"
+      variant="ghost"
+      placeholder="example.com"
+      icon="i-lucide-link"
+    >
+      <template
+        v-if="modelValue.url"
+        #trailing
+      >
+        <UTooltip text="Open source URL">
+          <UButton
+            variant="link"
+            size="sm"
+            icon="i-lucide-external-link"
+            aria-label="Open source URL"
+            target="_blank"
+            :to="modelValue.url"
+          />
+        </UTooltip>
+      </template>
+    </UInput>
 
     <p v-if="modelValue.notes">{{ modelValue.notes }}</p>
 
@@ -181,11 +196,20 @@ const iconForType = {
   }
 }
 
-.RecordDetail__buttonGroup {
-  & :deep(svg) {
-    width: 16px;
-    height: 16px;
+.RecordDetail__input {
+  & :deep(input) {
     color: var(--ui-text-muted);
+  }
+
+  & :deep(input:hover),
+  & :deep(input:focus) {
+    color: var(--ui-text);
+  }
+
+  & :deep(svg) {
+    width: 14px;
+    height: 14px;
+    color: var(--ui-text-dimmed);
   }
 }
 </style>

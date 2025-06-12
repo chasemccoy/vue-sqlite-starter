@@ -77,11 +77,6 @@ const searchResultItems = computed(() => {
 </script>
 
 <style scoped>
-.App {
-	display: grid;
-	gap: 1rem;
-}
-
 :deep(.App__nav) {
 	position: sticky;
 	top: 0px;

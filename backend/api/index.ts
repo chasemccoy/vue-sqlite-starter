@@ -5,6 +5,7 @@ import { treeRoutes } from './tree';
 import { linkRoutes } from './links';
 import { errorHandler } from './errorHandler';
 import cors from 'cors';
+import { searchRoutes } from 'backend/api/search';
 
 const PORT = process.env.BACKEND_PORT;
 
@@ -16,6 +17,7 @@ app.use(errorHandler);
 app.use(recordRoutes);
 app.use(treeRoutes);
 app.use(linkRoutes);
+app.use(searchRoutes);
 
 app.listen(PORT, () => {
 	// eslint-disable-next-line no-console

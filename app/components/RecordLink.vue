@@ -29,7 +29,7 @@
         <UBadge
           v-if="relationship"
           color="neutral"
-          variant="soft"
+          variant="subtle"
           class="RecordLink__badge"
           size="sm"
         >

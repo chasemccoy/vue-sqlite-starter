@@ -5,6 +5,7 @@
     placeholder="Select a record"
     valueKey="id"
     size="lg"
+    variant="subtle"
     :items="searchResultItems"
     :arrow="false"
     ignoreFilter

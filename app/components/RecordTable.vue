@@ -61,8 +61,7 @@ const columns = [
 				UBadge,
 				{
 					color: 'neutral',
-					size: 'sm',
-					variant: 'subtle',
+					variant: 'outline',
 				},
 				() => capitalize(row.getValue('type') as string),
 			);
