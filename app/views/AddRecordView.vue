@@ -1,13 +1,20 @@
 <template>
-	<h1>Add record</h1>
 
-	<EditRecordForm v-model="record" @save="handleSubmit" />
+	<Head>
+		<title>New record | Enchiridion</title>
+	</Head>
+
+	<EditRecordForm
+		v-model="record"
+		@save="handleSubmit"
+	/>
 </template>
 
 <script setup lang="ts">
 import EditRecordForm from '@app/components/EditRecordForm.vue';
 import useRecord from '@app/composables/useRecord';
 import type { RecordInsert } from '@db/schema';
+import { Head } from '@unhead/vue/components';
 import { ref } from 'vue';
 
 const emptyRecord: RecordInsert = {

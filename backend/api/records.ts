@@ -8,6 +8,7 @@ import {
 	deleteRecord,
 	linksForRecord,
 	getRecordBySlug,
+	getRecordWithOutgoingLinks,
 } from '@db/queries/records';
 import { getFamilyTree } from '@db/queries/tree';
 
@@ -20,7 +21,9 @@ export const recordRoutes = Router();
 recordRoutes.get('/record/:id', async (req, res, next) => {
 	try {
 		const { id } = IdParamSchema.parse(req.params);
-		const record = await getRecord(id);
+		const { outgoing_links } = req.query;
+
+		const record = outgoing_links ? await getRecordWithOutgoingLinks(id) : await getRecord(id);
 
 		if (!record) {
 			res.status(404).send(`Record with id ${id} not found`);

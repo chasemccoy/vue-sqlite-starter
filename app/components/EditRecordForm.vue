@@ -1,28 +1,85 @@
 <template>
-  <form class="EditRecordForm" ref="formRef">
-    <RecordTypeSelectButton v-if="modelValue.type" v-model="modelValue.type" />
+  <form
+    ref="formRef"
+    class="EditRecordForm"
+  >
+    <div>
+      <UFormField
+        aria-label="Title"
+        class="EditRecordForm__formField"
+      >
+        <UInput
+          v-model.trim="modelValue.title"
+          type="text"
+          size="lg"
+          variant="none"
+          placeholder="Untitled record"
+          :ui="{
+            base: 'EditRecordForm__titleInput',
+          }"
+        />
+      </UFormField>
 
-    <UFormField label="Title">
-      <UInput type="text" v-model.trim="modelValue.title" size="lg" />
-    </UFormField>
+      <RecordTypeSelectButton
+        v-if="modelValue.type"
+        v-model="modelValue.type"
+      />
+    </div>
 
-    <SlugField v-model="slug" />
+    <div>
+      <SlugField v-model="slug" />
 
-    <UFormField label="URL">
-      <UInput type="url" v-model.trim="modelValue.url" size="lg" placeholder="https://" />
-    </UFormField>
+      <UFormField
+        aria-label="URL"
+        class="EditRecordForm__formField"
+      >
+        <UInput
+          v-model.trim="modelValue.url"
+          type="url"
+          size="lg"
+          placeholder="https://example.org"
+          icon="i-lucide-link"
+          variant="none"
+        />
+      </UFormField>
+    </div>
 
-    <UCheckbox label="Curated?" v-model="modelValue.isCurated" />
+    <USwitch
+      v-model="modelValue.isCurated"
+      label="Curated"
+      color="neutral"
+      size="lg"
+    />
 
     <UFormField label="Summary">
-      <UTextarea v-model.trim="modelValue.summary" size="lg" placeholder="A brief summary of this record" :rows="3" />
+      <UTextarea
+        v-model.trim="modelValue.summary"
+        size="lg"
+        placeholder="A brief summary of this record"
+        :rows="3"
+      />
     </UFormField>
 
     <UFormField label="Content">
-      <UTextarea v-model.trim="modelValue.content" size="lg" placeholder="Main content of the record" :rows="6" />
+      <UTextarea
+        v-model.trim="modelValue.content"
+        size="lg"
+        placeholder="Main content of the record"
+        :rows="6"
+      />
     </UFormField>
 
-    <UButton type="submit" @click="handleSubmit" :disabled="!isDirty" size="xl" block>Save</UButton>
+    <UButton
+      type="submit"
+      size="xl"
+      variant="outline"
+      color="neutral"
+      :disabled="!isDirty"
+      block
+      @click="handleSubmit"
+    >
+      Save record
+    </UButton>
   </form>
 </template>
 
@@ -66,6 +123,18 @@ function handleSubmit() {
 .EditRecordForm {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 16px;
+}
+
+.EditRecordForm__formField {
+  margin-inline: -8px;
+}
+
+:deep(.EditRecordForm__titleInput) {
+  margin-bottom: 8px;
+}
+
+:deep(.EditRecordForm__titleInput) {
+  font-size: 1.5rem;
 }
 </style>

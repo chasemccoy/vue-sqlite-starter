@@ -8,9 +8,13 @@ export const getRecord = (recordId: RecordSelect['id']) => {
 		where: {
 			id: recordId,
 		},
+		with: {
+			outgoingLinks: true,
+		},
 	});
 };
 
+export type GetRecordQueryResponse = Awaited<ReturnType<typeof getRecord>>;
 export type GetRecordAPIResponse = APIResponse<typeof getRecord>;
 
 export const getRecordBySlug = (slug: RecordSelect['slug']) => {
@@ -22,6 +26,26 @@ export const getRecordBySlug = (slug: RecordSelect['slug']) => {
 };
 
 export type GetRecordBySlugAPIResponse = APIResponse<typeof getRecordBySlug>;
+
+export const getRecordWithOutgoingLinks = (id: RecordSelect['id']) => {
+	return db.query.records.findFirst({
+		where: {
+			id,
+		},
+		with: {
+			outgoingLinks: {
+				columns: {
+					predicateId: true,
+				},
+				with: {
+					target: true,
+				},
+			},
+		},
+	});
+};
+
+export type GetRecordWithOutgoingLinksAPIResponse = APIResponse<typeof getRecordWithOutgoingLinks>;
 
 export const listRecords = async (input: ListRecordsInput = {}) => {
 	const { filters, limit, offset, orderBy } = ListRecordsInputSchema.parse(input);
@@ -38,6 +62,7 @@ export const listRecords = async (input: ListRecordsInput = {}) => {
 			content: true,
 			recordCreatedAt: true,
 			recordUpdatedAt: true,
+			contentCreatedAt: true,
 		},
 		where: {
 			type,
@@ -48,19 +73,22 @@ export const listRecords = async (input: ListRecordsInput = {}) => {
 						}
 					: title
 						? {
-								ilike: `%${title}%`,
+								like: `%${title}%`,
 							}
 						: undefined,
 			OR: text
 				? [
 						{
-							content: { ilike: `%${text}%` },
+							title: { like: `%${text}%` },
 						},
 						{
-							summary: { ilike: `%${text}%` },
+							content: { like: `%${text}%` },
 						},
 						{
-							notes: { ilike: `%${text}%` },
+							summary: { like: `%${text}%` },
+						},
+						{
+							notes: { like: `%${text}%` },
 						},
 					]
 				: undefined,
@@ -71,7 +99,7 @@ export const listRecords = async (input: ListRecordsInput = {}) => {
 						}
 					: domain
 						? {
-								ilike: `%${domain}%`,
+								like: `%${domain}%`,
 							}
 						: undefined,
 			isCurated,
@@ -107,12 +135,9 @@ export const listRecords = async (input: ListRecordsInput = {}) => {
 	});
 
 	return rows;
-
-	// return {
-	// 	ids: rows.map((row) => ({ id: row.id })),
-	// };
 };
 
+export type ListRecordsQueryResponse = Awaited<ReturnType<typeof listRecords>>;
 export type ListRecordsAPIResponse = APIResponse<typeof listRecords>;
 
 export const upsertRecord = async (record: RecordInsert) => {
@@ -189,10 +214,35 @@ export const linksForRecord = async (recordId: RecordSelect['id']) => {
 			id: recordId,
 		},
 		with: {
-			outgoingLinks: true,
-			incomingLinks: true,
+			outgoingLinks: {
+				with: {
+					predicate: {
+						with: {
+							inverse: {
+								columns: {
+									name: true,
+								},
+							},
+						},
+					},
+				},
+			},
+			incomingLinks: {
+				with: {
+					predicate: {
+						with: {
+							inverse: {
+								columns: {
+									name: true,
+								},
+							},
+						},
+					},
+				},
+			},
 		},
 	});
 };
 
+export type LinksForRecordQueryResponse = Awaited<ReturnType<typeof linksForRecord>>;
 export type LinksForRecordAPIResponse = APIResponse<typeof linksForRecord>;

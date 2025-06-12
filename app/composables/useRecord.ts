@@ -2,39 +2,60 @@ import useApiClient from '@app/composables/useApiClient';
 import { useMutation, useQuery } from '@tanstack/vue-query';
 import type {
 	GetRecordAPIResponse,
+	GetRecordWithOutgoingLinksAPIResponse,
 	LinksForRecordAPIResponse,
 	UpsertRecordAPIResponse,
 } from '@db/queries/records';
-import { toValue, type MaybeRef, type Ref } from 'vue';
+import type { GetFamilyTreeAPIResponse } from '@db/queries/tree';
+import { toValue, type MaybeRef } from 'vue';
 import type { DbId } from '@shared/types/api';
 import type { RecordInsert } from '@db/schema';
+
+type OptionalMaybeRef<T> = MaybeRef<T | null>;
+
+type GetRecordOptions = { includeOutgoingLinks?: boolean };
+
+type GetRecordResponse<T> = T extends { includeOutgoingLinks: true }
+	? GetRecordWithOutgoingLinksAPIResponse
+	: GetRecordAPIResponse;
 
 export default function useRecord() {
 	const { fetch } = useApiClient();
 
-	function getRecord(id: Ref<DbId>) {
+	function getRecord<T extends GetRecordOptions>(
+		id: OptionalMaybeRef<DbId>,
+		enabled: MaybeRef<boolean> = true,
+		options?: T,
+	) {
+		const params = new URLSearchParams();
+
+		if (options?.includeOutgoingLinks) {
+			params.set('outgoing_links', 'true');
+		}
+
 		return useQuery({
 			queryKey: ['get-record', id],
-			queryFn: () => fetch<GetRecordAPIResponse>(`/record/${id.value}`),
-		});
-	}
-
-	function getRecordBySlug(slug: Ref<string>) {
-		return useQuery({
-			queryKey: ['get-record-by-slug', slug],
-			queryFn: () => fetch<GetRecordAPIResponse>(`/record/slug/${slug.value}`),
-		});
-	}
-
-	function getRecordTree(id: MaybeRef<DbId>, enabled: MaybeRef<boolean>) {
-		return useQuery({
-			queryKey: ['get-record-tree', id],
-			queryFn: () => fetch<GetRecordAPIResponse>(`/record/${toValue(id)}/tree`),
+			queryFn: () => fetch<GetRecordResponse<T>>(`/record/${toValue(id)}?${params}`),
 			enabled,
 		});
 	}
 
-	function getRecordLinks(id: MaybeRef<DbId>, enabled: MaybeRef<boolean>) {
+	function getRecordBySlug(slug: OptionalMaybeRef<string>) {
+		return useQuery({
+			queryKey: ['get-record-by-slug', slug],
+			queryFn: () => fetch<GetRecordAPIResponse>(`/record/slug/${toValue(slug)}`),
+		});
+	}
+
+	function getRecordTree(id: OptionalMaybeRef<DbId>, enabled: MaybeRef<boolean> = true) {
+		return useQuery({
+			queryKey: ['get-record-tree', id],
+			queryFn: () => fetch<GetFamilyTreeAPIResponse>(`/record/${toValue(id)}/tree`),
+			enabled,
+		});
+	}
+
+	function getRecordLinks(id: OptionalMaybeRef<DbId>, enabled: MaybeRef<boolean> = true) {
 		return useQuery({
 			queryKey: ['get-record-links', id],
 			queryFn: () => fetch<LinksForRecordAPIResponse>(`/record/${toValue(id)}/links`),

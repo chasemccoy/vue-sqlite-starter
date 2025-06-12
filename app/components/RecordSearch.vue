@@ -2,10 +2,11 @@
   <UInputMenu
     v-model:searchTerm="modelValue"
     v-model:modelValue="selectedSlug"
-    placeholder="Select a record"
+    placeholder="Find a record"
     valueKey="id"
     size="lg"
     variant="subtle"
+    icon="i-lucide-search"
     :items="searchResultItems"
     :arrow="false"
     ignoreFilter
@@ -22,6 +23,10 @@
         />
         <span class="RecordSearch__label">{{ item.label }}</span>
       </div>
+    </template>
+
+    <template #trailing>
+      <span />
     </template>
   </UInputMenu>
 </template>

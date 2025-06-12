@@ -1,6 +1,18 @@
 <template>
-  <UFormField label="Slug">
-    <UInput type="text" v-model.trim="modelValue" size="lg" required />
+  <UFormField
+    aria-label="Slug"
+    class="SlugField"
+    required
+  >
+    <UInput
+      v-model.trim="modelValue"
+      type="text"
+      size="lg"
+      variant="none"
+      icon="i-lucide-hash"
+      placeholder="record-slug"
+      required
+    />
   </UFormField>
 </template>
 
@@ -14,3 +26,9 @@ const modelValue = defineModel<string>({
   }
 });
 </script>
+
+<style scoped>
+.SlugField {
+  margin-inline: -8px;
+}
+</style>
