@@ -10,6 +10,7 @@ export const getRecord = (recordId: RecordSelect['id']) => {
 		},
 		with: {
 			outgoingLinks: true,
+			media: true,
 		},
 	});
 };
@@ -21,6 +22,9 @@ export const getRecordBySlug = (slug: RecordSelect['slug']) => {
 	return db.query.records.findFirst({
 		where: {
 			slug,
+		},
+		with: {
+			media: true,
 		},
 	});
 };
