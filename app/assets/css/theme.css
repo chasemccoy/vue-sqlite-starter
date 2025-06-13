@@ -14,7 +14,7 @@
 	--color-surface: white;
 }
 
-html,
-body {
+html:not(.dark),
+html:not(.dark) body {
 	background-color: var(--ui-bg-muted);
 }

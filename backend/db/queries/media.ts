@@ -19,10 +19,12 @@ export async function getMediaByRecordId(recordId: number): Promise<MediaSelect[
 	return await db.select().from(media).where(eq(media.recordId, recordId));
 }
 
-export async function deleteMedia(id: number): Promise<boolean> {
-	const result = await db.delete(media).where(eq(media.id, id));
-	return result.changes > 0;
+export async function deleteMedia(id: number) {
+	const [result] = await db.delete(media).where(eq(media.id, id)).returning();
+	return result;
 }
+
+export type DeleteMediaAPIResponse = APIResponse<typeof deleteMedia>;
 
 export async function updateMedia(
 	id: number,

@@ -288,7 +288,7 @@ mediaRoutes.delete('/media/:id', async (req, res, next) => {
 			throw new Error('Media not found');
 		}
 
-		res.status(204).send();
+		res.json(deleted);
 	} catch (error) {
 		next(error);
 	}

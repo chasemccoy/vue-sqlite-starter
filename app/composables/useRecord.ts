@@ -2,6 +2,7 @@ import useApiClient from '@app/composables/useApiClient';
 import { useMutation, useQuery } from '@tanstack/vue-query';
 import type {
 	GetRecordAPIResponse,
+	GetRecordBySlugAPIResponse,
 	GetRecordWithOutgoingLinksAPIResponse,
 	LinksForRecordAPIResponse,
 	UpsertRecordAPIResponse,
@@ -43,7 +44,7 @@ export default function useRecord() {
 	function getRecordBySlug(slug: OptionalMaybeRef<string>) {
 		return useQuery({
 			queryKey: ['get-record-by-slug', slug],
-			queryFn: () => fetch<GetRecordAPIResponse>(`/record/slug/${toValue(slug)}`),
+			queryFn: () => fetch<GetRecordBySlugAPIResponse>(`/record/slug/${toValue(slug)}`),
 		});
 	}
 

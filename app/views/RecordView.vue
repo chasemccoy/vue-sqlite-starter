@@ -10,6 +10,7 @@
     :modelValue="record"
     :links="links"
     @mediaUpload="handleMediaUpload"
+    @mediaDelete="handleMediaDelete"
   />
 </template>
 
@@ -23,7 +24,7 @@ import { Head } from '@unhead/vue/components';
 
 const route = useRoute()
 const { getRecordBySlug, getRecordLinks } = useRecord();
-const { uploadMedia } = useMedia();
+const { uploadMedia, deleteMedia } = useMedia();
 
 const recordSlug = computed(() => route.params.slug as string)
 const { data: record, error, isError } = getRecordBySlug(recordSlug);
@@ -37,22 +38,21 @@ const {
   data: links,
 } = getRecordLinks(recordId, isRecordFetched);
 
-const uploadMutation = uploadMedia();
+const { mutate: uploadMediaMutation } = uploadMedia();
+const { mutate: deleteMediaMutation } = deleteMedia();
 
 function handleMediaUpload({ file, altText }: { file: File; altText?: string }) {
-  if (!recordId.value) {
-    // console.error('No record ID available for media upload');
-    return;
-  }
+  if (!recordId.value) return
 
-  uploadMutation.mutate({
+  uploadMediaMutation({
     file,
     recordId: recordId.value,
     altText,
   });
 }
 
-// watch([record, tree, links], () => {
-//   console.log('tree', tree.value);
-// })
+function handleMediaDelete({ mediaId }: { mediaId: number }) {
+  if (!recordId.value) return
+  deleteMediaMutation(mediaId);
+}
 </script>

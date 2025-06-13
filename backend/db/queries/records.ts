@@ -29,6 +29,7 @@ export const getRecordBySlug = (slug: RecordSelect['slug']) => {
 	});
 };
 
+export type GetRecordBySlugQueryResponse = Awaited<ReturnType<typeof getRecordBySlug>>;
 export type GetRecordBySlugAPIResponse = APIResponse<typeof getRecordBySlug>;
 
 export const getRecordWithOutgoingLinks = (id: RecordSelect['id']) => {
@@ -229,6 +230,12 @@ export const linksForRecord = async (recordId: RecordSelect['id']) => {
 							},
 						},
 					},
+					target: {
+						columns: {
+							title: true,
+							slug: true,
+						},
+					},
 				},
 			},
 			incomingLinks: {
@@ -240,6 +247,12 @@ export const linksForRecord = async (recordId: RecordSelect['id']) => {
 									name: true,
 								},
 							},
+						},
+					},
+					target: {
+						columns: {
+							title: true,
+							slug: true,
 						},
 					},
 				},

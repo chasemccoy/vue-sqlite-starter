@@ -27,7 +27,10 @@
     </div>
 
     <div>
-      <SlugField v-model="slug" />
+      <SlugField
+        v-model="slug"
+        class="EditRecordForm__input"
+      />
 
       <UFormField
         aria-label="URL"
@@ -40,6 +43,7 @@
           placeholder="https://example.org"
           icon="i-lucide-link"
           variant="none"
+          class="EditRecordForm__input"
         />
       </UFormField>
     </div>
@@ -136,5 +140,12 @@ function handleSubmit() {
 
 :deep(.EditRecordForm__titleInput) {
   font-size: 1.5rem;
+}
+
+.EditRecordForm__input {
+  & :deep(svg) {
+    width: 16px;
+    height: 16px;
+  }
 }
 </style>

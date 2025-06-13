@@ -5,6 +5,14 @@
   >
     <div class="RecordDetail__badges">
       <UBadge
+        v-if="modelValue.isCurated"
+        color="neutral"
+        variant="outline"
+        class="RecordDetail__badge"
+        icon="i-lucide-check"
+      />
+
+      <UBadge
         color="neutral"
         variant="outline"
         class="RecordDetail__badge"
@@ -34,13 +42,11 @@
     </div>
 
     <h1
-      v-if="modelValue.title"
+      v-if="modelValue.title || parent?.title"
       class="RecordDetail__title"
     >
-      {{ modelValue.title }}
+      {{ modelValue.title || `↳ ${parent?.title}` }}
     </h1>
-
-    <p v-if="modelValue.summary">{{ modelValue.summary }}</p>
 
     <UInput
       v-model="modelValue.url"
@@ -67,54 +73,59 @@
       </template>
     </UInput>
 
-    <p v-if="modelValue.notes">{{ modelValue.notes }}</p>
+    <UFormField
+      label="Summary"
+      size="xs"
+    >
+      <UTextarea
+        v-model.trim="modelValue.summary"
+        size="lg"
+        placeholder="A brief summary of this record"
+        variant="outline"
+        :rows="1"
+        autoresize
+      />
+    </UFormField>
 
-    <div v-if="modelValue.content">
-      {{ modelValue.content }}
-    </div>
+    <UFormField
+      label="Notes"
+      size="xs"
+    >
+      <UTextarea
+        v-model.trim="modelValue.notes"
+        size="lg"
+        placeholder="Additional notes"
+        variant="outline"
+        :rows="1"
+        autoresize
+      />
+    </UFormField>
+
+    <UFormField
+      label="Content"
+      size="xs"
+    >
+      <UTextarea
+        v-model.trim="modelValue.content"
+        size="lg"
+        placeholder="Main content of the record"
+        variant="outline"
+        :rows="5"
+        autoresize
+      />
+    </UFormField>
+
 
     <div class="RecordDetail__attachments">
       <h3 class="RecordDetail__sectionTitle">
         <UIcon name="i-lucide-paperclip" /> Attachments
       </h3>
 
-      <ul class="RecordDetail__mediaGallery">
-        <li
-          v-for="media in modelValue.media"
-          :key="media.id"
-          class="RecordDetail__mediaGalleryItem"
-        >
-          <img
-            v-if="media.type === 'image'"
-            :src="`${backendBaseUrl}${media.url}`"
-            :alt="media.altText ?? ''"
-          />
-          <div v-else-if="media.url.includes('.pdf')">PDF</div>
-          <div v-else-if="media.type === 'video'">Video</div>
-        </li>
-
-        <li>
-          <div class="RecordDetail__fileUpload">
-            <input
-              ref="fileInput"
-              type="file"
-              class="RecordDetail__fileInput"
-              :accept="acceptedFileTypes"
-              multiple
-              @change="handleFileSelect"
-            />
-            <UButton
-              variant="outline"
-              color="neutral"
-              class="justify-center"
-              icon="i-lucide-upload"
-              size="lg"
-              @click="triggerFileSelect"
-            />
-          </div>
-        </li>
-      </ul>
-
+      <AttachmentGallery
+        v-model="modelValue.media"
+        @mediaUpload="({ file, altText }) => emit('mediaUpload', { file, altText })"
+        @mediaDelete="({ mediaId }) => emit('mediaDelete', { mediaId })"
+      />
     </div>
 
     <div class="RecordDetail__links">
@@ -164,30 +175,23 @@
 </template>
 
 <script setup lang="ts">
+import AttachmentGallery from '@app/components/AttachmentGallery.vue';
 import RecordLink from '@app/components/RecordLink.vue';
-import useApiClient from '@app/composables/useApiClient';
-import type { GetRecordQueryResponse, LinksForRecordQueryResponse } from '@db/queries/records';
+import type { GetRecordBySlugQueryResponse, LinksForRecordQueryResponse } from '@db/queries/records';
 import { capitalize } from '@shared/lib/formatting';
-import { SUPPORTED_MEDIA_TYPES } from '@shared/types/api';
-import { computed, ref } from 'vue';
+import { computed } from 'vue';
 
-const modelValue = defineModel<GetRecordQueryResponse>({ required: true })
+const modelValue = defineModel<GetRecordBySlugQueryResponse>({ required: true })
 
 const emit = defineEmits<{
-  'media-upload': [{ file: File; altText?: string }]
+  'mediaUpload': [{ file: File; altText?: string }],
+  'mediaDelete': [{ mediaId: number }]
 }>()
 
 const { links } = defineProps<{
   links?: LinksForRecordQueryResponse
 }>()
 
-const { backendBaseUrl } = useApiClient();
-
-const fileInput = ref<HTMLInputElement>()
-const acceptedFileTypes = SUPPORTED_MEDIA_TYPES.join(',')
-
-const incomingLinks = computed(() => links?.incomingLinks ?? null)
-const outgoingLinks = computed(() => links?.outgoingLinks ?? null)
 
 const iconForType = {
   'entity': 'i-lucide-user',
@@ -195,22 +199,14 @@ const iconForType = {
   'concept': 'i-lucide-brain',
 }
 
-function triggerFileSelect() {
-  fileInput.value?.click()
-}
+const incomingLinks = computed(() => links?.incomingLinks ?? null)
+const outgoingLinks = computed(() => links?.outgoingLinks ?? null)
 
-function handleFileSelect(event: Event) {
-  const target = event.target as HTMLInputElement
-  const files = target.files
+const parent = computed(() => {
+  if (!outgoingLinks.value) return null
 
-  if (files && files.length > 0) {
-    for (const file of Array.from(files)) {
-      emit('media-upload', { file })
-    }
-    // Reset input to allow selecting same file again
-    target.value = ''
-  }
-}
+  return outgoingLinks.value.find((link) => link.predicate.type === 'containment')?.target ?? null
+})
 </script>
 
 <style scoped>
@@ -221,7 +217,7 @@ function handleFileSelect(event: Event) {
 
 .RecordDetail__badges {
   display: flex;
-  gap: 6px;
+  gap: 4px;
   flex-wrap: wrap;
 }
 
@@ -250,9 +246,8 @@ function handleFileSelect(event: Event) {
   display: flex;
   align-items: center;
   gap: 0.25rem;
-  border-bottom: 1px solid var(--ui-border);
-  padding-bottom: 0.5rem;
   margin-bottom: 0.5rem;
+  color: var(--ui-text-dimmed);
 }
 
 .RecordDetail__badge {
@@ -282,33 +277,9 @@ function handleFileSelect(event: Event) {
   }
 
   & :deep(svg) {
-    width: 14px;
-    height: 14px;
+    width: 12px;
+    height: 12px;
     color: var(--ui-text-dimmed);
   }
-}
-
-.RecordDetail__mediaGallery {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(120px, 100%), 1fr));
-  gap: 16px;
-}
-
-.RecordDetail__mediaGalleryItem {
-  img {
-    object-fit: cover;
-    aspect-ratio: 1 / 1;
-    border-radius: 8px;
-  }
-}
-
-.RecordDetail__fileUpload {
-  display: grid;
-  gap: 0.5rem;
-  height: 100%;
-}
-
-.RecordDetail__fileInput {
-  display: none;
 }
 </style>
