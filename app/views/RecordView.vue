@@ -9,18 +9,21 @@
     v-if="record"
     :modelValue="record"
     :links="links"
+    @mediaUpload="handleMediaUpload"
   />
 </template>
 
 <script setup lang="ts">
 import RecordDetail from '@app/components/RecordDetail.vue';
 import useRecord from '@app/composables/useRecord';
+import useMedia from '@app/composables/useMedia';
 import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 import { Head } from '@unhead/vue/components';
 
 const route = useRoute()
 const { getRecordBySlug, getRecordLinks } = useRecord();
+const { uploadMedia } = useMedia();
 
 const recordSlug = computed(() => route.params.slug as string)
 const { data: record, error, isError } = getRecordBySlug(recordSlug);
@@ -33,6 +36,21 @@ const isRecordFetched = computed(() => !!recordId.value)
 const {
   data: links,
 } = getRecordLinks(recordId, isRecordFetched);
+
+const uploadMutation = uploadMedia();
+
+function handleMediaUpload({ file, altText }: { file: File; altText?: string }) {
+  if (!recordId.value) {
+    // console.error('No record ID available for media upload');
+    return;
+  }
+
+  uploadMutation.mutate({
+    file,
+    recordId: recordId.value,
+    altText,
+  });
+}
 
 // watch([record, tree, links], () => {
 //   console.log('tree', tree.value);

@@ -42,7 +42,6 @@
 
     <p v-if="modelValue.summary">{{ modelValue.summary }}</p>
 
-
     <UInput
       v-model="modelValue.url"
       class="RecordDetail__input"
@@ -72,6 +71,50 @@
 
     <div v-if="modelValue.content">
       {{ modelValue.content }}
+    </div>
+
+    <div class="RecordDetail__attachments">
+      <h3 class="RecordDetail__sectionTitle">
+        <UIcon name="i-lucide-paperclip" /> Attachments
+      </h3>
+
+      <ul class="RecordDetail__mediaGallery">
+        <li
+          v-for="media in modelValue.media"
+          :key="media.id"
+          class="RecordDetail__mediaGalleryItem"
+        >
+          <img
+            v-if="media.type === 'image'"
+            :src="`${backendBaseUrl}${media.url}`"
+            :alt="media.altText ?? ''"
+          />
+          <div v-else-if="media.url.includes('.pdf')">PDF</div>
+          <div v-else-if="media.type === 'video'">Video</div>
+        </li>
+
+        <li>
+          <div class="RecordDetail__fileUpload">
+            <input
+              ref="fileInput"
+              type="file"
+              class="RecordDetail__fileInput"
+              :accept="acceptedFileTypes"
+              multiple
+              @change="handleFileSelect"
+            />
+            <UButton
+              variant="outline"
+              color="neutral"
+              class="justify-center"
+              icon="i-lucide-upload"
+              size="lg"
+              @click="triggerFileSelect"
+            />
+          </div>
+        </li>
+      </ul>
+
     </div>
 
     <div class="RecordDetail__links">
@@ -122,15 +165,26 @@
 
 <script setup lang="ts">
 import RecordLink from '@app/components/RecordLink.vue';
+import useApiClient from '@app/composables/useApiClient';
 import type { GetRecordQueryResponse, LinksForRecordQueryResponse } from '@db/queries/records';
 import { capitalize } from '@shared/lib/formatting';
-import { computed } from 'vue';
+import { SUPPORTED_MEDIA_TYPES } from '@shared/types/api';
+import { computed, ref } from 'vue';
 
 const modelValue = defineModel<GetRecordQueryResponse>({ required: true })
+
+const emit = defineEmits<{
+  'media-upload': [{ file: File; altText?: string }]
+}>()
 
 const { links } = defineProps<{
   links?: LinksForRecordQueryResponse
 }>()
+
+const { backendBaseUrl } = useApiClient();
+
+const fileInput = ref<HTMLInputElement>()
+const acceptedFileTypes = SUPPORTED_MEDIA_TYPES.join(',')
 
 const incomingLinks = computed(() => links?.incomingLinks ?? null)
 const outgoingLinks = computed(() => links?.outgoingLinks ?? null)
@@ -139,6 +193,23 @@ const iconForType = {
   'entity': 'i-lucide-user',
   'artifact': 'i-lucide-box',
   'concept': 'i-lucide-brain',
+}
+
+function triggerFileSelect() {
+  fileInput.value?.click()
+}
+
+function handleFileSelect(event: Event) {
+  const target = event.target as HTMLInputElement
+  const files = target.files
+
+  if (files && files.length > 0) {
+    for (const file of Array.from(files)) {
+      emit('media-upload', { file })
+    }
+    // Reset input to allow selecting same file again
+    target.value = ''
+  }
 }
 </script>
 
@@ -162,6 +233,10 @@ const iconForType = {
   margin-top: 2rem;
   display: grid;
   gap: 2rem;
+}
+
+.RecordDetail__attachments {
+  margin-top: 2rem;
 }
 
 .RecordDetail__section {
@@ -211,5 +286,29 @@ const iconForType = {
     height: 14px;
     color: var(--ui-text-dimmed);
   }
+}
+
+.RecordDetail__mediaGallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(120px, 100%), 1fr));
+  gap: 16px;
+}
+
+.RecordDetail__mediaGalleryItem {
+  img {
+    object-fit: cover;
+    aspect-ratio: 1 / 1;
+    border-radius: 8px;
+  }
+}
+
+.RecordDetail__fileUpload {
+  display: grid;
+  gap: 0.5rem;
+  height: 100%;
+}
+
+.RecordDetail__fileInput {
+  display: none;
 }
 </style>
