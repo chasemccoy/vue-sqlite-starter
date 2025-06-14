@@ -18,16 +18,21 @@
 import RecordDetail from '@app/components/RecordDetail.vue';
 import useRecord from '@app/composables/useRecord';
 import useMedia from '@app/composables/useMedia';
-import { computed } from 'vue';
+import { computed, ref, toRaw, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { Head } from '@unhead/vue/components';
+import type { GetRecordBySlugQueryResponse } from '@db/queries/records';
+import { useDebounceFn } from '@vueuse/core';
+import type { RecordInsert } from '@db/schema';
 
 const route = useRoute()
-const { getRecordBySlug, getRecordLinks } = useRecord();
+const { getRecordBySlug, getRecordLinks, upsertRecord } = useRecord();
 const { uploadMedia, deleteMedia } = useMedia();
 
+const record = ref<GetRecordBySlugQueryResponse | undefined>();
+
 const recordSlug = computed(() => route.params.slug as string)
-const { data: record, error, isError } = getRecordBySlug(recordSlug);
+const { data, error, isError } = getRecordBySlug(recordSlug);
 
 const recordId = computed(() => record.value?.id ?? null)
 const isRecordFetched = computed(() => !!recordId.value)
@@ -38,8 +43,24 @@ const {
   data: links,
 } = getRecordLinks(recordId, isRecordFetched);
 
+const { mutate: mutateRecord } = upsertRecord();
+
 const { mutate: uploadMediaMutation } = uploadMedia();
 const { mutate: deleteMediaMutation } = deleteMedia();
+
+const debouncedMutate = useDebounceFn((data: RecordInsert) => {
+  mutateRecord(data);
+}, 1000, { maxWait: 5000 })
+
+watch(data, () => {
+  if (!data.value) return;
+  record.value = structuredClone(toRaw(data.value));
+}, { immediate: true });
+
+watch(record, () => {
+  if (!record.value) return;
+  debouncedMutate(record.value)
+}, { deep: true });
 
 function handleMediaUpload({ file, altText }: { file: File; altText?: string }) {
   if (!recordId.value) return

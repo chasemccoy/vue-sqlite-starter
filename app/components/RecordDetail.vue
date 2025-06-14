@@ -41,11 +41,29 @@
       </UBadge>
     </div>
 
+    <UFormField
+      aria-label="Title"
+      class="EditRecordForm__formField"
+    >
+      <UTextarea
+        v-model.trim="modelValue.title"
+        type="text"
+        size="lg"
+        variant="none"
+        placeholder="Untitled record"
+        :rows="1"
+        :ui="{
+          base: 'RecordDetail__titleInput',
+        }"
+        autoresize
+      />
+    </UFormField>
+
     <h1
-      v-if="modelValue.title || parent?.title"
+      v-if="!modelValue.title && parent?.title"
       class="RecordDetail__title"
     >
-      {{ modelValue.title || `↳ ${parent?.title}` }}
+      ↳ {{ parent?.title }}
     </h1>
 
     <UInput
@@ -88,20 +106,6 @@
     </UFormField>
 
     <UFormField
-      label="Notes"
-      size="xs"
-    >
-      <UTextarea
-        v-model.trim="modelValue.notes"
-        size="lg"
-        placeholder="Additional notes"
-        variant="outline"
-        :rows="1"
-        autoresize
-      />
-    </UFormField>
-
-    <UFormField
       label="Content"
       size="xs"
     >
@@ -115,8 +119,21 @@
       />
     </UFormField>
 
+    <UFormField
+      label="Notes"
+      size="xs"
+    >
+      <UTextarea
+        v-model.trim="modelValue.notes"
+        size="lg"
+        placeholder="Additional notes"
+        variant="outline"
+        :rows="1"
+        autoresize
+      />
+    </UFormField>
 
-    <div class="RecordDetail__attachments">
+    <div>
       <h3 class="RecordDetail__sectionTitle">
         <UIcon name="i-lucide-paperclip" /> Attachments
       </h3>
@@ -225,14 +242,16 @@ const parent = computed(() => {
   font-size: 1.5rem;
 }
 
+:deep(.RecordDetail__titleInput) {
+  font-size: 1.5rem;
+  margin-inline: -8px;
+  padding-block: 0;
+}
+
 .RecordDetail__links {
   margin-top: 2rem;
   display: grid;
   gap: 2rem;
-}
-
-.RecordDetail__attachments {
-  margin-top: 2rem;
 }
 
 .RecordDetail__section {

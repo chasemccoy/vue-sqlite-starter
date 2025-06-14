@@ -15,6 +15,9 @@ export default defineConfig({
 		vue(),
 		ui({
 			ui: {
+				colors: {
+					primary: 'indigo',
+				},
 				formField: {
 					slots: {
 						container: 'w-full',

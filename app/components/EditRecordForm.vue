@@ -135,11 +135,8 @@ function handleSubmit() {
 }
 
 :deep(.EditRecordForm__titleInput) {
-  margin-bottom: 8px;
-}
-
-:deep(.EditRecordForm__titleInput) {
   font-size: 1.5rem;
+  margin-bottom: 8px;
 }
 
 .EditRecordForm__input {
