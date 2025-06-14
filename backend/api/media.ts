@@ -5,29 +5,19 @@ import fs from 'fs/promises';
 import sharp from 'sharp';
 import crypto from 'crypto';
 import { insertMedia, getMedia, deleteMedia } from '@db/queries/media';
-import { IdParamSchema, IdSchema } from '@shared/types/api';
+import {
+	IdParamSchema,
+	IdSchema,
+	SUPPORTED_IMAGE_TYPES,
+	SUPPORTED_MEDIA_TYPES,
+	SUPPORTED_PDF_TYPES,
+	SUPPORTED_VIDEO_TYPES,
+} from '@shared/types/api';
 import { z } from 'zod/v4';
 
 export const mediaRoutes = Router();
 
 export const MAX_FILE_SIZE = 100 * 1024 * 1024; // 100MB
-
-export const SUPPORTED_IMAGE_TYPES = [
-	'image/jpeg',
-	'image/png',
-	'image/gif',
-	'image/webp',
-] as const;
-
-export const SUPPORTED_VIDEO_TYPES = ['video/mp4', 'video/quicktime', 'video/x-msvideo'] as const;
-
-export const SUPPORTED_PDF_TYPES = ['application/pdf'] as const;
-
-export const SUPPORTED_MEDIA_TYPES = [
-	...SUPPORTED_IMAGE_TYPES,
-	...SUPPORTED_VIDEO_TYPES,
-	...SUPPORTED_PDF_TYPES,
-] as const;
 
 export const MediaUploadSchema = z.object({
 	recordId: IdSchema.optional(),

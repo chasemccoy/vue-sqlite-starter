@@ -63,7 +63,7 @@ const { relationship } = defineProps<{
 const { getRecord } = useRecord()
 const { getPredicates } = usePredicates()
 
-const { data: record, error, isError, isLoading } = getRecord(modelValue, true, { includeOutgoingLinks: true });
+const { data: record, error, isError, isLoading } = getRecord(modelValue);
 
 const { data: predicates } = getPredicates();
 

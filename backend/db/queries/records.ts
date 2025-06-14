@@ -9,7 +9,14 @@ export const getRecord = (recordId: RecordSelect['id']) => {
 			id: recordId,
 		},
 		with: {
-			outgoingLinks: true,
+			outgoingLinks: {
+				columns: {
+					predicateId: true,
+				},
+				with: {
+					target: true,
+				},
+			},
 			media: true,
 		},
 	});
@@ -31,26 +38,6 @@ export const getRecordBySlug = (slug: RecordSelect['slug']) => {
 
 export type GetRecordBySlugQueryResponse = Awaited<ReturnType<typeof getRecordBySlug>>;
 export type GetRecordBySlugAPIResponse = APIResponse<typeof getRecordBySlug>;
-
-export const getRecordWithOutgoingLinks = (id: RecordSelect['id']) => {
-	return db.query.records.findFirst({
-		where: {
-			id,
-		},
-		with: {
-			outgoingLinks: {
-				columns: {
-					predicateId: true,
-				},
-				with: {
-					target: true,
-				},
-			},
-		},
-	});
-};
-
-export type GetRecordWithOutgoingLinksAPIResponse = APIResponse<typeof getRecordWithOutgoingLinks>;
 
 export const listRecords = async (input: ListRecordsInput = {}) => {
 	const { filters, limit, offset, orderBy } = ListRecordsInputSchema.parse(input);

@@ -3,7 +3,6 @@ import { useMutation, useQuery } from '@tanstack/vue-query';
 import type {
 	GetRecordAPIResponse,
 	GetRecordBySlugAPIResponse,
-	GetRecordWithOutgoingLinksAPIResponse,
 	LinksForRecordAPIResponse,
 	UpsertRecordAPIResponse,
 } from '@db/queries/records';
@@ -14,29 +13,13 @@ import type { RecordInsert } from '@db/schema';
 
 type OptionalMaybeRef<T> = MaybeRef<T | null>;
 
-type GetRecordOptions = { includeOutgoingLinks?: boolean };
-
-type GetRecordResponse<T> = T extends { includeOutgoingLinks: true }
-	? GetRecordWithOutgoingLinksAPIResponse
-	: GetRecordAPIResponse;
-
 export default function useRecord() {
 	const { fetch } = useApiClient();
 
-	function getRecord<T extends GetRecordOptions>(
-		id: OptionalMaybeRef<DbId>,
-		enabled: MaybeRef<boolean> = true,
-		options?: T,
-	) {
-		const params = new URLSearchParams();
-
-		if (options?.includeOutgoingLinks) {
-			params.set('outgoing_links', 'true');
-		}
-
+	function getRecord(id: OptionalMaybeRef<DbId>, enabled: MaybeRef<boolean> = true) {
 		return useQuery({
 			queryKey: ['get-record', id],
-			queryFn: () => fetch<GetRecordResponse<T>>(`/record/${toValue(id)}?${params}`),
+			queryFn: () => fetch<GetRecordAPIResponse>(`/record/${toValue(id)}`),
 			enabled,
 		});
 	}

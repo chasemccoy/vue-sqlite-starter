@@ -8,7 +8,6 @@ import {
 	deleteRecord,
 	linksForRecord,
 	getRecordBySlug,
-	getRecordWithOutgoingLinks,
 } from '@db/queries/records';
 import { getFamilyTree } from '@db/queries/tree';
 
@@ -21,9 +20,8 @@ export const recordRoutes = Router();
 recordRoutes.get('/record/:id', async (req, res, next) => {
 	try {
 		const { id } = IdParamSchema.parse(req.params);
-		const { outgoing_links } = req.query;
 
-		const record = outgoing_links ? await getRecordWithOutgoingLinks(id) : await getRecord(id);
+		const record = await getRecord(id);
 
 		if (!record) {
 			res.status(404).send(`Record with id ${id} not found`);
@@ -40,6 +38,12 @@ recordRoutes.get('/record/slug/:slug', async (req, res, next) => {
 	try {
 		const { slug } = req.params;
 		const record = await getRecordBySlug(slug);
+
+		if (!record) {
+			res.status(404).send(`Record with slug ${slug} not found`);
+			return;
+		}
+
 		res.json(record);
 	} catch (error) {
 		next(error);
