@@ -1,17 +1,18 @@
 <template>
-  <div v-if="isError">Error: {{ error }}</div>
+	<div v-if="isError">Error: {{ error }}</div>
 
-  <Head>
-    <title v-if="record?.title">{{ record.title }} | Enchiridion</title>
-  </Head>
+	<Head>
+		<title v-if="record?.title">{{ record.title }} | Enchiridion</title>
+	</Head>
 
-  <RecordDetail
-    v-if="record"
-    :modelValue="record"
-    :links="links"
-    @mediaUpload="handleMediaUpload"
-    @mediaDelete="handleMediaDelete"
-  />
+	<RecordDetail
+		v-if="record"
+		:modelValue="record"
+		:links="links"
+		@mediaUpload="handleMediaUpload"
+		@mediaDelete="handleMediaDelete"
+		@createLink="handleCreateLink"
+	/>
 </template>
 
 <script setup lang="ts">
@@ -23,57 +24,74 @@ import { useRoute } from 'vue-router';
 import { Head } from '@unhead/vue/components';
 import type { GetRecordBySlugQueryResponse } from '@db/queries/records';
 import { useDebounceFn } from '@vueuse/core';
-import type { RecordInsert } from '@db/schema';
+import type { LinkInsert, RecordInsert } from '@db/schema';
+import useLink from '@app/composables/useLink';
 
-const route = useRoute()
+const route = useRoute();
 const { getRecordBySlug, getRecordLinks, upsertRecord } = useRecord();
 const { uploadMedia, deleteMedia } = useMedia();
+const { upsertLink } = useLink();
 
 const record = ref<GetRecordBySlugQueryResponse | undefined>();
 
-const recordSlug = computed(() => route.params.slug as string)
+const recordSlug = computed(() => route.params.slug as string);
 const { data, error, isError } = getRecordBySlug(recordSlug);
 
-const recordId = computed(() => record.value?.id ?? null)
-const isRecordFetched = computed(() => !!recordId.value)
+const recordId = computed(() => record.value?.id ?? null);
+const isRecordFetched = computed(() => !!recordId.value);
 
 // const { data: tree } = getRecordTree(recordId, isRecordFetched);
 
-const {
-  data: links,
-} = getRecordLinks(recordId, isRecordFetched);
+const { data: links } = getRecordLinks(recordId, isRecordFetched);
 
 const { mutate: mutateRecord } = upsertRecord();
+const { mutate: createLink } = upsertLink();
 
 const { mutate: uploadMediaMutation } = uploadMedia();
 const { mutate: deleteMediaMutation } = deleteMedia();
 
-const debouncedMutate = useDebounceFn((data: RecordInsert) => {
-  mutateRecord(data);
-}, 1000, { maxWait: 5000 })
+const debouncedMutate = useDebounceFn(
+	(data: RecordInsert) => {
+		mutateRecord(data);
+	},
+	1000,
+	{ maxWait: 5000 },
+);
 
-watch(data, () => {
-  if (!data.value) return;
-  record.value = structuredClone(toRaw(data.value));
-}, { immediate: true });
+watch(
+	data,
+	() => {
+		if (!data.value) return;
+		record.value = structuredClone(toRaw(data.value));
+	},
+	{ immediate: true },
+);
 
-watch(record, () => {
-  if (!record.value) return;
-  debouncedMutate(record.value)
-}, { deep: true });
+watch(
+	record,
+	() => {
+		if (!record.value) return;
+		debouncedMutate(record.value);
+	},
+	{ deep: true },
+);
 
 function handleMediaUpload({ file, altText }: { file: File; altText?: string }) {
-  if (!recordId.value) return
+	if (!recordId.value) return;
 
-  uploadMediaMutation({
-    file,
-    recordId: recordId.value,
-    altText,
-  });
+	uploadMediaMutation({
+		file,
+		recordId: recordId.value,
+		altText,
+	});
 }
 
 function handleMediaDelete({ mediaId }: { mediaId: number }) {
-  if (!recordId.value) return
-  deleteMediaMutation(mediaId);
+	if (!recordId.value) return;
+	deleteMediaMutation(mediaId);
+}
+
+function handleCreateLink({ link }: { link: LinkInsert }) {
+	createLink(link);
 }
 </script>

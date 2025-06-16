@@ -3,23 +3,30 @@ export enum ApiEndpoints {
 }
 
 const { BACKEND_PORT } = import.meta.env;
-const baseUrl = `http://localhost:${BACKEND_PORT}`;
 
 const defaultHeaders = {
 	'Content-Type': 'application/json',
 };
 
 export default function useApiClient() {
-	async function fetch<T>(endpoint: ApiEndpoints | string, options?: RequestInit): Promise<T> {
-		const url = new URL(endpoint, baseUrl);
+	const backendBaseUrl = `http://localhost:${BACKEND_PORT}`;
+
+	async function fetch<T>(
+		endpoint: ApiEndpoints | string,
+		options?: RequestInit,
+		formData: boolean = false,
+	): Promise<T> {
+		const url = new URL(endpoint, backendBaseUrl);
 
 		const { headers, ...restOptions } = options ?? {};
 
 		const optionsWithDefaults = {
-			headers: {
-				...defaultHeaders,
-				...headers,
-			},
+			headers: formData
+				? undefined
+				: {
+						...defaultHeaders,
+						...headers,
+					},
 			...restOptions,
 		};
 
@@ -40,6 +47,7 @@ export default function useApiClient() {
 	}
 
 	return {
+		backendBaseUrl,
 		fetch,
 	};
 }

@@ -61,7 +61,8 @@
       class="RecordDetail__byline"
     >
       <span v-if="parent">
-        from <UButton
+        from
+        <UButton
           icon="i-lucide-workflow"
           size="sm"
           color="neutral"
@@ -71,7 +72,8 @@
       </span>
 
       <span v-if="creator">
-        by <UButton
+        by
+        <UButton
           icon="i-lucide-user-pen"
           size="sm"
           color="neutral"
@@ -161,6 +163,11 @@
     </div>
 
     <div class="RecordDetail__links">
+      <RelationshipSelect
+        :sourceRecordId="modelValue.id"
+        @createLink="handleCreateLink"
+      />
+
       <div
         v-if="incomingLinks && incomingLinks.length > 0"
         class="RecordDetail__section"
@@ -200,51 +207,72 @@
           </li>
         </ul>
       </div>
-
     </div>
-
   </div>
 </template>
 
 <script setup lang="ts">
 import AttachmentGallery from '@app/components/AttachmentGallery.vue';
+import RelationshipSelect from '@app/components/RelationshipSelect.vue';
 import RecordLink from '@app/components/RecordLink.vue';
-import type { GetRecordBySlugQueryResponse, LinksForRecordQueryResponse } from '@db/queries/records';
+import type {
+  GetRecordBySlugQueryResponse,
+  LinksForRecordQueryResponse,
+} from '@db/queries/records';
 import { capitalize } from '@shared/lib/formatting';
 import { computed } from 'vue';
+import type { LinkInsert } from '@db/schema';
 
-const modelValue = defineModel<GetRecordBySlugQueryResponse>({ required: true })
+const modelValue = defineModel<GetRecordBySlugQueryResponse>({ required: true });
 
 const emit = defineEmits<{
-  'mediaUpload': [{ file: File; altText?: string }],
-  'mediaDelete': [{ mediaId: number }]
-}>()
+  mediaUpload: [{ file: File; altText?: string }];
+  mediaDelete: [{ mediaId: number }];
+  createLink: [{ link: LinkInsert }]
+}>();
 
 const { links } = defineProps<{
-  links?: LinksForRecordQueryResponse
-}>()
-
+  links?: LinksForRecordQueryResponse;
+}>();
 
 const iconForType = {
-  'entity': 'i-lucide-user',
-  'artifact': 'i-lucide-box',
-  'concept': 'i-lucide-brain',
-}
+  entity: 'i-lucide-user',
+  artifact: 'i-lucide-box',
+  concept: 'i-lucide-brain',
+};
 
-const incomingLinks = computed(() => links?.incomingLinks ?? null)
-const outgoingLinks = computed(() => links?.outgoingLinks ?? null)
+const incomingLinks = computed(() => links?.incomingLinks ?? null);
+const outgoingLinks = computed(() => links?.outgoingLinks ?? null);
 
 const parent = computed(() => {
-  if (!outgoingLinks.value) return null
+  if (!outgoingLinks.value) return null;
 
-  return outgoingLinks.value.find((link) => link.predicate.type === 'containment')?.target ?? null
-})
+  return outgoingLinks.value.find((link) => link.predicate.type === 'containment')?.target ?? null;
+});
 
 const creator = computed(() => {
-  if (!outgoingLinks.value) return null
+  if (!outgoingLinks.value) return null;
 
-  return outgoingLinks.value.find((link) => link.predicate.slug === 'created_by')?.target ?? null
-})
+  return outgoingLinks.value.find((link) => link.predicate.slug === 'created_by')?.target ?? null;
+});
+
+function handleCreateLink({
+  targetRecordId,
+  predicateId,
+}: {
+  targetRecordId: number;
+  predicateId: number;
+}) {
+  if (!modelValue.value) return;
+
+  emit('createLink', {
+    link: {
+      sourceId: modelValue.value.id,
+      targetId: targetRecordId,
+      predicateId,
+    },
+  });
+}
 </script>
 
 <style scoped>

@@ -85,4 +85,9 @@ export const upsertLink = async (link: LinkInsert) => {
 		// but included for exhaustive handling.
 		throw new Error('Failed to obtain result from upsert operation');
 	}
+
+	return row;
 };
+
+export type UpsertLinkQueryResponse = Awaited<ReturnType<typeof upsertLink>>;
+export type UpsertLinkAPIResponse = APIResponse<typeof upsertLink>;

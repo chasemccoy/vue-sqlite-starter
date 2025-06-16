@@ -1,5 +1,4 @@
 <template>
-
 	<Head>
 		<title>New record | Enchiridion</title>
 	</Head>
@@ -22,14 +21,14 @@ const emptyRecord: RecordInsert = {
 	title: '',
 	slug: '',
 	source: 'manual',
-}
+};
 
 const record = ref<RecordInsert>(emptyRecord);
 
-const { upsertRecord } = useRecord()
+const { upsertRecord } = useRecord();
 const { mutate } = upsertRecord();
 
 function handleSubmit(data: RecordInsert) {
-	mutate(data)
+	mutate(data);
 }
 </script>

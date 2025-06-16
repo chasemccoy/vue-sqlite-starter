@@ -52,6 +52,7 @@ export const listRecords = async (input: ListRecordsInput = {}) => {
 			url: true,
 			type: true,
 			content: true,
+			summary: true,
 			recordCreatedAt: true,
 			recordUpdatedAt: true,
 			contentCreatedAt: true,
@@ -72,6 +73,9 @@ export const listRecords = async (input: ListRecordsInput = {}) => {
 				? [
 						{
 							title: { like: `%${text}%` },
+						},
+						{
+							slug: { like: `%${text}%` },
 						},
 						{
 							content: { like: `%${text}%` },

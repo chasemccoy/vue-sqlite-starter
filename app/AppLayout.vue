@@ -47,21 +47,21 @@ const navItems = [
 			label: 'Artifacts',
 			to: '/artifacts',
 			icon: 'i-lucide-box',
-		}
+		},
 	],
 	[
 		{
 			to: '/add',
 			icon: 'i-lucide-plus',
-		}
-	]
-]
+		},
+	],
+];
 
 const iconForType = {
-	'entity': 'i-lucide-user',
-	'artifact': 'i-lucide-box',
-	'concept': 'i-lucide-brain',
-}
+	entity: 'i-lucide-user',
+	artifact: 'i-lucide-box',
+	concept: 'i-lucide-brain',
+};
 
 const { data: searchResults } = useSearch(searchQuery, shouldSearch);
 
