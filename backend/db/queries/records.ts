@@ -118,10 +118,10 @@ export const listRecords = async (input: ListRecordsInput = {}) => {
 		offset,
 		// TODO: fix type issue
 		orderBy: (records, { asc, desc }) => {
-			// Map each order criteria to a sort expression
 			return orderBy.map(({ field, direction }) => {
 				const orderColumn = records[field];
-				return direction === 'asc' ? asc(orderColumn) : desc(orderColumn);
+				const lower = sql`lower(${orderColumn})`;
+				return direction === 'asc' ? asc(lower) : desc(lower);
 			});
 		},
 	});

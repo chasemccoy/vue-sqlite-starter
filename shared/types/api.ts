@@ -22,6 +22,7 @@ const OrderByFieldSchema = z.enum([
 	'contentCreatedAt',
 	'contentUpdatedAt',
 	'id',
+	'slug',
 ]);
 
 const OrderDirectionSchema = z.enum(['asc', 'desc']);
@@ -32,7 +33,14 @@ export const OrderCriteriaSchema = z.object({
 });
 
 export const RecordFiltersSchema = z.object({
-	type: RecordTypeSchema.optional(),
+	type: z
+		.union([
+			RecordTypeSchema.optional(),
+			z.object({
+				in: z.array(RecordTypeSchema),
+			}),
+		])
+		.optional(),
 	title: z.string().nullable().optional(),
 	text: z.string().nullable().optional(),
 	url: z.string().nullable().optional(),

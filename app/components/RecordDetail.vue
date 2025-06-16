@@ -41,10 +41,7 @@
       </UBadge>
     </div>
 
-    <UFormField
-      aria-label="Title"
-      class="EditRecordForm__formField"
-    >
+    <UFormField aria-label="Title">
       <UTextarea
         v-model.trim="modelValue.title"
         type="text"
@@ -59,12 +56,30 @@
       />
     </UFormField>
 
-    <h1
-      v-if="!modelValue.title && parent?.title"
-      class="RecordDetail__title"
+    <div
+      v-if="parent || creator"
+      class="RecordDetail__byline"
     >
-      ↳ {{ parent?.title }}
-    </h1>
+      <span v-if="parent">
+        from <UButton
+          icon="i-lucide-workflow"
+          size="sm"
+          color="neutral"
+          variant="ghost"
+          :to="`/${parent.slug}`"
+        >{{ parent.title }}</UButton>
+      </span>
+
+      <span v-if="creator">
+        by <UButton
+          icon="i-lucide-user-pen"
+          size="sm"
+          color="neutral"
+          variant="ghost"
+          :to="`/${creator.slug}`"
+        >{{ creator.title }}</UButton>
+      </span>
+    </div>
 
     <UInput
       v-model="modelValue.url"
@@ -223,6 +238,12 @@ const parent = computed(() => {
   if (!outgoingLinks.value) return null
 
   return outgoingLinks.value.find((link) => link.predicate.type === 'containment')?.target ?? null
+})
+
+const creator = computed(() => {
+  if (!outgoingLinks.value) return null
+
+  return outgoingLinks.value.find((link) => link.predicate.slug === 'created_by')?.target ?? null
 })
 </script>
 

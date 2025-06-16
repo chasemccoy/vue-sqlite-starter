@@ -27,6 +27,7 @@
 		"@tanstack/vue-query": "^5.80.6",
 		"@types/multer": "^1.4.13",
 		"@unhead/vue": "^2.0.10",
+		"@vueuse/core": "^13.3.0",
 		"better-sqlite3": "^11.10.0",
 		"cors": "^2.8.5",
 		"drizzle-orm": "1.0.0-beta.1-c0277c0",
