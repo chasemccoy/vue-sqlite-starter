@@ -22,6 +22,7 @@
 <script async setup lang="ts">
 import RecordSearch from '@app/components/RecordSearch.vue';
 import useSearch from '@app/composables/useSearch';
+import { getIconForRecordType } from '@app/utils';
 import { computed, ref } from 'vue';
 
 const searchQuery = ref('');
@@ -36,17 +37,17 @@ const navItems = [
 		{
 			label: 'Concepts',
 			to: '/concepts',
-			icon: 'i-lucide-brain',
+			icon: getIconForRecordType('concept')
 		},
 		{
 			label: 'Entities',
 			to: '/entities',
-			icon: 'i-lucide-users',
+			icon: getIconForRecordType('entity')
 		},
 		{
 			label: 'Artifacts',
 			to: '/artifacts',
-			icon: 'i-lucide-box',
+			icon: getIconForRecordType('artifact')
 		},
 	],
 	[

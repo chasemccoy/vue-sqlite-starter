@@ -16,7 +16,7 @@
         color="neutral"
         variant="outline"
         class="RecordDetail__badge"
-        :icon="iconForType[modelValue.type]"
+        :icon="getIconForRecordType(modelValue.type)"
       >
         {{ capitalize(modelValue.type) }}
       </UBadge>
@@ -95,58 +95,111 @@
       </span>
     </div>
 
-    <UInput
-      v-model="modelValue.url"
-      class="RecordDetail__input"
-      color="neutral"
-      variant="ghost"
-      placeholder="example.com"
-      icon="i-lucide-link"
-    >
-      <template
-        v-if="modelValue.url"
-        #trailing
+    <div class="RecordDetail__combinedFields">
+      <UFormField
+        aria-label="Summary"
+        size="xs"
       >
-        <UTooltip text="Open source URL">
-          <UButton
-            variant="link"
-            size="sm"
-            icon="i-lucide-external-link"
-            aria-label="Open source URL"
-            target="_blank"
-            :to="modelValue.url"
-          />
-        </UTooltip>
-      </template>
-    </UInput>
+        <UTextarea
+          v-model.trim="modelValue.summary"
+          size="lg"
+          placeholder="A brief summary of this record"
+          variant="outline"
+          :rows="1"
+          autoresize
+        />
+      </UFormField>
+
+      <UButtonGroup>
+        <UBadge
+          color="neutral"
+          variant="outline"
+          size="lg"
+          label="URL"
+          class="RecordDetail__badge"
+        />
+
+        <UInput
+          v-model="modelValue.url"
+          class="RecordDetail__input"
+          variant="outline"
+          placeholder="example.com"
+        >
+          <template
+            v-if="modelValue.url"
+            #trailing
+          >
+            <UTooltip text="Open source URL">
+              <UButton
+                variant="link"
+                size="sm"
+                icon="i-lucide-external-link"
+                aria-label="Open source URL"
+                target="_blank"
+                :to="modelValue.url"
+              />
+            </UTooltip>
+          </template>
+        </UInput>
+      </UButtonGroup>
+
+      <UButtonGroup>
+        <UBadge
+          color="neutral"
+          variant="outline"
+          size="lg"
+          label="Created"
+          class="RecordDetail__badge"
+        />
+
+        <UInput
+          v-model="modelValue.contentCreatedAt"
+          class="RecordDetail__input"
+          variant="outline"
+          placeholder="May 4, 1995"
+          readonly
+        />
+      </UButtonGroup>
+
+      <UButtonGroup>
+        <UBadge
+          color="neutral"
+          variant="outline"
+          size="lg"
+          label="Captured"
+          class="RecordDetail__badge"
+        />
+
+        <UInput
+          v-model="modelValue.recordCreatedAt"
+          class="RecordDetail__input"
+          variant="outline"
+          placeholder="May 4, 2025"
+          readonly
+        />
+      </UButtonGroup>
+    </div>
 
     <UFormField
-      label="Summary"
+      aria-label="Content"
       size="xs"
-    >
-      <UTextarea
-        v-model.trim="modelValue.summary"
-        size="lg"
-        placeholder="A brief summary of this record"
-        variant="outline"
-        :rows="1"
-        autoresize
-      />
-    </UFormField>
-
-    <UFormField
-      label="Content"
-      size="xs"
+      class="RecordDetail__content"
     >
       <UTextarea
         v-model.trim="modelValue.content"
         size="lg"
         placeholder="Main content of the record"
-        variant="outline"
-        :rows="5"
+        variant="none"
+        :rows="1"
         autoresize
       />
     </UFormField>
+
+    <AttachmentGallery
+      v-model="modelValue.media"
+      @mediaUpload="({ file, altText }) => emit('mediaUpload', { file, altText })"
+      @mediaDelete="({ mediaId }) => emit('mediaDelete', { mediaId })"
+    />
 
     <UFormField
       label="Notes"
@@ -161,18 +214,6 @@
         autoresize
       />
     </UFormField>
-
-    <div>
-      <h3 class="RecordDetail__sectionTitle">
-        <UIcon name="i-lucide-paperclip" /> Attachments
-      </h3>
-
-      <AttachmentGallery
-        v-model="modelValue.media"
-        @mediaUpload="({ file, altText }) => emit('mediaUpload', { file, altText })"
-        @mediaDelete="({ mediaId }) => emit('mediaDelete', { mediaId })"
-      />
-    </div>
 
     <div class="RecordDetail__links">
       <RelationshipSelect
@@ -234,6 +275,7 @@ import type {
 import { capitalize } from '@shared/lib/formatting';
 import { computed } from 'vue';
 import type { LinkInsert } from '@db/schema';
+import { getIconForRecordType } from '@app/utils';
 
 const modelValue = defineModel<GetRecordBySlugQueryResponse>({ required: true });
 
@@ -246,12 +288,6 @@ const emit = defineEmits<{
 const { links } = defineProps<{
   links?: LinksForRecordQueryResponse;
 }>();
-
-const iconForType = {
-  entity: 'i-lucide-user',
-  artifact: 'i-lucide-box',
-  concept: 'i-lucide-brain',
-};
 
 const incomingLinks = computed(() => links?.incomingLinks ?? null);
 const outgoingLinks = computed(() => links?.outgoingLinks ?? null);
@@ -311,14 +347,14 @@ function handleCreateLink({
 
 .RecordDetail__byline {
   display: inline-flex;
-  margin-top: -8px;
+  margin-top: -12px;
 }
 
 .RecordDetail__bylineItem {
   display: flex;
   align-items: center;
   color: var(--ui-text-muted);
-  font-size: 0.85rem;
+  font-size: 0.8rem;
 }
 
 :deep(.RecordDetail__bylineButton) {
@@ -333,10 +369,15 @@ function handleCreateLink({
   }
 }
 
+.RecordDetail__content {
+  margin-inline: -12px;
+}
+
 .RecordDetail__links {
   margin-top: 2rem;
   display: grid;
   gap: 2rem;
+  align-items: start;
 }
 
 .RecordDetail__section {
@@ -383,7 +424,30 @@ function handleCreateLink({
   & :deep(svg) {
     width: 12px;
     height: 12px;
-    color: var(--ui-text-dimmed);
+    color: var(--ui-text-muted);
   }
+}
+
+.RecordDetail__combinedFields {
+  display: grid;
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid var(--ui-border);
+
+  --ui-radius: 0;
+
+  & :deep(input),
+  & :deep(textarea),
+  & :deep(span) {
+    box-shadow: none;
+  }
+
+  &>*+* {
+    border-top: 1px solid var(--ui-border);
+  }
+}
+
+.RecordDetail__combinedFields .RecordDetail__badge {
+  min-width: 80px;
 }
 </style>

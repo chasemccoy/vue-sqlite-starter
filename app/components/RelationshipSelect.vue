@@ -10,7 +10,9 @@
       color="neutral"
       variant="outline"
       icon="i-lucide-list-tree"
-      label="Add Link"
+      label="Add link"
+      class="RelationshipSelect__button"
+      :style="{ width: 'fit-content' }"
     />
 
     <template #content>
@@ -22,10 +24,13 @@
           variant="ghost"
           size="xs"
           icon="i-lucide-arrow-left"
+          color="neutral"
           @click="goBackToRecordSelection"
         />
 
-        <span class="RelationshipSelect__headerText"> Linking to: {{ selectedRecord?.label }} </span>
+        <span class="RelationshipSelect__headerText">
+          Linking to: {{ selectedRecord?.label }}
+        </span>
       </div>
 
       <UCommandPalette
@@ -45,20 +50,7 @@
         :groups="predicateCommandItems"
         :ui="{ input: '[&>input]:h-8 [&>input]:text-sm' }"
         @update:modelValue="handlePredicateSelect"
-      >
-        <template #header>
-          <div class="RelationshipSelect__header">
-            <UButton
-              variant="ghost"
-              size="xs"
-              icon="i-lucide-arrow-left"
-              @click="goBackToRecordSelection"
-            />
-
-            <span class="RelationshipSelect__headerText"> Linking to: {{ selectedRecord?.label }} </span>
-          </div>
-        </template>
-      </UCommandPalette>
+      />
     </template>
   </UPopover>
 </template>
@@ -70,6 +62,7 @@ import { capitalize } from '@shared/lib/formatting';
 import type { DbId } from '@shared/types/api';
 import type { CommandPaletteItem } from '@nuxt/ui';
 import { computed, ref, watch } from 'vue';
+import { getIconForRecordType } from '@app/utils';
 
 type SearchResultItem = {
   label?: string;
@@ -107,9 +100,8 @@ const commandItems = computed(() => {
     .map((record) => ({
       id: record.id.toString(),
       label: record.title || record.slug,
-      icon: getRecordIcon(record.type),
+      icon: getIconForRecordType(record.type),
       suffix: record.summary || record.content || undefined,
-      // prefix: record.summary || record.content || undefined,
     }));
 
   return [
@@ -144,19 +136,6 @@ watch(isOpen, () => {
     resetForm();
   }
 });
-
-function getRecordIcon(type: string) {
-  switch (type) {
-    case 'artifact':
-      return 'i-lucide-file';
-    case 'concept':
-      return 'i-lucide-lightbulb';
-    case 'entity':
-      return 'i-lucide-user';
-    default:
-      return 'i-lucide-circle';
-  }
-}
 
 function handleRecordSelect(item: CommandPaletteItem) {
   if (!item) return;
@@ -201,7 +180,7 @@ function resetForm() {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.75rem 1rem;
+  padding: 8px;
   border-bottom: 1px solid var(--ui-border);
 }
 

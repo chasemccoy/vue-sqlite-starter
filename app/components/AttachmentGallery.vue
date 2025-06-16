@@ -89,7 +89,6 @@ function handleFileSelect(event: Event) {
 	display: grid;
 	grid-template-columns: repeat(auto-fill, minmax(min(120px, 100%), 1fr));
 	gap: 16px;
-	margin-top: 12px;
 }
 
 .Attachments__item {
