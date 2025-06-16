@@ -128,7 +128,6 @@ const predicateCommandItems = computed(() => {
     .map((p) => ({
       id: p.id.toString(),
       label: capitalize(p.name),
-      icon: 'i-lucide-list-tree',
       suffix: capitalize(p.type),
     }));
 

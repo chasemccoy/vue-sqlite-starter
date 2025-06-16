@@ -60,26 +60,38 @@
       v-if="parent || creator"
       class="RecordDetail__byline"
     >
-      <span v-if="parent">
+      <span
+        v-if="parent"
+        class="RecordDetail__bylineItem"
+      >
         from
         <UButton
           icon="i-lucide-workflow"
           size="sm"
           color="neutral"
-          variant="ghost"
+          variant="link"
+          class="RecordDetail__bylineButton"
           :to="`/${parent.slug}`"
-        >{{ parent.title }}</UButton>
+        >
+          <span>{{ parent.title }}</span>
+        </UButton>
       </span>
 
-      <span v-if="creator">
+      <span
+        v-if="creator"
+        class="RecordDetail__bylineItem"
+      >
         by
         <UButton
           icon="i-lucide-user-pen"
           size="sm"
           color="neutral"
-          variant="ghost"
+          variant="link"
+          class="RecordDetail__bylineButton"
           :to="`/${creator.slug}`"
-        >{{ creator.title }}</UButton>
+        >
+          <span>{{ creator.title }}</span>
+        </UButton>
       </span>
     </div>
 
@@ -293,8 +305,32 @@ function handleCreateLink({
 
 :deep(.RecordDetail__titleInput) {
   font-size: 1.5rem;
-  margin-inline: -8px;
+  margin-inline: -12px;
   padding-block: 0;
+}
+
+.RecordDetail__byline {
+  display: inline-flex;
+  margin-top: -8px;
+}
+
+.RecordDetail__bylineItem {
+  display: flex;
+  align-items: center;
+  color: var(--ui-text-muted);
+  font-size: 0.85rem;
+}
+
+:deep(.RecordDetail__bylineButton) {
+  max-width: 250px;
+  margin-left: -2px;
+
+  & :deep(span) {
+    min-width: 0;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+  }
 }
 
 .RecordDetail__links {
