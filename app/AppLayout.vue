@@ -8,19 +8,20 @@
 			/>
 
 			<div class="App__content">
-				<RecordSearch
-					v-model="searchQuery"
-					:searchResultItems="searchResultItems"
-				/>
-
 				<RouterView />
 			</div>
 		</div>
+
+		<SearchModal
+			v-model:open="isSearchModalOpen"
+			v-model:searchQuery="searchQuery"
+			:searchResultItems="searchResultItems"
+		/>
 	</UApp>
 </template>
 
 <script async setup lang="ts">
-import RecordSearch from '@app/components/RecordSearch.vue';
+import SearchModal from '@app/components/SearchModal.vue';
 import useSearch from '@app/composables/useSearch';
 import { getIconForRecordType } from '@app/utils';
 import { computed, ref } from 'vue';
@@ -52,17 +53,19 @@ const navItems = [
 	],
 	[
 		{
+			icon: 'i-lucide-search',
+			onSelect: () => {
+				isSearchModalOpen.value = true
+			},
+		},
+		{
 			to: '/add',
 			icon: 'i-lucide-plus',
 		},
 	],
 ];
 
-const iconForType = {
-	entity: 'i-lucide-user',
-	artifact: 'i-lucide-box',
-	concept: 'i-lucide-brain',
-};
+const isSearchModalOpen = ref(false);
 
 const { data: searchResults } = useSearch(searchQuery, shouldSearch);
 
@@ -72,7 +75,12 @@ const searchResultItems = computed(() => {
 	return searchResults.value.map((result) => ({
 		label: result.title || result.content || result.slug,
 		id: result.slug,
-		icon: iconForType[result.type],
+		icon: getIconForRecordType(result.type),
+		to: `/${result.slug}`,
+		suffix: result.summary || result.content || result.notes || undefined,
+		onSelect: () => {
+			isSearchModalOpen.value = false;
+		}
 	}));
 });
 </script>
