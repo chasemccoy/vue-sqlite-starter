@@ -56,6 +56,11 @@ export const listRecords = async (input: ListRecordsInput = {}) => {
 			recordCreatedAt: true,
 			recordUpdatedAt: true,
 			contentCreatedAt: true,
+			notes: true,
+			isCurated: true,
+		},
+		with: {
+			media: true,
 		},
 		where: {
 			type,

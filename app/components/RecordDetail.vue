@@ -215,6 +215,13 @@
       />
     </UFormField>
 
+    <USwitch
+      v-model="modelValue.isCurated"
+      label="Curated"
+      color="neutral"
+      size="lg"
+    />
+
     <div class="RecordDetail__links">
       <RelationshipSelect
         :sourceRecordId="modelValue.id"
