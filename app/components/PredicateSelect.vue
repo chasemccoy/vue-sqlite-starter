@@ -11,8 +11,8 @@
 	>
 		<UButton
 			color="neutral"
-			variant="outline"
-			icon="i-lucide-list-tree"
+			variant="link"
+			trailingIcon="i-lucide-chevrons-up-down"
 			size="sm"
 			:label="capitalize(selectedPredicate?.name ?? 'Predicates')"
 		/>
@@ -21,31 +21,51 @@
 
 <script setup lang="ts">
 import usePredicates from '@app/composables/usePredicates';
+import type { PredicateSelect } from '@db/schema';
 import { capitalize } from '@shared/lib/formatting';
 import type { DbId } from '@shared/types/api';
 import { computed } from 'vue';
 
 const modelValue = defineModel<DbId>({ default: 19 });
 
-const { getPredicates } = usePredicates();
+const emit = defineEmits<{
+	'select:predicate': [PredicateSelect];
+	'delete:link': [];
+}>();
 
+const { getPredicates } = usePredicates();
 const { data: predicates } = getPredicates();
 
 const menuItems = computed(() => {
 	if (!predicates.value) return [];
 
-	return predicates.value
+	const predicateItems = predicates.value
 		.filter((p) => p.canonical)
 		.map((p) => ({
 			label: capitalize(p.name),
 			type: 'checkbox' as const,
 			checked: modelValue.value === p.id,
 			onUpdateChecked(checked: boolean) {
-				if (checked) {
+				if (checked && p.id !== modelValue.value) {
 					modelValue.value = p.id;
+					emit('select:predicate', p);
 				}
 			},
 		}));
+
+	return [
+		predicateItems,
+		[
+			{
+				label: 'Delete',
+				icon: 'i-lucide-trash',
+				color: 'error',
+				onSelect() {
+					emit('delete:link');
+				}
+			}
+		]
+	]
 });
 
 const selectedPredicate = computed(() => {

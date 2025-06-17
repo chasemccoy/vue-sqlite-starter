@@ -3,52 +3,16 @@
     v-if="modelValue"
     class="RecordCard"
   >
-    <div class="RecordCard__badges">
-      <UBadge
-        v-if="modelValue.isCurated"
-        color="neutral"
-        variant="outline"
-        class="RecordCard__badge"
-        icon="i-lucide-check"
-      />
-
-      <UBadge
-        color="neutral"
-        variant="outline"
-        class="RecordCard__badge"
-        :icon="getIconForRecordType(modelValue.type)"
-      >
-        {{ capitalize(modelValue.type) }}
-      </UBadge>
-    </div>
-
-    <h1 class="RecordCard__title">
+    <h1
+      v-if="modelValue.title"
+      class="RecordCard__title"
+    >
       <RouterLink :to="`/${modelValue.slug}`">
         {{ modelValue.title }}
       </RouterLink>
     </h1>
 
-    <div
-      v-if="parent || creator"
-      class="RecordCard__byline"
-    >
-      <span
-        v-if="parent"
-        class="RecordCard__bylineItem"
-      >
-        from
-        <UButton
-          icon="i-lucide-workflow"
-          size="sm"
-          color="neutral"
-          variant="link"
-          class="RecordCard__bylineButton"
-          :to="`/${parent.slug}`"
-        >
-          <span>{{ parent.title }}</span>
-        </UButton>
-      </span>
-
+    <div class="RecordCard__byline">
       <span
         v-if="creator"
         class="RecordCard__bylineItem"
@@ -65,14 +29,29 @@
           <span>{{ creator.title }}</span>
         </UButton>
       </span>
+
+      <span
+        v-if="modelValue.url"
+        class="RecordCard__url"
+      >
+        [<img
+          v-if="faviconUrl"
+          alt=""
+          :src="faviconUrl"
+        />
+        <a
+          target="_blank"
+          :href="modelValue.url"
+        >
+          {{ urlOrigin }}
+        </a>]
+      </span>
     </div>
 
-    <div
-      v-if="modelValue.url"
-      class="RecordCard__url"
-    >
-      {{ modelValue.url }}
-    </div>
+    <AttachmentGallery
+      v-model="modelValue.media"
+      readonly
+    />
 
     <div
       v-if="modelValue.summary"
@@ -88,13 +67,6 @@
       {{ modelValue.content }}
     </div>
 
-    <AttachmentGallery
-      v-if="false"
-      v-model="modelValue.media"
-      @mediaUpload="({ file, altText }) => emit('mediaUpload', { file, altText })"
-      @mediaDelete="({ mediaId }) => emit('mediaDelete', { mediaId })"
-    />
-
     <div v-if="modelValue.notes">
       {{ modelValue.notes }}
     </div>
@@ -104,31 +76,24 @@
 <script setup lang="ts">
 import AttachmentGallery from '@app/components/AttachmentGallery.vue';
 import type {
-  LinksForRecordQueryResponse,
   ListRecordsQueryResponse
 } from '@db/queries/records';
-import { capitalize } from '@shared/lib/formatting';
 import { computed } from 'vue';
-import { getIconForRecordType } from '@app/utils';
+import { getOriginOfUrl } from '@app/utils';
 
 const modelValue = defineModel<ListRecordsQueryResponse[number]>({ required: true });
 
-const emit = defineEmits<{
-  mediaUpload: [{ file: File; altText?: string }];
-  mediaDelete: [{ mediaId: number }];
-}>();
-
-const { links } = defineProps<{
-  links?: LinksForRecordQueryResponse;
-}>();
-
-const outgoingLinks = computed(() => links?.outgoingLinks ?? null);
-
-const parent = computed(() => {
-  if (!outgoingLinks.value) return null;
-
-  return outgoingLinks.value.find((link) => link.predicate.type === 'containment')?.target ?? null;
+const urlOrigin = computed(() => {
+  if (!modelValue.value.url) return null;
+  return getOriginOfUrl(modelValue.value.url);
 });
+
+const faviconUrl = computed(() => {
+  if (!urlOrigin.value) return null;
+  return `https://www.google.com/s2/favicons?domain=${urlOrigin.value}`;
+});
+
+const outgoingLinks = computed(() => modelValue.value?.outgoingLinks ?? null);
 
 const creator = computed(() => {
   if (!outgoingLinks.value) return null;
@@ -140,7 +105,7 @@ const creator = computed(() => {
 <style scoped>
 .RecordCard {
   display: grid;
-  gap: 12px;
+  gap: 4px;
   background-color: var(--ui-bg);
   border: 1px solid var(--ui-border);
   border-radius: 8px;
@@ -157,12 +122,6 @@ const creator = computed(() => {
   }
 }
 
-.RecordCard__badges {
-  display: flex;
-  gap: 4px;
-  flex-wrap: wrap;
-}
-
 .RecordCard__title {
   font-size: 1.25rem;
   line-height: 1.2;
@@ -174,21 +133,47 @@ const creator = computed(() => {
 
 .RecordCard__byline {
   display: inline-flex;
-  margin-top: -12px;
+  margin-top: -2px;
+  flex-wrap: wrap;
+  font-weight: 500;
+  font-size: 0.75rem;
+  color: var(--ui-text-muted);
 }
 
 .RecordCard__bylineItem {
   display: flex;
   align-items: center;
-  color: var(--ui-text-muted);
-  font-size: 0.8rem;
+}
+
+:deep(.RecordCard__bylineButton) {
+  max-width: 250px;
+  margin-left: -2px;
+
+  & :deep(span) {
+    min-width: 0;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
+  & :deep(svg) {
+    width: 14px;
+    height: 14px;
+  }
 }
 
 .RecordCard__url {
   word-break: break-all;
+  display: inline-flex;
+  align-items: center;
+
+  img {
+    width: 1em;
+    aspect-ratio: 1;
+    margin-right: 4px
+  }
 }
 
-.RecordCard__url,
 .RecordCard__summary,
 .RecordCard__content {
   font-size: 0.8rem;
@@ -208,16 +193,6 @@ const creator = computed(() => {
   gap: 0.25rem;
   margin-bottom: 0.5rem;
   color: var(--ui-text-dimmed);
-}
-
-.RecordCard__badge {
-  width: fit-content;
-
-  & :deep(svg) {
-    width: 12px;
-    height: 12px;
-    color: var(--ui-text-muted);
-  }
 }
 
 .RecordCard__list {

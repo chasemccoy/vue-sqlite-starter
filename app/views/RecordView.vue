@@ -12,6 +12,7 @@
 		@mediaUpload="handleMediaUpload"
 		@mediaDelete="handleMediaDelete"
 		@createLink="handleCreateLink"
+		@deleteLink="handleDeleteLink"
 	/>
 </template>
 
@@ -26,11 +27,12 @@ import type { GetRecordBySlugQueryResponse } from '@db/queries/records';
 import { useDebounceFn } from '@vueuse/core';
 import type { LinkInsert, RecordInsert } from '@db/schema';
 import useLink from '@app/composables/useLink';
+import type { DbId } from '@shared/types/api';
 
 const route = useRoute();
 const { getRecordBySlug, getRecordLinks, upsertRecord } = useRecord();
 const { uploadMedia, deleteMedia } = useMedia();
-const { upsertLink } = useLink();
+const { upsertLink, deleteLink } = useLink();
 
 const record = ref<GetRecordBySlugQueryResponse | undefined>();
 
@@ -46,6 +48,7 @@ const { data: links } = getRecordLinks(recordId, isRecordFetched);
 
 const { mutate: mutateRecord } = upsertRecord();
 const { mutate: createLink } = upsertLink();
+const { mutate: deleteLinkMutation } = deleteLink();
 
 const { mutate: uploadMediaMutation } = uploadMedia();
 const { mutate: deleteMediaMutation } = deleteMedia();
@@ -93,5 +96,9 @@ function handleMediaDelete({ mediaId }: { mediaId: number }) {
 
 function handleCreateLink({ link }: { link: LinkInsert }) {
 	createLink(link);
+}
+
+function handleDeleteLink({ linkId }: { linkId: DbId }) {
+	deleteLinkMutation(linkId);
 }
 </script>

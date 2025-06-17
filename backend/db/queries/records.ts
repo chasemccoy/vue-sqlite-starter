@@ -61,6 +61,20 @@ export const listRecords = async (input: ListRecordsInput = {}) => {
 		},
 		with: {
 			media: true,
+			outgoingLinks: {
+				columns: {
+					predicateId: true,
+				},
+				where: {
+					predicate: {
+						type: 'creation',
+					},
+				},
+				with: {
+					target: true,
+					predicate: true,
+				},
+			},
 		},
 		where: {
 			type,
@@ -245,10 +259,11 @@ export const linksForRecord = async (recordId: RecordSelect['id']) => {
 							},
 						},
 					},
-					target: {
+					source: {
 						columns: {
 							title: true,
 							slug: true,
+							content: true,
 						},
 					},
 				},

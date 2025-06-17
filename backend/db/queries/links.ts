@@ -13,6 +13,9 @@ export const deleteLink = async (linkId: LinkSelect['id']) => {
 	return db.delete(links).where(eq(links.id, linkId)).returning();
 };
 
+export type DeleteLinkQueryResponse = Awaited<ReturnType<typeof deleteLink>>;
+export type DeleteLinkAPIResponse = APIResponse<typeof deleteLink>;
+
 export const upsertLink = async (link: LinkInsert) => {
 	/* 1 ─ fetch predicate + inverse */
 	const predicate = await db.query.predicates.findFirst({

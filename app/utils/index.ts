@@ -10,3 +10,8 @@ export function getIconForRecordType(type: RecordType) {
 			return 'i-lucide-users';
 	}
 }
+
+export function getOriginOfUrl(urlString: string) {
+	const url = new URL(urlString);
+	return url.hostname.replace('www.', '');
+}

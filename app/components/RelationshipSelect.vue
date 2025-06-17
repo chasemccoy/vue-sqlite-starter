@@ -3,15 +3,16 @@
     v-model:open="isOpen"
     :content="{ align: 'start', sideOffset: 8 }"
     :ui="{
-      content: 'min-w-[400px]',
+      content: 'min-w-[300px] max-w-[90vw]',
     }"
   >
     <UButton
       color="neutral"
-      variant="outline"
+      variant="subtle"
       icon="i-lucide-list-tree"
       label="Add link"
       class="RelationshipSelect__button"
+      size="sm"
       :style="{ width: 'fit-content' }"
     />
 
@@ -38,8 +39,7 @@
         v-model:searchTerm="searchQuery"
         placeholder="Search for a record to link..."
         :groups="commandItems"
-        :ui="{ input: '[&>input]:h-8 [&>input]:text-sm' }"
-        ignoreFilter
+        :ui="{ input: '[&>input]:h-8 [&>input]:text-sm', item: 'RelationshipSelect__item', }"
         @update:modelValue="handleRecordSelect"
       />
 
@@ -99,7 +99,7 @@ const commandItems = computed(() => {
     .filter((record) => record.id !== sourceRecordId)
     .map((record) => ({
       id: record.id.toString(),
-      label: record.title || record.slug,
+      label: record.title || record.content || record.slug,
       icon: getIconForRecordType(record.type),
       suffix: record.summary || record.content || undefined,
     }));
@@ -108,6 +108,7 @@ const commandItems = computed(() => {
     {
       id: 'records',
       items,
+      ignoreFilter: true,
     }
   ]
 });
@@ -211,5 +212,12 @@ function resetForm() {
   -webkit-line-clamp: 2;
   line-clamp: 2;
   overflow: hidden;
+}
+
+:deep(.RelationshipSelect__item) {
+  & :deep(svg) {
+    width: 16px;
+    height: 16px;
+  }
 }
 </style>

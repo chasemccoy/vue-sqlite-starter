@@ -1,6 +1,9 @@
 <template>
-	<div>
-		<ul class="Attachments">
+	<div v-if="readonly && modelValue.length > 0 || !readonly">
+		<ul
+			class="Attachments"
+			:class="{ 'Attachments--isEmpty': modelValue.length === 0 }"
+		>
 			<li
 				v-for="media in modelValue"
 				:key="media.id"
@@ -15,6 +18,7 @@
 				<div v-else-if="media.type === 'video'">Video</div>
 
 				<UButton
+					v-if="!readonly"
 					variant="outline"
 					color="neutral"
 					icon="i-lucide-trash"
@@ -24,7 +28,7 @@
 				/>
 			</li>
 
-			<li>
+			<li v-if="!readonly">
 				<div class="Attachments__fileUpload">
 					<input
 						ref="fileInput"
@@ -35,11 +39,12 @@
 						@change="handleFileSelect"
 					/>
 					<UButton
-						variant="outline"
 						color="neutral"
 						class="justify-center"
 						icon="i-lucide-upload"
-						size="lg"
+						:size="modelValue.length === 0 ? 'sm' : 'lg'"
+						:variant="modelValue.length === 0 ? 'subtle' : 'outline'"
+						:label="modelValue.length === 0 ? 'Upload attachments' : undefined"
 						@click="triggerFileSelect"
 					/>
 				</div>
@@ -59,6 +64,10 @@ const modelValue = defineModel<MediaSelect[]>({ required: true });
 const emit = defineEmits<{
 	mediaUpload: [{ file: File; altText?: string }];
 	mediaDelete: [{ mediaId: number }];
+}>();
+
+const { readonly = false } = defineProps<{
+	readonly?: boolean;
 }>();
 
 const fileInput = useTemplateRef('fileInput');
@@ -119,7 +128,7 @@ function handleFileSelect(event: Event) {
 	}
 }
 
-.Attachments__fileUpload {
+.Attachments:not(.Attachments--isEmpty) .Attachments__fileUpload {
 	display: grid;
 	gap: 0.5rem;
 	height: 100%;

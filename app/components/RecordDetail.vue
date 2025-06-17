@@ -5,11 +5,12 @@
   >
     <div class="RecordDetail__badges">
       <UBadge
-        v-if="modelValue.isCurated"
+        v-if="modelValue.isCurated !== true"
         color="neutral"
         variant="outline"
         class="RecordDetail__badge"
-        icon="i-lucide-check"
+        icon="i-lucide-inbox"
+        label="Needs curating"
       />
 
       <UBadge
@@ -187,13 +188,28 @@
     >
       <UTextarea
         v-model.trim="modelValue.content"
-        size="lg"
+        size="xl"
         placeholder="Main content of the record"
         variant="none"
         :rows="1"
         autoresize
       />
     </UFormField>
+
+    <div v-if="children && children.length > 0">
+      <h2 class="RecordDetail__sectionTitle">
+        Children
+      </h2>
+
+      <ul class="RecordDetail__children">
+        <li
+          v-for="child in children"
+          :key="child.id"
+        >
+          {{ child.source.content }}
+        </li>
+      </ul>
+    </div>
 
     <AttachmentGallery
       v-model="modelValue.media"
@@ -229,26 +245,6 @@
       />
 
       <div
-        v-if="incomingLinks && incomingLinks.length > 0"
-        class="RecordDetail__section"
-      >
-        <h2 class="RecordDetail__sectionTitle">
-          <UIcon name="i-lucide-arrow-left" /> Incoming links ({{ incomingLinks.length }})
-        </h2>
-        <ul class="RecordDetail__list">
-          <li
-            v-for="link in incomingLinks"
-            :key="link.id"
-          >
-            <RecordLink
-              :model-value="link.sourceId"
-              :relationship="link.predicate.inverse?.name"
-            />
-          </li>
-        </ul>
-      </div>
-
-      <div
         v-if="outgoingLinks && outgoingLinks.length > 0"
         class="RecordDetail__section"
       >
@@ -261,8 +257,34 @@
             :key="link.id"
           >
             <RecordLink
-              :model-value="link.targetId"
+              :modelValue="link.targetId"
               :relationship="link.predicate.name"
+              :predicate="link.predicate"
+              @updatePredicate="handleUpdatePredicate"
+              @deleteLink="() => handleDeleteLink(link.id)"
+            />
+          </li>
+        </ul>
+      </div>
+
+      <div
+        v-if="incomingLinks && incomingLinks.length > 0"
+        class="RecordDetail__section"
+      >
+        <h2 class="RecordDetail__sectionTitle">
+          <UIcon name="i-lucide-arrow-left" /> Incoming links ({{ incomingLinks.length }})
+        </h2>
+        <ul class="RecordDetail__list">
+          <li
+            v-for="link in incomingLinks"
+            :key="link.id"
+          >
+            <RecordLink
+              v-model:predicate="link.predicate"
+              :modelValue="link.sourceId"
+              :relationship="link.predicate.inverse?.name"
+              @updatePredicate="handleUpdatePredicate"
+              @deleteLink="() => handleDeleteLink(link.id)"
             />
           </li>
         </ul>
@@ -281,8 +303,9 @@ import type {
 } from '@db/queries/records';
 import { capitalize } from '@shared/lib/formatting';
 import { computed } from 'vue';
-import type { LinkInsert } from '@db/schema';
+import type { LinkInsert, PredicateSelect } from '@db/schema';
 import { getIconForRecordType } from '@app/utils';
+import type { DbId } from '@shared/types/api';
 
 const modelValue = defineModel<GetRecordBySlugQueryResponse>({ required: true });
 
@@ -290,6 +313,7 @@ const emit = defineEmits<{
   mediaUpload: [{ file: File; altText?: string }];
   mediaDelete: [{ mediaId: number }];
   createLink: [{ link: LinkInsert }]
+  deleteLink: [{ linkId: DbId }]
 }>();
 
 const { links } = defineProps<{
@@ -311,6 +335,12 @@ const creator = computed(() => {
   return outgoingLinks.value.find((link) => link.predicate.slug === 'created_by')?.target ?? null;
 });
 
+const children = computed(() => {
+  if (!incomingLinks.value) return null;
+
+  return incomingLinks.value.filter((link) => link.predicate.type === 'containment');
+})
+
 function handleCreateLink({
   targetRecordId,
   predicateId,
@@ -327,6 +357,14 @@ function handleCreateLink({
       predicateId,
     },
   });
+}
+
+function handleUpdatePredicate(predicate: PredicateSelect) {
+  console.log(predicate)
+}
+
+function handleDeleteLink(linkId: DbId) {
+  emit('deleteLink', { linkId });
 }
 </script>
 
@@ -378,6 +416,16 @@ function handleCreateLink({
 
 .RecordDetail__content {
   margin-inline: -12px;
+}
+
+.RecordDetail__children {
+  font-size: 1rem;
+
+  &>*+* {
+    border-top: 1px dashed var(--ui-border-accented);
+    padding-top: 12px;
+    margin-top: 12px;
+  }
 }
 
 .RecordDetail__links {

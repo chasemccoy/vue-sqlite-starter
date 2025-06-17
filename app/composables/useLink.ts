@@ -1,5 +1,5 @@
 import useApiClient from '@app/composables/useApiClient';
-import type { UpsertLinkAPIResponse } from '@db/queries/links';
+import type { DeleteLinkQueryResponse, UpsertLinkAPIResponse } from '@db/queries/links';
 import type { LinkInsert } from '@db/schema';
 import { useMutation, useQueryClient } from '@tanstack/vue-query';
 
@@ -22,7 +22,22 @@ export default function useLink() {
 		});
 	}
 
+	function deleteLink() {
+		return useMutation({
+			mutationFn: (id: number) =>
+				fetch<DeleteLinkQueryResponse>(`/link/${id}`, {
+					method: 'DELETE',
+				}),
+			onSuccess: () => {
+				queryClient.invalidateQueries({ queryKey: ['get-record'] });
+				queryClient.invalidateQueries({ queryKey: ['get-record-by-slug'] });
+				queryClient.invalidateQueries({ queryKey: ['get-record-links'] });
+			},
+		});
+	}
+
 	return {
 		upsertLink,
+		deleteLink,
 	};
 }

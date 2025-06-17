@@ -127,6 +127,6 @@ export const predicates = sqliteTable(
 );
 
 // export const PredicateSelectSchema = createSelectSchema(predicates);
-// export type PredicateSelect = typeof predicates.$inferSelect;
+export type PredicateSelect = typeof predicates.$inferSelect;
 // export const PredicateInsertSchema = createInsertSchema(predicates);
 export type PredicateInsert = typeof predicates.$inferInsert;
