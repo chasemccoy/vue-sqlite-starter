@@ -29,6 +29,7 @@
         <PredicateSelect
           v-if="localPredicate"
           v-model="localPredicate.id"
+          :linkDirection="linkDirection"
           @select:predicate="handleSelectPredicate"
           @delete:link="handleDeleteLink"
         />
@@ -60,9 +61,9 @@ const emit = defineEmits<{
   deleteLink: [];
 }>()
 
-const { relationship, predicate } = defineProps<{
-  relationship?: string;
-  predicate?: Predicate
+const { predicate, linkDirection = 'outgoing' } = defineProps<{
+  predicate?: Predicate;
+  linkDirection?: 'incoming' | 'outgoing';
 }>();
 
 const localPredicate = ref(structuredClone(toRaw(predicate)));

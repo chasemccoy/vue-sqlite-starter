@@ -281,6 +281,7 @@
           >
             <RecordLink
               v-model:predicate="link.predicate"
+              linkDirection="incoming"
               :modelValue="link.sourceId"
               :relationship="link.predicate.inverse?.name"
               @updatePredicate="handleUpdatePredicate"

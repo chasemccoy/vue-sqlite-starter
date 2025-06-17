@@ -14,7 +14,7 @@
 			variant="link"
 			trailingIcon="i-lucide-chevrons-up-down"
 			size="sm"
-			:label="capitalize(selectedPredicate?.name ?? 'Predicates')"
+			:label="label"
 		/>
 	</UDropdownMenu>
 </template>
@@ -31,6 +31,10 @@ const modelValue = defineModel<DbId>({ default: 19 });
 const emit = defineEmits<{
 	'select:predicate': [PredicateSelect];
 	'delete:link': [];
+}>();
+
+const { linkDirection = 'outgoing' } = defineProps<{
+	linkDirection?: 'incoming' | 'outgoing';
 }>();
 
 const { getPredicates } = usePredicates();
@@ -71,5 +75,22 @@ const menuItems = computed(() => {
 const selectedPredicate = computed(() => {
 	if (!predicates.value) return null;
 	return predicates.value.find((p) => p.id === modelValue.value);
+});
+
+const selectedInverse = computed(() => {
+	if (!predicates.value || !selectedPredicate.value) return null;
+
+	const inverseSlug = selectedPredicate.value.inverseSlug;
+	return predicates.value.find((p) => p.slug === inverseSlug);
+});
+
+const label = computed(() => {
+	let name = selectedPredicate.value?.name;
+
+	if (linkDirection === 'incoming') {
+		name = selectedInverse.value?.name;
+	}
+
+	return name ? capitalize(name) : 'Predicates'
 });
 </script>
