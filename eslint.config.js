@@ -12,6 +12,7 @@ export default defineConfig([
 		extends: ['js/recommended'],
 		languageOptions: {
 			globals: {
+				defineShortcuts: true,
 				...globals.browser,
 				...globals.node,
 			},

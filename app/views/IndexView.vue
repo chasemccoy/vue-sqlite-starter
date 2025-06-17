@@ -11,7 +11,6 @@
 				<RecordCard v-model="data[index]" />
 			</li>
 		</ul>
-
 	</div>
 </template>
 

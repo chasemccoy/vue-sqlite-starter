@@ -486,7 +486,7 @@ function handleDeleteLink(linkId: DbId) {
 
 .RecordDetail__combinedFields {
   display: grid;
-  border-radius: 6px;
+  border-radius: var(--radius-md);
   overflow: hidden;
   border: 1px solid var(--ui-border);
 

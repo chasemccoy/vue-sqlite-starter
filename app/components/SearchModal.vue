@@ -1,5 +1,9 @@
 <template>
-  <UModal v-model:open="open">
+  <UModal
+    v-model:open="open"
+    title="Search"
+    description="Search for records"
+  >
     <template #content>
       <UCommandPalette
         v-model:searchTerm="searchQuery"
