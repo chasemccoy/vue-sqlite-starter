@@ -333,7 +333,14 @@ export async function createRecordsFromReadwiseDocuments() {
 			},
 			// Exclude old Instapaper imports
 			source: {
-				ne: 'instapaper',
+				OR: [
+					{
+						isNull: true,
+					},
+					{
+						ne: 'instapaper',
+					},
+				],
 			},
 			deletedAt: {
 				isNull: true,

@@ -7,7 +7,10 @@
       v-if="modelValue.title"
       class="RecordCard__title"
     >
-      <RouterLink :to="`/${modelValue.slug}`">
+      <RouterLink
+        activeClass="RecordCard__link--isActive"
+        :to="href"
+      >
         {{ modelValue.title }}
       </RouterLink>
     </h1>
@@ -83,6 +86,16 @@ import { getOriginOfUrl } from '@app/utils';
 
 const modelValue = defineModel<ListRecordsQueryResponse[number]>({ required: true });
 
+const props = defineProps<{
+  to?: string;
+}>();
+
+const href = computed(() => {
+  if (props.to) return props.to;
+
+  return `/${modelValue.value.slug}`;
+})
+
 const urlOrigin = computed(() => {
   if (!modelValue.value.url) return null;
   return getOriginOfUrl(modelValue.value.url);
@@ -119,6 +132,10 @@ const creator = computed(() => {
     overflow-wrap: break-word;
     hyphens: auto;
     min-width: 0;
+  }
+
+  &:has(.RecordCard__link--isActive) {
+    border-color: var(--ui-primary);
   }
 }
 

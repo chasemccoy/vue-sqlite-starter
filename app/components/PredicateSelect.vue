@@ -3,10 +3,12 @@
 		size="sm"
 		:items="menuItems"
 		:ui="{
-			content: 'min-w-[200px]',
+			content: 'min-w-[150px]',
 		}"
 		:content="{
 			align: 'start',
+			alignOffset: 10,
+			sideOffset: 4,
 		}"
 	>
 		<UButton
@@ -14,6 +16,7 @@
 			variant="link"
 			trailingIcon="i-lucide-chevrons-up-down"
 			size="sm"
+			class="PredicateSelect__button"
 			:label="label"
 		/>
 	</UDropdownMenu>
@@ -45,17 +48,27 @@ const menuItems = computed(() => {
 
 	const predicateItems = predicates.value
 		.filter((p) => p.canonical)
-		.map((p) => ({
-			label: capitalize(p.name),
-			type: 'checkbox' as const,
-			checked: modelValue.value === p.id,
-			onUpdateChecked(checked: boolean) {
-				if (checked && p.id !== modelValue.value) {
-					modelValue.value = p.id;
-					emit('select:predicate', p);
-				}
-			},
-		}));
+		.map((p) => {
+			let label = capitalize(p.name);
+
+			if (linkDirection === 'incoming') {
+				const inverseSlug = p.inverseSlug;
+				const inversePredicate = predicates.value?.find((p) => p.slug === inverseSlug);
+				label = inversePredicate ? inversePredicate?.name : label;
+			}
+
+			return {
+				label: capitalize(label),
+				type: 'checkbox' as const,
+				checked: modelValue.value === p.id,
+				onUpdateChecked(checked: boolean) {
+					if (checked && p.id !== modelValue.value) {
+						modelValue.value = p.id;
+						emit('select:predicate', p);
+					}
+				},
+			}
+		});
 
 	return [
 		predicateItems,
@@ -94,3 +107,15 @@ const label = computed(() => {
 	return name ? capitalize(name) : 'Predicates'
 });
 </script>
+
+<style scoped>
+:global(.PredicateSelect__button) {
+	gap: 2px;
+}
+
+:global(.PredicateSelect__button svg) {
+	width: 14px;
+	height: 14px;
+	color: var(--ui-text-dimmed);
+}
+</style>

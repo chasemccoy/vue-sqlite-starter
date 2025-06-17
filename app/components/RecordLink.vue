@@ -13,27 +13,6 @@
       >
         {{ title }}
       </RouterLink>
-
-      <div class="RecordLink__headerMeta">
-        <a
-          v-if="record?.url"
-          target="_blank"
-          :href="record.url"
-        >
-          <UIcon
-            name="i-lucide-link"
-            class="RecordLink__icon"
-          />
-        </a>
-
-        <PredicateSelect
-          v-if="localPredicate"
-          v-model="localPredicate.id"
-          :linkDirection="linkDirection"
-          @select:predicate="handleSelectPredicate"
-          @delete:link="handleDeleteLink"
-        />
-      </div>
     </div>
 
     <div
@@ -41,6 +20,27 @@
       class="RecordLink__summary"
     >
       {{ record.summary || record.content }}
+    </div>
+
+    <div class="RecordLink__headerMeta">
+      <PredicateSelect
+        v-if="localPredicate"
+        v-model="localPredicate.id"
+        :linkDirection="linkDirection"
+        @select:predicate="handleSelectPredicate"
+        @delete:link="handleDeleteLink"
+      />
+
+      <a
+        v-if="record?.url"
+        target="_blank"
+        :href="record.url"
+      >
+        <UIcon
+          name="i-lucide-external-link"
+          class="RecordLink__icon"
+        />
+      </a>
     </div>
   </div>
 </template>
@@ -162,6 +162,7 @@ function handleDeleteLink() {
   flex-grow: 1;
   text-decoration-color: var(--ui-border-accented);
   transition: text-decoration-color 0.15s ease-in-out;
+  font-weight: 500;
 
   &:hover {
     text-decoration-color: currentColor;
@@ -170,8 +171,13 @@ function handleDeleteLink() {
 
 .RecordLink__headerMeta {
   display: flex;
-  gap: 0.5rem;
   align-items: center;
+  margin-left: -10px;
+
+  :deep(svg) {
+    width: 14px;
+    height: 14px;
+  }
 }
 
 .RecordLink__icon {

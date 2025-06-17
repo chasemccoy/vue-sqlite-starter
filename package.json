@@ -20,6 +20,8 @@
 		"db:generate": "pnpm drizzle-kit generate",
 		"db:studio": "drizzle-kit studio",
 		"db:seed": "tsx backend/db/seed.ts",
+		"db:clean": "rm -f enchiridion.db enchiridion.db-shm enchiridion.db-wal",
+		"db:reset": "pnpm db:clean && pnpm db:push && pnpm db:seed",
 		"sync:readwise": "tsx backend/integrations/readwise/sync.ts"
 	},
 	"dependencies": {

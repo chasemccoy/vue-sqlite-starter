@@ -13,6 +13,7 @@
 		@mediaDelete="handleMediaDelete"
 		@createLink="handleCreateLink"
 		@deleteLink="handleDeleteLink"
+		@updatePredicate="handleUpdatePredicate"
 	/>
 </template>
 
@@ -25,7 +26,7 @@ import { useRoute } from 'vue-router';
 import { Head } from '@unhead/vue/components';
 import type { GetRecordBySlugQueryResponse } from '@db/queries/records';
 import { useDebounceFn } from '@vueuse/core';
-import type { LinkInsert, RecordInsert } from '@db/schema';
+import type { LinkInsert, LinkSelect, PredicateSelect, RecordInsert } from '@db/schema';
 import useLink from '@app/composables/useLink';
 import type { DbId } from '@shared/types/api';
 
@@ -47,7 +48,7 @@ const isRecordFetched = computed(() => !!recordId.value);
 const { data: links } = getRecordLinks(recordId, isRecordFetched);
 
 const { mutate: mutateRecord } = upsertRecord();
-const { mutate: createLink } = upsertLink();
+const { mutate: upsertLinkMutation } = upsertLink();
 const { mutate: deleteLinkMutation } = deleteLink();
 
 const { mutate: uploadMediaMutation } = uploadMedia();
@@ -95,10 +96,17 @@ function handleMediaDelete({ mediaId }: { mediaId: number }) {
 }
 
 function handleCreateLink({ link }: { link: LinkInsert }) {
-	createLink(link);
+	upsertLinkMutation(link);
 }
 
 function handleDeleteLink({ linkId }: { linkId: DbId }) {
 	deleteLinkMutation(linkId);
+}
+
+function handleUpdatePredicate({ link, predicate }: { link: LinkSelect; predicate: PredicateSelect }) {
+	upsertLinkMutation({
+		...link,
+		predicateId: predicate.id,
+	});
 }
 </script>

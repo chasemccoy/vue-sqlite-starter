@@ -260,7 +260,7 @@
               :modelValue="link.targetId"
               :relationship="link.predicate.name"
               :predicate="link.predicate"
-              @updatePredicate="handleUpdatePredicate"
+              @updatePredicate="(predicate) => handleUpdatePredicate(link, predicate)"
               @deleteLink="() => handleDeleteLink(link.id)"
             />
           </li>
@@ -284,7 +284,7 @@
               linkDirection="incoming"
               :modelValue="link.sourceId"
               :relationship="link.predicate.inverse?.name"
-              @updatePredicate="handleUpdatePredicate"
+              @updatePredicate="(predicate) => handleUpdatePredicate(link, predicate)"
               @deleteLink="() => handleDeleteLink(link.id)"
             />
           </li>
@@ -304,7 +304,7 @@ import type {
 } from '@db/queries/records';
 import { capitalize } from '@shared/lib/formatting';
 import { computed } from 'vue';
-import type { LinkInsert, PredicateSelect } from '@db/schema';
+import type { LinkInsert, LinkSelect, PredicateSelect } from '@db/schema';
 import { getIconForRecordType } from '@app/utils';
 import type { DbId } from '@shared/types/api';
 
@@ -314,7 +314,8 @@ const emit = defineEmits<{
   mediaUpload: [{ file: File; altText?: string }];
   mediaDelete: [{ mediaId: number }];
   createLink: [{ link: LinkInsert }]
-  deleteLink: [{ linkId: DbId }]
+  deleteLink: [{ linkId: DbId }],
+  updatePredicate: [{ link: LinkSelect; predicate: PredicateSelect }]
 }>();
 
 const { links } = defineProps<{
@@ -360,8 +361,8 @@ function handleCreateLink({
   });
 }
 
-function handleUpdatePredicate(predicate: PredicateSelect) {
-  console.log(predicate)
+function handleUpdatePredicate(link: LinkSelect, predicate: PredicateSelect) {
+  emit('updatePredicate', { link, predicate });
 }
 
 function handleDeleteLink(linkId: DbId) {

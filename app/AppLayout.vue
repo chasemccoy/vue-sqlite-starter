@@ -36,6 +36,11 @@ const navItems = [
 			icon: 'i-lucide-home',
 		},
 		{
+			label: 'Inbox',
+			to: '/inbox',
+			icon: 'i-lucide-inbox',
+		},
+		{
 			label: 'Concepts',
 			to: '/concepts',
 			icon: getIconForRecordType('concept')
@@ -67,6 +72,12 @@ const navItems = [
 
 const isSearchModalOpen = ref(false);
 
+defineShortcuts({
+	meta_k: () => {
+		isSearchModalOpen.value = !isSearchModalOpen.value;
+	}
+})
+
 const { data: searchResults } = useSearch(searchQuery, shouldSearch);
 
 const searchResultItems = computed(() => {
@@ -86,6 +97,13 @@ const searchResultItems = computed(() => {
 </script>
 
 <style scoped>
+.App {
+	isolation: isolate;
+	display: flex;
+	flex-direction: column;
+	height: 100vh;
+}
+
 :deep(.App__nav) {
 	position: sticky;
 	top: 0px;
@@ -99,5 +117,7 @@ const searchResultItems = computed(() => {
 	padding: 1rem;
 	display: grid;
 	gap: 2rem;
+	align-items: start;
+	height: 100%;
 }
 </style>

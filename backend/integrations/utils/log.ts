@@ -1,4 +1,5 @@
 /* eslint-disable no-console */
+import { styleText } from 'node:util';
 
 /**
  * Creates a logger with a specific prefix for integration processes
@@ -22,7 +23,7 @@ export function createIntegrationLogger(integration: string, process: string) {
 		 * Log a warning message
 		 */
 		warn: (message: string, ...args: unknown[]) => {
-			console.warn(`${prefix} ${message}`, ...args);
+			console.warn(styleText('yellow', `${prefix} ${message}`), ...args);
 		},
 
 		/**
@@ -30,14 +31,15 @@ export function createIntegrationLogger(integration: string, process: string) {
 		 */
 		error: (message: string, error?: unknown, ...args: unknown[]) => {
 			if (error instanceof Error) {
-				console.error(`${prefix} ${message}:`, error.message, ...args);
+				console.error(styleText('red', `${prefix} ${message}:`), error.message, ...args);
+
 				if (error.stack) {
-					console.error(error.stack);
+					console.error(styleText('red', error.stack));
 				}
 			} else if (error !== undefined) {
-				console.error(`${prefix} ${message}:`, error, ...args);
+				console.error(styleText('red', `${prefix} ${message}:`), error, ...args);
 			} else {
-				console.error(`${prefix} ${message}`, ...args);
+				console.error(styleText('red', `${prefix} ${message}`), ...args);
 			}
 		},
 
@@ -45,7 +47,7 @@ export function createIntegrationLogger(integration: string, process: string) {
 		 * Log the start of a process
 		 */
 		start: (message: string = 'Starting') => {
-			console.log(`${prefix} ${message}`);
+			console.log(styleText('green', `${prefix} ${message}`));
 		},
 
 		/**
