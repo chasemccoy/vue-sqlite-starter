@@ -411,6 +411,7 @@ function handleDeleteLink(linkId: DbId) {
   font-size: 1.5rem;
   margin-inline: -12px;
   padding-block: 0;
+  text-wrap: pretty;
 }
 
 .RecordDetail__byline {

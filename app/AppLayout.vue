@@ -50,11 +50,6 @@ const navItems = [
 			to: '/entities',
 			icon: getIconForRecordType('entity')
 		},
-		{
-			label: 'Artifacts',
-			to: '/artifacts',
-			icon: getIconForRecordType('artifact')
-		},
 	],
 	[
 		{

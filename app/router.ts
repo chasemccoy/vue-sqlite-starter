@@ -1,5 +1,4 @@
 import AddRecordView from '@app/views/AddRecordView.vue';
-import ArtifactsView from '@app/views/ArtifactsView.vue';
 import ConceptsView from '@app/views/ConceptsView.vue';
 import EditRecordView from '@app/views/EditRecordView.vue';
 import EntitiesView from '@app/views/EntitiesView.vue';
@@ -12,6 +11,12 @@ const routes = [
 	{
 		path: '/',
 		component: IndexView,
+		children: [
+			{
+				path: ':slug',
+				component: RecordView,
+			},
+		],
 	},
 	{
 		path: '/inbox',
@@ -32,16 +37,8 @@ const routes = [
 		component: EntitiesView,
 	},
 	{
-		path: '/artifacts',
-		component: ArtifactsView,
-	},
-	{
 		path: '/add',
 		component: AddRecordView,
-	},
-	{
-		path: '/:slug',
-		component: RecordView,
 	},
 	{
 		path: '/edit/:id',

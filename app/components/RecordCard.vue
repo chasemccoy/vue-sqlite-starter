@@ -9,14 +9,17 @@
       class="RecordCard__title"
     >
       <RouterLink
-        activeClass="RecordCard__link--isActive"
+        activeClass="RouterLink--isActive"
         :to="href"
       >
         {{ modelValue.title }}
       </RouterLink>
     </h1>
 
-    <div class="RecordCard__byline">
+    <div
+      v-if="creator || modelValue.url"
+      class="RecordCard__byline"
+    >
       <span
         v-if="creator"
         class="RecordCard__bylineItem"
@@ -33,6 +36,7 @@
           <span>{{ creator.title }}</span>
         </UButton>
       </span>
+
       <span
         v-if="modelValue.url"
         class="RecordCard__url"
@@ -69,7 +73,10 @@
       {{ modelValue.content }}
     </div>
 
-    <div v-if="modelValue.notes">
+    <div
+      v-if="modelValue.notes"
+      class="RecordCard__notes"
+    >
       {{ modelValue.notes }}
     </div>
 
@@ -167,10 +174,14 @@ const tags = computed(() => {
     min-width: 0;
   }
 
-  &:has(.RecordCard__link--isActive) {
+  &:has(.RouterLink--isActive) {
     border-color: var(--ui-primary);
     box-shadow: 0 0 0 1px var(--ui-primary);
   }
+}
+
+:global(.RouterLink--isActive) {
+  scroll-margin-top: 32px;
 }
 
 .RecordCard__title {
@@ -235,7 +246,8 @@ const tags = computed(() => {
 }
 
 .RecordCard__summary,
-.RecordCard__content {
+.RecordCard__content,
+.RecordCard__notes {
   font-size: 0.8rem;
 }
 
