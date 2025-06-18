@@ -9,7 +9,7 @@
 	"scripts": {
 		"format": "prettier --write .",
 		"lint": "prettier --write . && eslint . --fix && vue-tsc --noEmit",
-		"dev:app": "vite",
+		"dev:app": "vite --host",
 		"dev:backend": "tsx watch backend/api/index.ts",
 		"dev": "concurrently \"npm run dev:app\" \"npm run dev:backend\"",
 		"build": "vue-tsc -b && vite build",

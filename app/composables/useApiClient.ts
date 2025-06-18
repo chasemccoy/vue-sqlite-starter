@@ -9,7 +9,8 @@ const defaultHeaders = {
 };
 
 export default function useApiClient() {
-	const backendBaseUrl = `http://localhost:${BACKEND_PORT}`;
+	const hostname = window.location.hostname;
+	const backendBaseUrl = `http://${hostname}:${BACKEND_PORT}`;
 
 	async function fetch<T>(
 		endpoint: ApiEndpoints | string,

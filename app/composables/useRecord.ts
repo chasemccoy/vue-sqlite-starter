@@ -1,5 +1,5 @@
 import useApiClient from '@app/composables/useApiClient';
-import { useMutation, useQuery } from '@tanstack/vue-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query';
 import type {
 	GetRecordAPIResponse,
 	GetRecordBySlugAPIResponse,
@@ -15,6 +15,7 @@ type OptionalMaybeRef<T> = MaybeRef<T | null>;
 
 export default function useRecord() {
 	const { fetch } = useApiClient();
+	const queryClient = useQueryClient();
 
 	function getRecord(id: OptionalMaybeRef<DbId>, enabled: MaybeRef<boolean> = true) {
 		return useQuery({
@@ -54,6 +55,9 @@ export default function useRecord() {
 					method: 'PUT',
 					body: JSON.stringify(data),
 				}),
+			onSuccess: () => {
+				queryClient.invalidateQueries({ queryKey: ['list-records'] });
+			},
 		});
 	}
 

@@ -189,6 +189,11 @@ function resetForm() {
   font-size: 0.875rem;
   font-weight: 500;
   color: var(--ui-text-highlighted);
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
 }
 
 .RelationshipSelect__searchItem {

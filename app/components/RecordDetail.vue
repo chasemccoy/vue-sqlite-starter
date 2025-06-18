@@ -146,12 +146,12 @@
 
       <SlugField v-model="modelValue.slug" />
 
-      <UButtonGroup>
+      <UButtonGroup v-if="createdAt">
         <UBadge
           color="neutral"
           variant="outline"
           size="lg"
-          label="Created"
+          label="Published"
           class="RecordDetail__badge"
         />
 
@@ -403,12 +403,8 @@ function handleDeleteLink(linkId: DbId) {
   flex-wrap: wrap;
 }
 
-.RecordDetail__title {
-  font-size: 1.5rem;
-}
-
 :deep(.RecordDetail__titleInput) {
-  font-size: 1.5rem;
+  font-size: 1.7rem;
   margin-inline: -12px;
   padding-block: 0;
   text-wrap: pretty;
@@ -481,13 +477,18 @@ function handleDeleteLink(linkId: DbId) {
 }
 
 .RecordDetail__sectionTitle {
-  font-size: 0.75rem;
-  text-transform: uppercase;
+  font-size: 0.85rem;
   display: flex;
   align-items: center;
   gap: 0.25rem;
-  margin-bottom: 0.5rem;
+  margin-bottom: 8px;
   color: var(--ui-text-dimmed);
+  font-weight: 500;
+
+  & :deep(svg) {
+    width: 18px;
+    height: 18px;
+  }
 }
 
 .RecordDetail__badge {
@@ -543,7 +544,7 @@ function handleDeleteLink(linkId: DbId) {
 }
 
 .RecordDetail__combinedFields .RecordDetail__badge {
-  min-width: 72px;
+  min-width: 88px;
 }
 
 .RecordDetail__actions {

@@ -34,7 +34,7 @@ const modelValue = defineModel<string>({
 
 <style scoped>
 .SlugField__badge {
-	min-width: 72px;
+	min-width: 88px;
 }
 
 :global(.SlugField__input) {

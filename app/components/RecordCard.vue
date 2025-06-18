@@ -37,24 +37,22 @@
         </UButton>
       </span>
 
-      <span
+      <LinkWithFavicon
         v-if="modelValue.url"
-        class="RecordCard__url"
-      >at&nbsp;&nbsp;<img
-          v-if="faviconUrl"
-          alt=""
-          :src="faviconUrl"
-        />
-        <a
-          target="_blank"
-          :href="modelValue.url"
-        >
-          {{ urlOrigin }}
-        </a>
-      </span>
+        prefix="at"
+        :modelValue="modelValue.url"
+      />
     </div>
 
+    <img
+      v-if="modelValue.media.length > 0 && modelValue.media[0].type === 'image'"
+      class="RecordCard__image"
+      :src="`${backendBaseUrl}${modelValue.media[0].url}`"
+      :alt="modelValue.media[0].altText ?? ''"
+    />
+
     <AttachmentGallery
+      v-if="false"
       v-model="modelValue.media"
       readonly
     />
@@ -109,8 +107,9 @@ import type {
   ListRecordsQueryResponse
 } from '@db/queries/records';
 import { computed } from 'vue';
-import { getOriginOfUrl } from '@app/utils';
 import { slugify } from '@shared/lib/formatting';
+import useApiClient from '@app/composables/useApiClient';
+import LinkWithFavicon from '@app/components/LinkWithFavicon.vue';
 
 const modelValue = defineModel<ListRecordsQueryResponse[number]>({ required: true });
 
@@ -119,21 +118,13 @@ const { to, size = 'default' } = defineProps<{
   size?: 'compact' | 'default';
 }>();
 
+const { backendBaseUrl } = useApiClient();
+
 const href = computed(() => {
   if (to) return to;
 
   return `/${modelValue.value.slug}`;
 })
-
-const urlOrigin = computed(() => {
-  if (!modelValue.value.url) return null;
-  return getOriginOfUrl(modelValue.value.url);
-});
-
-const faviconUrl = computed(() => {
-  if (!urlOrigin.value) return null;
-  return `https://www.google.com/s2/favicons?domain=${urlOrigin.value}`;
-});
 
 const outgoingLinks = computed(() => modelValue.value?.outgoingLinks ?? null);
 
@@ -156,7 +147,7 @@ const tags = computed(() => {
   gap: 4px;
   background-color: var(--ui-bg);
   border: 1px solid var(--ui-border);
-  border-radius: 8px;
+  border-radius: var(--radius-lg);
   padding: 16px;
 
   -webkit-column-break-inside: avoid;
@@ -233,22 +224,15 @@ const tags = computed(() => {
   }
 }
 
-.RecordCard__url {
-  word-break: break-all;
-  display: inline-flex;
-  align-items: center;
-
-  img {
-    width: 1em;
-    aspect-ratio: 1;
-    margin-right: 4px
-  }
-}
-
 .RecordCard__summary,
 .RecordCard__content,
 .RecordCard__notes {
   font-size: 0.8rem;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 8;
+  line-clamp: 8;
+  overflow: hidden;
 }
 
 .RecordCard__section {
@@ -302,5 +286,14 @@ const tags = computed(() => {
   display: inline-block;
   font-size: 0.8rem;
   color: var(--ui-text-dimmed);
+}
+
+.RecordCard__image {
+  height: 150px;
+  width: 100%;
+  object-fit: cover;
+  object-position: top;
+  border-radius: var(--radius-md);
+  margin-bottom: 4px;
 }
 </style>

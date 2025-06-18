@@ -43,6 +43,7 @@ export default defineConfig({
 	],
 	server: {
 		port: FRONTEND_PORT,
+		allowedHosts: ['.ts.net'],
 	},
 	resolve: {
 		alias: {

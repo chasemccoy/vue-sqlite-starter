@@ -13,6 +13,13 @@
       >
         {{ title }}
       </RouterLink>
+
+      <span
+        v-if="creator"
+        class="RecordLink__creator"
+      >
+        by <RouterLink :to="`/${creator.slug}`">{{ creator.title }}</RouterLink>
+      </span>
     </div>
 
     <div
@@ -31,21 +38,16 @@
         @delete:link="handleDeleteLink"
       />
 
-      <a
+      <LinkWithFavicon
         v-if="record?.url"
-        target="_blank"
-        :href="record.url"
-      >
-        <UIcon
-          name="i-lucide-external-link"
-          class="RecordLink__icon"
-        />
-      </a>
+        :modelValue="record.url"
+      />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import LinkWithFavicon from '@app/components/LinkWithFavicon.vue';
 import PredicateSelect from '@app/components/PredicateSelect.vue';
 import usePredicates from '@app/composables/usePredicates';
 import useRecord from '@app/composables/useRecord';
@@ -162,34 +164,40 @@ function handleDeleteLink() {
 <style scoped>
 .RecordLink {
   display: grid;
-  gap: 2px;
 }
 
 .RecordLink__header {
-  display: flex;
-  gap: 1rem;
-  justify-content: space-between;
-  align-items: baseline;
+  display: inline-flex;
+  gap: 6px;
+  flex-wrap: wrap;
 }
 
-.RecordLink__title {
-  text-decoration: underline;
+.RecordLink__title,
+.RecordLink__creator {
   font-size: 0.875rem;
-  display: block;
-  flex-grow: 1;
+}
+
+.RecordLink__title,
+.RecordLink__creator a {
+  font-weight: 500;
+  text-decoration: underline;
   text-decoration-color: var(--ui-border-accented);
   transition: text-decoration-color 0.15s ease-in-out;
-  font-weight: 500;
 
   &:hover {
     text-decoration-color: currentColor;
   }
 }
 
+.RecordLink__creator {
+  color: var(--ui-text-muted);
+}
+
 .RecordLink__headerMeta {
   display: flex;
   align-items: center;
   margin-left: -10px;
+  font-size: 0.75rem;
 
   :deep(svg) {
     width: 14px;
@@ -210,5 +218,6 @@ function handleDeleteLink() {
   -webkit-line-clamp: 5;
   line-clamp: 5;
   overflow: hidden;
+  margin-top: 2px;
 }
 </style>

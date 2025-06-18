@@ -2,6 +2,7 @@
 	<div
 		ref="elRef"
 		class="IndexView"
+		:class="{ 'IndexView--empty': route.name === RouteName.index }"
 	>
 		<div class="IndexView_list">
 			<ul
@@ -20,7 +21,10 @@
 			</ul>
 		</div>
 
-		<div class="IndexView_detail">
+		<div
+			v-if="route.name !== RouteName.index"
+			class="IndexView_detail"
+		>
 			<RouterView />
 		</div>
 	</div>
@@ -29,6 +33,7 @@
 <script setup lang="ts">
 import RecordCard from '@app/components/RecordCard.vue';
 import useRecords from '@app/composables/useRecords';
+import { RouteName } from '@app/router';
 import { useTemplateRef, watch } from 'vue';
 import { useRoute } from 'vue-router';
 
@@ -74,6 +79,10 @@ watch([data, route], () => {
 	overflow: hidden;
 	height: calc(100% + 2rem);
 	margin: -1rem;
+
+	&.IndexView--empty {
+		grid-template-columns: 1fr;
+	}
 }
 
 .IndexView_list {
@@ -83,13 +92,23 @@ watch([data, route], () => {
 }
 
 .IndexView_grid {
+	column-gap: 12px;
+
 	&>*+* {
 		margin-top: 8px;
+	}
+
+	.IndexView--empty & {
+		columns: 30ch 3;
+
+		&>*+* {
+			margin-top: 12px;
+		}
 	}
 }
 
 .IndexView_detail {
 	overflow: auto;
-	padding: 1rem 1.5rem 0 0.5rem;
+	padding: 1rem 1.5rem 1rem 0.5rem;
 }
 </style>
