@@ -3,6 +3,7 @@ import ArtifactsView from '@app/views/ArtifactsView.vue';
 import ConceptsView from '@app/views/ConceptsView.vue';
 import EditRecordView from '@app/views/EditRecordView.vue';
 import EntitiesView from '@app/views/EntitiesView.vue';
+import InboxView from '@app/views/InboxView.vue';
 import IndexView from '@app/views/IndexView.vue';
 import RecordView from '@app/views/RecordView.vue';
 import { createWebHistory, createRouter } from 'vue-router';
@@ -11,6 +12,16 @@ const routes = [
 	{
 		path: '/',
 		component: IndexView,
+	},
+	{
+		path: '/inbox',
+		component: InboxView,
+		children: [
+			{
+				path: 'record/:slug',
+				component: RecordView,
+			},
+		],
 	},
 	{
 		path: '/concepts',

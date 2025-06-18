@@ -1,5 +1,5 @@
 <template>
-	<div v-if="readonly && modelValue.length > 0 || !readonly">
+	<div v-if="modelValue.length > 0">
 		<ul
 			class="Attachments"
 			:class="{ 'Attachments--isEmpty': modelValue.length === 0 }"
@@ -28,7 +28,7 @@
 				/>
 			</li>
 
-			<li v-if="!readonly">
+			<li v-if="!readonly && modelValue.length !== 0">
 				<div class="Attachments__fileUpload">
 					<input
 						ref="fileInput"
@@ -42,9 +42,8 @@
 						color="neutral"
 						class="justify-center"
 						icon="i-lucide-upload"
-						:size="modelValue.length === 0 ? 'sm' : 'lg'"
-						:variant="modelValue.length === 0 ? 'subtle' : 'outline'"
-						:label="modelValue.length === 0 ? 'Upload attachments' : undefined"
+						variant="outline"
+						size="lg"
 						@click="triggerFileSelect"
 					/>
 				</div>
@@ -87,6 +86,7 @@ function handleFileSelect(event: Event) {
 		for (const file of Array.from(files)) {
 			emit('mediaUpload', { file });
 		}
+
 		// Reset input to allow selecting same file again
 		target.value = '';
 	}

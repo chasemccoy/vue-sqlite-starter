@@ -23,6 +23,7 @@ const OrderByFieldSchema = z.enum([
 	'contentUpdatedAt',
 	'id',
 	'slug',
+	'type',
 ]);
 
 const OrderDirectionSchema = z.enum(['asc', 'desc']);

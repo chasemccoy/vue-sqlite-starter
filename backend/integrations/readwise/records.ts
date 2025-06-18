@@ -263,9 +263,11 @@ export const mapReadwiseDocumentToRecord = (
 		title: document.title || null,
 		slug: slugify(document.title || document.id.toString()),
 		url: document.sourceUrl || document.url,
-		content: document.content ? document.content.replace(/(?<!\n)\n(?!\n)/g, '\n\n') : null, // Normalize newlines: add extra newlines between paragraphs but keep existing double newlines.
-		summary: document.summary || null,
-		notes: notes || null,
+		content: document.content.trim()
+			? document.content.replace(/(?<!\n)\n(?!\n)/g, '\n\n').trim()
+			: null, // Normalize newlines: add extra newlines between paragraphs but keep existing double newlines.
+		summary: document.summary.trim() || null,
+		notes: notes.trim() || null,
 		isCurated: false,
 		source: 'readwise',
 		recordCreatedAt: document.recordCreatedAt,

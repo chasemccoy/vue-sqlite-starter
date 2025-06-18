@@ -2,6 +2,7 @@
   <div
     v-if="modelValue"
     class="RecordCard"
+    :data-size="size"
   >
     <h1
       v-if="modelValue.title"
@@ -32,12 +33,10 @@
           <span>{{ creator.title }}</span>
         </UButton>
       </span>
-
       <span
         v-if="modelValue.url"
         class="RecordCard__url"
-      >
-        [<img
+      >at&nbsp;&nbsp;<img
           v-if="faviconUrl"
           alt=""
           :src="faviconUrl"
@@ -47,7 +46,7 @@
           :href="modelValue.url"
         >
           {{ urlOrigin }}
-        </a>]
+        </a>
       </span>
     </div>
 
@@ -73,6 +72,27 @@
     <div v-if="modelValue.notes">
       {{ modelValue.notes }}
     </div>
+
+    <ul
+      v-if="(tags && tags.length > 0) || modelValue.notes"
+      class="RecordCard__tags"
+    >
+      <li v-if="modelValue.notes">
+        <UIcon
+          name="i-lucide-message-circle"
+          class="size-4"
+        />
+      </li>
+      <li
+        v-for="tag in tags"
+        :key="tag.id"
+        class="RecordCard__tag"
+      >
+        <RouterLink :to="`/${tag.slug}`">
+          #{{ slugify(tag.title ?? tag.slug) }}
+        </RouterLink>
+      </li>
+    </ul>
   </div>
 </template>
 
@@ -83,15 +103,17 @@ import type {
 } from '@db/queries/records';
 import { computed } from 'vue';
 import { getOriginOfUrl } from '@app/utils';
+import { slugify } from '@shared/lib/formatting';
 
 const modelValue = defineModel<ListRecordsQueryResponse[number]>({ required: true });
 
-const props = defineProps<{
+const { to, size = 'default' } = defineProps<{
   to?: string;
+  size?: 'compact' | 'default';
 }>();
 
 const href = computed(() => {
-  if (props.to) return props.to;
+  if (to) return to;
 
   return `/${modelValue.value.slug}`;
 })
@@ -113,6 +135,12 @@ const creator = computed(() => {
 
   return outgoingLinks.value.find((link) => link.predicate.slug === 'created_by')?.target ?? null;
 });
+
+const tags = computed(() => {
+  if (!outgoingLinks.value) return null;
+
+  return outgoingLinks.value.filter((link) => link.predicate.type === 'description')?.map((link) => link.target) ?? null;
+});
 </script>
 
 <style scoped>
@@ -128,6 +156,11 @@ const creator = computed(() => {
   page-break-inside: avoid;
   break-inside: avoid;
 
+  &[data-size="compact"] {
+    padding: 12px;
+    gap: 6px;
+  }
+
   &>* {
     overflow-wrap: break-word;
     hyphens: auto;
@@ -136,6 +169,7 @@ const creator = computed(() => {
 
   &:has(.RecordCard__link--isActive) {
     border-color: var(--ui-primary);
+    box-shadow: 0 0 0 1px var(--ui-primary);
   }
 }
 
@@ -143,8 +177,16 @@ const creator = computed(() => {
   font-size: 1.25rem;
   line-height: 1.2;
 
+  & a {
+    display: block;
+  }
+
   & a:hover {
     text-decoration: underline;
+  }
+
+  [data-size="compact"] & {
+    font-size: 1rem;
   }
 }
 
@@ -164,7 +206,8 @@ const creator = computed(() => {
 
 :deep(.RecordCard__bylineButton) {
   max-width: 250px;
-  margin-left: -2px;
+  margin-left: 1px;
+  padding-inline: 4px;
 
   & :deep(span) {
     min-width: 0;
@@ -194,7 +237,6 @@ const creator = computed(() => {
 .RecordCard__summary,
 .RecordCard__content {
   font-size: 0.8rem;
-  color: var(--ui-text-muted);
 }
 
 .RecordCard__section {
@@ -233,5 +275,20 @@ const creator = computed(() => {
     height: 12px;
     color: var(--ui-text-muted);
   }
+}
+
+.RecordCard__tags {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 4px;
+  margin-bottom: -2px;
+  color: var(--ui-text-dimmed);
+}
+
+.RecordCard__tag {
+  display: inline-block;
+  font-size: 0.8rem;
+  color: var(--ui-text-dimmed);
 }
 </style>

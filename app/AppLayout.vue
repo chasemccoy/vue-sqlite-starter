@@ -99,9 +99,10 @@ const searchResultItems = computed(() => {
 <style scoped>
 .App {
 	isolation: isolate;
-	display: flex;
-	flex-direction: column;
-	height: 100vh;
+	max-height: 100vh;
+	overflow: hidden;
+	display: grid;
+	grid-template-rows: auto minmax(0px, 1fr);
 }
 
 :deep(.App__nav) {
@@ -118,6 +119,6 @@ const searchResultItems = computed(() => {
 	display: grid;
 	gap: 2rem;
 	align-items: start;
-	height: 100%;
+	overflow: auto;
 }
 </style>

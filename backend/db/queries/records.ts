@@ -67,7 +67,9 @@ export const listRecords = async (input: ListRecordsInput = {}) => {
 				},
 				where: {
 					predicate: {
-						type: 'creation',
+						type: {
+							in: ['creation', 'description'],
+						},
 					},
 				},
 				with: {

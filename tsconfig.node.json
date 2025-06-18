@@ -16,7 +16,8 @@
 			"@db/*": ["./backend/db/*"],
 			"@shared/*": ["./shared/*"],
 			"@app/*": ["./app/*"],
-			"@integrations/*": ["./backend/integrations/*"]
+			"@integrations/*": ["./backend/integrations/*"],
+			"#build/ui": ["./node_modules/@nuxt/ui/.nuxt/ui"]
 		}
 	},
 	"include": ["vite.config.ts", "backend/**/*.ts", "backend/**/*.tsx", "shared/**/*.ts"]

@@ -43,8 +43,6 @@ const { data, error, isError } = getRecordBySlug(recordSlug);
 const recordId = computed(() => record.value?.id ?? null);
 const isRecordFetched = computed(() => !!recordId.value);
 
-// const { data: tree } = getRecordTree(recordId, isRecordFetched);
-
 const { data: links } = getRecordLinks(recordId, isRecordFetched);
 
 const { mutate: mutateRecord } = upsertRecord();

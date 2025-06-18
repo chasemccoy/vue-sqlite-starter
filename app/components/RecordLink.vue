@@ -16,10 +16,10 @@
     </div>
 
     <div
-      v-if="record?.summary || record?.content"
+      v-if="summary"
       class="RecordLink__summary"
     >
-      {{ record.summary || record.content }}
+      {{ summary }}
     </div>
 
     <div class="RecordLink__headerMeta">
@@ -49,6 +49,7 @@
 import PredicateSelect from '@app/components/PredicateSelect.vue';
 import usePredicates from '@app/composables/usePredicates';
 import useRecord from '@app/composables/useRecord';
+import { getOriginOfUrl } from '@app/utils';
 import type { PredicateSelect as Predicate } from '@db/schema';
 import type { DbId } from '@shared/types/api';
 import { computed, ref, toRaw } from 'vue';
@@ -133,6 +134,22 @@ const title = computed(() => {
   return null;
 });
 
+const summary = computed(() => {
+  if (record.value?.summary) {
+    return record.value.summary;
+  }
+
+  if (record.value?.content) {
+    return record.value.content;
+  }
+
+  if (record.value?.url) {
+    return getOriginOfUrl(record.value.url);
+  }
+
+  return null;
+});
+
 function handleSelectPredicate(predicate: Predicate) {
   emit('updatePredicate', predicate);
 }
@@ -190,8 +207,8 @@ function handleDeleteLink() {
   color: var(--ui-text-muted);
   display: -webkit-box;
   -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-  line-clamp: 2;
+  -webkit-line-clamp: 5;
+  line-clamp: 5;
   overflow: hidden;
 }
 </style>

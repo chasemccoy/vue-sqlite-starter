@@ -144,6 +144,8 @@
         </UInput>
       </UButtonGroup>
 
+      <SlugField v-model="modelValue.slug" />
+
       <UButtonGroup>
         <UBadge
           color="neutral"
@@ -154,7 +156,7 @@
         />
 
         <UInput
-          v-model="modelValue.contentCreatedAt"
+          v-model="createdAt"
           class="RecordDetail__input"
           variant="outline"
           placeholder="May 4, 1995"
@@ -167,18 +169,34 @@
           color="neutral"
           variant="outline"
           size="lg"
-          label="Captured"
+          label="Saved"
           class="RecordDetail__badge"
         />
 
         <UInput
-          v-model="modelValue.recordCreatedAt"
+          v-model="capturedAt"
           class="RecordDetail__input"
           variant="outline"
           placeholder="May 4, 2025"
           readonly
         />
       </UButtonGroup>
+    </div>
+
+    <div class="RecordDetail__actions">
+      <RelationshipSelect
+        :sourceRecordId="modelValue.id"
+        @createLink="handleCreateLink"
+      />
+
+      <FileUploadButton @fileUpload="({ file, altText }) => emit('mediaUpload', { file, altText })" />
+
+      <USwitch
+        v-model="modelValue.isCurated"
+        label="Curated"
+        size="lg"
+        class="RecordDetail__curatedSwitch"
+      />
     </div>
 
     <UFormField
@@ -196,6 +214,12 @@
       />
     </UFormField>
 
+    <AttachmentGallery
+      v-model="modelValue.media"
+      @mediaUpload="({ file, altText }) => emit('mediaUpload', { file, altText })"
+      @mediaDelete="({ mediaId }) => emit('mediaDelete', { mediaId })"
+    />
+
     <div v-if="children && children.length > 0">
       <h2 class="RecordDetail__sectionTitle">
         Children
@@ -206,16 +230,13 @@
           v-for="child in children"
           :key="child.id"
         >
-          {{ child.source.content }}
+          <blockquote>
+            {{ child.source.content }}
+          </blockquote>
         </li>
       </ul>
     </div>
 
-    <AttachmentGallery
-      v-model="modelValue.media"
-      @mediaUpload="({ file, altText }) => emit('mediaUpload', { file, altText })"
-      @mediaDelete="({ mediaId }) => emit('mediaDelete', { mediaId })"
-    />
 
     <UFormField
       label="Notes"
@@ -225,31 +246,19 @@
         v-model.trim="modelValue.notes"
         size="lg"
         placeholder="Additional notes"
-        variant="outline"
+        variant="subtle"
         :rows="1"
         autoresize
       />
     </UFormField>
 
-    <USwitch
-      v-model="modelValue.isCurated"
-      label="Curated"
-      color="neutral"
-      size="lg"
-    />
-
     <div class="RecordDetail__links">
-      <RelationshipSelect
-        :sourceRecordId="modelValue.id"
-        @createLink="handleCreateLink"
-      />
-
       <div
         v-if="outgoingLinks && outgoingLinks.length > 0"
         class="RecordDetail__section"
       >
         <h2 class="RecordDetail__sectionTitle">
-          <UIcon name="i-lucide-arrow-right" /> Outgoing links ({{ outgoingLinks.length }})
+          <UIcon name="i-lucide-arrow-up-right" /> Outgoing links ({{ outgoingLinks.length }})
         </h2>
         <ul class="RecordDetail__list">
           <li
@@ -272,7 +281,7 @@
         class="RecordDetail__section"
       >
         <h2 class="RecordDetail__sectionTitle">
-          <UIcon name="i-lucide-arrow-left" /> Incoming links ({{ incomingLinks.length }})
+          <UIcon name="i-lucide-arrow-down-right" /> Incoming links ({{ incomingLinks.length }})
         </h2>
         <ul class="RecordDetail__list">
           <li
@@ -302,11 +311,13 @@ import type {
   GetRecordBySlugQueryResponse,
   LinksForRecordQueryResponse,
 } from '@db/queries/records';
-import { capitalize } from '@shared/lib/formatting';
+import { capitalize, formatDate } from '@shared/lib/formatting';
 import { computed } from 'vue';
 import type { LinkInsert, LinkSelect, PredicateSelect } from '@db/schema';
 import { getIconForRecordType } from '@app/utils';
 import type { DbId } from '@shared/types/api';
+import SlugField from '@app/components/SlugField.vue';
+import FileUploadButton from '@app/components/FileUploadButton.vue';
 
 const modelValue = defineModel<GetRecordBySlugQueryResponse>({ required: true });
 
@@ -321,6 +332,16 @@ const emit = defineEmits<{
 const { links } = defineProps<{
   links?: LinksForRecordQueryResponse;
 }>();
+
+const capturedAt = computed(() => {
+  if (!modelValue.value) return null;
+  return formatDate(new Date(modelValue.value.recordCreatedAt));
+});
+
+const createdAt = computed(() => {
+  if (!modelValue.value?.contentCreatedAt) return null;
+  return formatDate(new Date(modelValue.value.contentCreatedAt));
+});
 
 const incomingLinks = computed(() => links?.incomingLinks ?? null);
 const outgoingLinks = computed(() => links?.outgoingLinks ?? null);
@@ -424,14 +445,30 @@ function handleDeleteLink(linkId: DbId) {
   font-size: 1rem;
 
   &>*+* {
-    border-top: 1px dashed var(--ui-border-accented);
-    padding-top: 12px;
-    margin-top: 12px;
+    border-top: 1px dashed var(--ui-border);
+    padding-top: 16px;
+    margin-top: 16px;
+  }
+
+  blockquote {
+    padding-left: 20px;
+    position: relative;
+  }
+
+  blockquote::before {
+    content: "";
+    width: 5px;
+    height: 100%;
+    background-color: var(--ui-border);
+    position: absolute;
+    top: 0;
+    left: 0;
+    border-radius: 8px;
   }
 }
 
 .RecordDetail__links {
-  margin-top: 2rem;
+  margin-top: 16px;
   display: grid;
   gap: 2rem;
   align-items: start;
@@ -505,6 +542,17 @@ function handleDeleteLink(linkId: DbId) {
 }
 
 .RecordDetail__combinedFields .RecordDetail__badge {
-  min-width: 80px;
+  min-width: 72px;
+}
+
+.RecordDetail__actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-top: -4px;
+}
+
+.RecordDetail__curatedSwitch {
+  margin-left: 4px;
 }
 </style>

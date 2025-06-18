@@ -1,19 +1,24 @@
 <template>
-	<UFormField
-		aria-label="Slug"
-		class="SlugField"
-		required
-	>
-		<UInput
-			v-model.trim="modelValue"
-			type="text"
+	<UButtonGroup class="SlugField">
+		<UBadge
+			color="neutral"
+			variant="outline"
 			size="lg"
-			variant="none"
-			icon="i-lucide-hash"
-			placeholder="record-slug"
-			required
+			label="Slug"
+			class="SlugField__badge"
 		/>
-	</UFormField>
+
+		<UInput
+			v-model="modelValue"
+			class="SlugField__field"
+			variant="outline"
+			placeholder="record-slug"
+			:ui="{
+				base: 'SlugField__input'
+			}"
+			readonly
+		/>
+	</UButtonGroup>
 </template>
 
 <script setup lang="ts">
@@ -28,7 +33,16 @@ const modelValue = defineModel<string>({
 </script>
 
 <style scoped>
-.SlugField {
-	margin-inline: -8px;
+.SlugField__badge {
+	min-width: 72px;
+}
+
+:global(.SlugField__input) {
+	color: var(--ui-text-muted);
+}
+
+:global(.SlugField__input:hover),
+:global(.SlugField__input:focus) {
+	color: var(--ui-text);
 }
 </style>
