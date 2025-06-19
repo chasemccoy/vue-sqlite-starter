@@ -1,32 +1,20 @@
 <template>
-	<div class="InboxView">
-		<div class="InboxView_list">
-			<ul
-				v-if="data"
-				class="InboxView_grid"
-			>
-				<li
-					v-for="(record, index) in data"
-					:key="record.id"
-				>
-					<RecordCard
-						v-model="data[index]"
-						size="compact"
-						:to="`/inbox/record/${record.slug}`"
-					/>
-				</li>
-			</ul>
-		</div>
-
-		<div class="InboxView_detail">
-			<RouterView />
-		</div>
-	</div>
+	<SplitViewLayout
+		v-model="data"
+		:recordCardProps="(record) => ({ to: `/inbox/record/${record.slug}` })"
+		:isEmpty="route.name === RouteName.inbox"
+	>
+		<RouterView />
+	</SplitViewLayout>
 </template>
 
 <script setup lang="ts">
-import RecordCard from '@app/components/RecordCard.vue';
+import SplitViewLayout from '@app/components/SplitViewLayout.vue';
 import useRecords from '@app/composables/useRecords';
+import { RouteName } from '@app/router';
+import { useRoute } from 'vue-router';
+
+const route = useRoute();
 
 const { data } = useRecords({
 	limit: 200,
@@ -45,31 +33,3 @@ const { data } = useRecords({
 	],
 });
 </script>
-
-<style scoped>
-.InboxView {
-	display: grid;
-	grid-template-columns: minmax(350px, 0.5fr) 1fr;
-	gap: 8px;
-	overflow: hidden;
-	height: calc(100% + 2rem);
-	margin: -1rem;
-}
-
-.InboxView_list {
-	height: 100%;
-	overflow: auto;
-	padding: 1rem 0.75rem 1rem 1rem;
-}
-
-.InboxView_grid {
-	&>*+* {
-		margin-top: 8px;
-	}
-}
-
-.InboxView_detail {
-	overflow: auto;
-	padding: 1rem 1.5rem 1rem 0.5rem;
-}
-</style>

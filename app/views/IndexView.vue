@@ -1,45 +1,19 @@
 <template>
-	<div
-		ref="elRef"
-		class="IndexView"
-		:class="{ 'IndexView--empty': route.name === RouteName.index }"
+	<SplitViewLayout
+		v-model="data"
+		:isEmpty="route.name === RouteName.index"
 	>
-		<div class="IndexView_list">
-			<ul
-				v-if="data"
-				class="IndexView_grid"
-			>
-				<li
-					v-for="(record, index) in data"
-					:key="record.id"
-				>
-					<RecordCard
-						v-model="data[index]"
-						size="compact"
-					/>
-				</li>
-			</ul>
-		</div>
-
-		<div
-			v-if="route.name !== RouteName.index"
-			class="IndexView_detail"
-		>
-			<RouterView />
-		</div>
-	</div>
+		<RouterView />
+	</SplitViewLayout>
 </template>
 
 <script setup lang="ts">
-import RecordCard from '@app/components/RecordCard.vue';
+import SplitViewLayout from '@app/components/SplitViewLayout.vue';
 import useRecords from '@app/composables/useRecords';
 import { RouteName } from '@app/router';
-import { useTemplateRef, watch } from 'vue';
 import { useRoute } from 'vue-router';
 
-const elRef = useTemplateRef('elRef');
-
-const route = useRoute()
+const route = useRoute();
 
 const { data } = useRecords({
 	limit: 200,
@@ -54,61 +28,4 @@ const { data } = useRecords({
 		},
 	],
 });
-
-watch([data, route], () => {
-	if (!elRef.value) return;
-
-	const selectedRecord = elRef.value.querySelector('.RouterLink--isActive');
-	if (!selectedRecord) return;
-
-	if (
-		!selectedRecord.getBoundingClientRect().top
-		|| selectedRecord.getBoundingClientRect().top < 0
-		|| selectedRecord.getBoundingClientRect().bottom > window.innerHeight
-	) {
-		selectedRecord.scrollIntoView();
-	}
-}, { flush: 'post' })
 </script>
-
-<style scoped>
-.IndexView {
-	display: grid;
-	grid-template-columns: minmax(350px, 0.5fr) 1fr;
-	gap: 8px;
-	overflow: hidden;
-	height: calc(100% + 2rem);
-	margin: -1rem;
-
-	&.IndexView--empty {
-		grid-template-columns: 1fr;
-	}
-}
-
-.IndexView_list {
-	height: 100%;
-	overflow: auto;
-	padding: 1rem 0.75rem 1rem 1rem;
-}
-
-.IndexView_grid {
-	column-gap: 12px;
-
-	&>*+* {
-		margin-top: 8px;
-	}
-
-	.IndexView--empty & {
-		columns: 30ch 3;
-
-		&>*+* {
-			margin-top: 12px;
-		}
-	}
-}
-
-.IndexView_detail {
-	overflow: auto;
-	padding: 1rem 1.5rem 1rem 0.5rem;
-}
-</style>

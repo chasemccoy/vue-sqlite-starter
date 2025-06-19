@@ -67,7 +67,7 @@ const menuItems = computed(() => {
 						emit('select:predicate', p);
 					}
 				},
-			}
+			};
 		});
 
 	return [
@@ -79,10 +79,10 @@ const menuItems = computed(() => {
 				color: 'error',
 				onSelect() {
 					emit('delete:link');
-				}
-			}
-		]
-	]
+				},
+			},
+		],
+	];
 });
 
 const selectedPredicate = computed(() => {
@@ -104,7 +104,7 @@ const label = computed(() => {
 		name = selectedInverse.value?.name;
 	}
 
-	return name ? capitalize(name) : 'Predicates'
+	return name ? capitalize(name) : 'Predicates';
 });
 </script>
 

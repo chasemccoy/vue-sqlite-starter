@@ -101,7 +101,13 @@ function handleDeleteLink({ linkId }: { linkId: DbId }) {
 	deleteLinkMutation(linkId);
 }
 
-function handleUpdatePredicate({ link, predicate }: { link: LinkSelect; predicate: PredicateSelect }) {
+function handleUpdatePredicate({
+	link,
+	predicate,
+}: {
+	link: LinkSelect;
+	predicate: PredicateSelect;
+}) {
 	upsertLinkMutation({
 		...link,
 		predicateId: predicate.id,

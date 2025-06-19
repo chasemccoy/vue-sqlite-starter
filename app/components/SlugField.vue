@@ -14,7 +14,7 @@
 			variant="outline"
 			placeholder="record-slug"
 			:ui="{
-				base: 'SlugField__input'
+				base: 'SlugField__input',
 			}"
 			readonly
 		/>

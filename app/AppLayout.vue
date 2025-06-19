@@ -43,19 +43,19 @@ const navItems = [
 		{
 			label: 'Concepts',
 			to: '/concepts',
-			icon: getIconForRecordType('concept')
+			icon: getIconForRecordType('concept'),
 		},
 		{
 			label: 'Entities',
 			to: '/entities',
-			icon: getIconForRecordType('entity')
+			icon: getIconForRecordType('entity'),
 		},
 	],
 	[
 		{
 			icon: 'i-lucide-search',
 			onSelect: () => {
-				isSearchModalOpen.value = true
+				isSearchModalOpen.value = true;
 			},
 		},
 		{
@@ -70,8 +70,8 @@ const isSearchModalOpen = ref(false);
 defineShortcuts({
 	meta_k: () => {
 		isSearchModalOpen.value = !isSearchModalOpen.value;
-	}
-})
+	},
+});
 
 const { data: searchResults } = useSearch(searchQuery, shouldSearch);
 
@@ -86,7 +86,7 @@ const searchResultItems = computed(() => {
 		suffix: result.summary || result.content || result.notes || undefined,
 		onSelect: () => {
 			isSearchModalOpen.value = false;
-		}
+		},
 	}));
 });
 </script>
