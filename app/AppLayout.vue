@@ -1,23 +1,23 @@
 <template>
-	<UApp>
-		<div class="App">
-			<UNavigationMenu
-				color="neutral"
-				class="App__nav"
-				:items="navItems"
-			/>
+  <UApp>
+    <div class="App">
+      <UNavigationMenu
+        color="neutral"
+        class="App__nav"
+        :items="navItems"
+      />
 
-			<div class="App__content">
-				<RouterView />
-			</div>
-		</div>
+      <div class="App__content">
+        <RouterView />
+      </div>
+    </div>
 
-		<SearchModal
-			v-model:open="isSearchModalOpen"
-			v-model:searchQuery="searchQuery"
-			:searchResultItems="searchResultItems"
-		/>
-	</UApp>
+    <SearchModal
+      v-model:open="isSearchModalOpen"
+      v-model:searchQuery="searchQuery"
+      :searchResultItems="searchResultItems"
+    />
+  </UApp>
 </template>
 
 <script async setup lang="ts">
@@ -30,90 +30,90 @@ const searchQuery = ref('');
 const shouldSearch = computed(() => searchQuery.value !== '');
 
 const navItems = [
-	[
-		{
-			to: '/',
-			icon: 'i-lucide-home',
-		},
-		{
-			label: 'Inbox',
-			to: '/inbox',
-			icon: 'i-lucide-inbox',
-		},
-		{
-			label: 'Concepts',
-			to: '/concepts',
-			icon: getIconForRecordType('concept'),
-		},
-		{
-			label: 'Entities',
-			to: '/entities',
-			icon: getIconForRecordType('entity'),
-		},
-	],
-	[
-		{
-			icon: 'i-lucide-search',
-			onSelect: () => {
-				isSearchModalOpen.value = true;
-			},
-		},
-		{
-			to: '/add',
-			icon: 'i-lucide-plus',
-		},
-	],
+  [
+    {
+      to: '/',
+      icon: 'i-lucide-home',
+    },
+    {
+      label: 'Inbox',
+      to: '/inbox',
+      icon: 'i-lucide-inbox',
+    },
+    {
+      label: 'Concepts',
+      to: '/concepts',
+      icon: getIconForRecordType('concept'),
+    },
+    {
+      label: 'Entities',
+      to: '/entities',
+      icon: getIconForRecordType('entity'),
+    },
+  ],
+  [
+    {
+      icon: 'i-lucide-search',
+      onSelect: () => {
+        isSearchModalOpen.value = true;
+      },
+    },
+    {
+      to: '/add',
+      icon: 'i-lucide-plus',
+    },
+  ],
 ];
 
 const isSearchModalOpen = ref(false);
 
 defineShortcuts({
-	meta_k: () => {
-		isSearchModalOpen.value = !isSearchModalOpen.value;
-	},
+  meta_k: () => {
+    isSearchModalOpen.value = !isSearchModalOpen.value;
+  },
 });
 
 const { data: searchResults } = useSearch(searchQuery, shouldSearch);
 
 const searchResultItems = computed(() => {
-	if (!searchResults.value) return undefined;
+  if (!searchResults.value) return undefined;
 
-	return searchResults.value.map((result) => ({
-		label: result.title || result.content || result.slug,
-		id: result.slug,
-		icon: getIconForRecordType(result.type),
-		to: `/${result.slug}`,
-		suffix: result.summary || result.content || result.notes || undefined,
-		onSelect: () => {
-			isSearchModalOpen.value = false;
-		},
-	}));
+  return searchResults.value.map((result) => ({
+    label: result.title || result.content || result.slug,
+    id: result.slug,
+    icon: getIconForRecordType(result.type),
+    to: `/${result.slug}`,
+    suffix: result.summary || result.content || result.notes || undefined,
+    onSelect: () => {
+      isSearchModalOpen.value = false;
+    },
+  }));
 });
 </script>
 
 <style scoped>
 .App {
-	isolation: isolate;
-	max-height: 100vh;
-	overflow: hidden;
-	display: grid;
-	grid-template-rows: auto minmax(0px, 1fr);
+  isolation: isolate;
+  max-height: 100vh;
+  overflow: hidden;
+  display: grid;
+  grid-template-rows: auto minmax(0px, 1fr);
 }
 
 :deep(.App__nav) {
-	position: sticky;
-	top: 0px;
-	z-index: 1;
-	background-color: var(--ui-bg);
-	border-bottom: 1px solid var(--ui-border);
-	padding: 0.25rem 0.5rem;
+  position: sticky;
+  top: 0px;
+  z-index: 1;
+  background-color: var(--ui-bg);
+  border-bottom: 1px solid var(--ui-border);
+  padding: 0.25rem 0.5rem;
 }
 
 .App__content {
-	padding: 1rem;
-	display: grid;
-	gap: 2rem;
-	align-items: start;
-	overflow: auto;
+  padding: 1rem;
+  display: grid;
+  gap: 2rem;
+  align-items: start;
+  overflow: auto;
 }
 </style>

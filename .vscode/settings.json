@@ -1,21 +1,24 @@
 {
-	"editor.formatOnSave": true,
-	"eslint.workingDirectories": ["."],
-	"editor.codeActionsOnSave": {
-		"source.fixAll": "always",
-		"source.fixAll.eslint": "explicit",
-		"source.removeUnusedImports": "always"
-	},
-	"vue.complete.casing.props": "camel",
-	"vue.complete.casing.tags": "pascal",
-	"editor.defaultFormatter": "esbenp.prettier-vscode",
-	"[typescript]": {
-		"editor.defaultFormatter": "esbenp.prettier-vscode"
-	},
-	"javascript.preferences.importModuleSpecifier": "non-relative",
-	"javascript.preferences.importModuleSpecifierEnding": "minimal",
-	"typescript.preferences.importModuleSpecifierEnding": "minimal",
-	"typescript.preferences.importModuleSpecifier": "non-relative",
-	"editor.suggestSelection": "recentlyUsed",
-	"html.format.wrapAttributes": "force-expand-multiline"
+  "editor.formatOnSave": true,
+  "eslint.workingDirectories": ["."],
+  "editor.codeActionsOnSave": {
+    "source.fixAll": "always",
+    "source.fixAll.eslint": "explicit",
+    "source.removeUnusedImports": "always"
+  },
+  "vue.complete.casing.props": "camel",
+  "vue.complete.casing.tags": "pascal",
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "javascript.preferences.importModuleSpecifier": "non-relative",
+  "javascript.preferences.importModuleSpecifierEnding": "minimal",
+  "typescript.preferences.importModuleSpecifierEnding": "minimal",
+  "typescript.preferences.importModuleSpecifier": "non-relative",
+  "editor.suggestSelection": "recentlyUsed",
+  "html.format.wrapAttributes": "force-expand-multiline",
+  "[vue]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  }
 }

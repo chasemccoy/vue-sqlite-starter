@@ -7,7 +7,6 @@
 	"author": "Chase McCoy",
 	"license": "MIT",
 	"scripts": {
-		"format": "prettier --write .",
 		"lint": "prettier --write . && eslint . --fix && vue-tsc --noEmit",
 		"dev:app": "vite --host",
 		"dev:backend": "tsx watch backend/api/index.ts",

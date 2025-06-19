@@ -1,11 +1,11 @@
 <template>
-	<SplitViewLayout
-		v-model="data"
-		:recordCardProps="(record) => ({ to: `/inbox/record/${record.slug}` })"
-		:isEmpty="route.name === RouteName.inbox"
-	>
-		<RouterView />
-	</SplitViewLayout>
+  <SplitViewLayout
+    v-model="data"
+    :recordCardProps="(record) => ({ to: `/inbox/record/${record.slug}` })"
+    :isEmpty="route.name === RouteName.inbox"
+  >
+    <RouterView />
+  </SplitViewLayout>
 </template>
 
 <script setup lang="ts">
@@ -17,19 +17,20 @@ import { useRoute } from 'vue-router';
 const route = useRoute();
 
 const { data } = useRecords({
-	limit: 200,
-	filters: {
-		isCurated: false,
-	},
-	orderBy: [
-		{
-			field: 'recordCreatedAt',
-			direction: 'desc',
-		},
-		{
-			field: 'type',
-			direction: 'asc',
-		},
-	],
+  limit: 200,
+  filters: {
+    isCurated: false,
+    hasParent: false,
+  },
+  orderBy: [
+    {
+      field: 'recordCreatedAt',
+      direction: 'desc',
+    },
+    {
+      field: 'type',
+      direction: 'asc',
+    },
+  ],
 });
 </script>
