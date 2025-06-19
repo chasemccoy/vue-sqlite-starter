@@ -56,7 +56,7 @@ const elRef = useTemplateRef('elRef');
 const route = useRoute();
 
 watch(
-	[() => modelValue, route],
+	[modelValue, route],
 	() => {
 		if (!elRef.value) return;
 

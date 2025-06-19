@@ -159,7 +159,7 @@ const tags = computed(() => {
 		gap: 6px;
 	}
 
-	& > * {
+	&>* {
 		overflow-wrap: break-word;
 		hyphens: auto;
 		min-width: 0;
@@ -178,6 +178,7 @@ const tags = computed(() => {
 .RecordCard__title {
 	font-size: 1.25rem;
 	line-height: 1.2;
+	text-wrap: pretty;
 
 	& a {
 		display: block;
@@ -251,7 +252,7 @@ const tags = computed(() => {
 }
 
 .RecordCard__list {
-	li + li {
+	li+li {
 		margin-top: 1rem;
 	}
 }
