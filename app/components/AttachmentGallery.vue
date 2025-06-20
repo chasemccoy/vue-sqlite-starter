@@ -1,55 +1,55 @@
 <template>
-	<div v-if="modelValue.length > 0">
-		<ul
-			class="Attachments"
-			:class="{ 'Attachments--isEmpty': modelValue.length === 0 }"
-		>
-			<li
-				v-for="media in modelValue"
-				:key="media.id"
-				class="Attachments__item"
-			>
-				<img
-					v-if="media.type === 'image'"
-					:src="`${backendBaseUrl}${media.url}`"
-					:alt="media.altText ?? ''"
-				/>
-				<div v-else-if="media.url.includes('.pdf')">PDF</div>
-				<div v-else-if="media.type === 'video'">Video</div>
+  <div v-if="modelValue.length > 0">
+    <ul
+      class="Attachments"
+      :class="{ 'Attachments--isEmpty': modelValue.length === 0 }"
+    >
+      <li
+        v-for="attachment in modelValue"
+        :key="attachment.id"
+        class="Attachments__item"
+      >
+        <img
+          v-if="attachment.type === 'image'"
+          :src="`${backendBaseUrl}${attachment.url}`"
+          :alt="attachment.altText ?? ''"
+        />
+        <div v-else-if="attachment.url.includes('.pdf')">PDF</div>
+        <div v-else-if="attachment.type === 'video'">Video</div>
 
-				<UButton
-					v-if="!readonly"
-					variant="outline"
-					color="neutral"
-					icon="i-lucide-trash"
-					size="md"
-					class="justify-center Attachments__itemDeleteButton"
-					@click="emit('mediaDelete', { mediaId: media.id })"
-				/>
-			</li>
+        <UButton
+          v-if="!readonly"
+          variant="outline"
+          color="neutral"
+          icon="i-lucide-trash"
+          size="md"
+          class="justify-center Attachments__itemDeleteButton"
+          @click="emit('mediaDelete', { mediaId: attachment.id })"
+        />
+      </li>
 
-			<li v-if="!readonly && modelValue.length !== 0">
-				<div class="Attachments__fileUpload">
-					<input
-						ref="fileInput"
-						type="file"
-						class="Attachments__fileInput"
-						:accept="acceptedFileTypes"
-						multiple
-						@change="handleFileSelect"
-					/>
-					<UButton
-						color="neutral"
-						class="justify-center"
-						icon="i-lucide-upload"
-						variant="outline"
-						size="lg"
-						@click="triggerFileSelect"
-					/>
-				</div>
-			</li>
-		</ul>
-	</div>
+      <li v-if="!readonly && modelValue.length !== 0">
+        <div class="Attachments__fileUpload">
+          <input
+            ref="fileInput"
+            type="file"
+            class="Attachments__fileInput"
+            :accept="acceptedFileTypes"
+            multiple
+            @change="handleFileSelect"
+          />
+          <UButton
+            color="neutral"
+            class="justify-center"
+            icon="i-lucide-upload"
+            variant="outline"
+            size="lg"
+            @click="triggerFileSelect"
+          />
+        </div>
+      </li>
+    </ul>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -61,12 +61,12 @@ import { useTemplateRef } from 'vue';
 const modelValue = defineModel<MediaSelect[]>({ required: true });
 
 const emit = defineEmits<{
-	mediaUpload: [{ file: File; altText?: string }];
-	mediaDelete: [{ mediaId: number }];
+  mediaUpload: [{ file: File; altText?: string }];
+  mediaDelete: [{ mediaId: number }];
 }>();
 
 const { readonly = false } = defineProps<{
-	readonly?: boolean;
+  readonly?: boolean;
 }>();
 
 const fileInput = useTemplateRef('fileInput');
@@ -75,67 +75,66 @@ const { backendBaseUrl } = useApiClient();
 const acceptedFileTypes = SUPPORTED_MEDIA_TYPES.join(',');
 
 function triggerFileSelect() {
-	fileInput.value?.click();
+  fileInput.value?.click();
 }
 
 function handleFileSelect(event: Event) {
-	const target = event.target as HTMLInputElement;
-	const files = target.files;
+  const target = event.target as HTMLInputElement;
+  const files = target.files;
 
-	if (files && files.length > 0) {
-		for (const file of Array.from(files)) {
-			emit('mediaUpload', { file });
-		}
+  if (files && files.length > 0) {
+    for (const file of Array.from(files)) {
+      emit('mediaUpload', { file });
+    }
 
-		// Reset input to allow selecting same file again
-		target.value = '';
-	}
+    target.value = '';
+  }
 }
 </script>
 
 <style scoped>
 .Attachments {
-	display: grid;
-	grid-template-columns: repeat(auto-fill, minmax(min(120px, 100%), 1fr));
-	gap: 16px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(120px, 100%), 1fr));
+  gap: 16px;
 }
 
 .Attachments__item {
-	position: relative;
+  position: relative;
 
-	img {
-		object-fit: cover;
-		aspect-ratio: 1 / 1;
-		border-radius: 8px;
-	}
+  img {
+    object-fit: cover;
+    aspect-ratio: 1 / 1;
+    border-radius: 8px;
+  }
 }
 
 :deep(.Attachments__itemDeleteButton) {
-	opacity: 0;
-	position: absolute;
-	top: 8px;
-	right: 8px;
-	transition: opacity 0.15s ease-in-out;
-	padding: 8px;
+  opacity: 0;
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  transition: opacity 0.15s ease-in-out;
+  padding: 8px;
 
-	.Attachments__item:hover & {
-		opacity: 1;
-	}
+  .Attachments__item:hover & {
+    opacity: 1;
+  }
 
-	:deep(svg) {
-		width: 16px;
-		height: 16px;
-	}
+  :deep(svg) {
+    width: 16px;
+    height: 16px;
+  }
 }
 
 .Attachments:not(.Attachments--isEmpty) .Attachments__fileUpload {
-	display: grid;
-	gap: 0.5rem;
-	height: 100%;
-	aspect-ratio: 1 / 1;
+  display: grid;
+  gap: 0.5rem;
+  height: 100%;
+  aspect-ratio: 1 / 1;
 }
 
 .Attachments__fileInput {
-	display: none;
+  display: none;
 }
 </style>

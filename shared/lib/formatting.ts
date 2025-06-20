@@ -21,39 +21,39 @@ export const toTitleCase = (str: string) => str.replace(/\b\w/g, (char) => char.
  * // '' -> null, 'value' -> 'value'
  */
 export const emptyStringToNull = <T extends z.ZodTypeAny>(schema: T) =>
-	z.preprocess((val) => (val === '' ? null : val), schema.nullable());
+  z.preprocess((val) => (val === '' ? null : val), schema.nullable());
 
 export const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
 
 export const formatDateToDbString = (date?: Date) => {
-	if (!date) return null;
+  if (!date) return null;
 
-	const pad = (n: number) => n.toString().padStart(2, '0');
+  const pad = (n: number) => n.toString().padStart(2, '0');
 
-	const year = date.getUTCFullYear();
-	const month = pad(date.getUTCMonth() + 1);
-	const day = pad(date.getUTCDate());
+  const year = date.getUTCFullYear();
+  const month = pad(date.getUTCMonth() + 1);
+  const day = pad(date.getUTCDate());
 
-	const hours = pad(date.getUTCHours());
-	const minutes = pad(date.getUTCMinutes());
-	const seconds = pad(date.getUTCSeconds());
+  const hours = pad(date.getUTCHours());
+  const minutes = pad(date.getUTCMinutes());
+  const seconds = pad(date.getUTCSeconds());
 
-	return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+  return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 };
 
 export const slugify = (str: string) => {
-	return slugifyLib(str, {
-		lower: true,
-		strict: true,
-		locale: 'en',
-		trim: true,
-	});
+  return slugifyLib(str, {
+    lower: true,
+    strict: true,
+    locale: 'en',
+    trim: true,
+  });
 };
 
 export const formatDate = (date: Date) => {
-	return date.toLocaleDateString('en-US', {
-		year: 'numeric',
-		month: 'long',
-		day: 'numeric',
-	});
+  return date.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
 };

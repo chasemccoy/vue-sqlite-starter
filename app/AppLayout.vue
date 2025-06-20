@@ -2,6 +2,7 @@
   <UApp>
     <div class="App">
       <UNavigationMenu
+        v-if="route.name !== RouteName.add"
         color="neutral"
         class="App__nav"
         :items="navItems"
@@ -23,8 +24,12 @@
 <script async setup lang="ts">
 import SearchModal from '@app/components/SearchModal.vue';
 import useSearch from '@app/composables/useSearch';
+import { RouteName } from '@app/router';
 import { getIconForRecordType } from '@app/utils';
 import { computed, ref, watch } from 'vue';
+import { useRoute } from 'vue-router';
+
+const route = useRoute();
 
 const searchQuery = ref('');
 const shouldSearch = computed(() => searchQuery.value !== '');
@@ -122,5 +127,6 @@ watch(isSearchModalOpen, () => {
   gap: 2rem;
   align-items: start;
   overflow: auto;
+  grid-row: 2;
 }
 </style>
