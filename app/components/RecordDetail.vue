@@ -42,20 +42,7 @@
       </UBadge>
     </div>
 
-    <UFormField aria-label="Title">
-      <UTextarea
-        v-model.trim="modelValue.title"
-        type="text"
-        size="lg"
-        variant="none"
-        placeholder="Untitled record"
-        :rows="1"
-        :ui="{
-          base: 'RecordDetail__titleInput',
-        }"
-        autoresize
-      />
-    </UFormField>
+    <TitleField v-model="modelValue.title" />
 
     <div
       v-if="parent || creator"
@@ -159,7 +146,10 @@
         </UInput>
       </UButtonGroup>
 
-      <SlugField v-model="modelValue.slug" />
+      <SlugField
+        v-model="modelValue.slug"
+        readonly
+      />
 
       <UButtonGroup v-if="createdAt">
         <UBadge
@@ -236,6 +226,7 @@
     </div>
 
     <AttachmentGallery
+      v-if="modelValue.media && modelValue.media.length > 0"
       v-model="modelValue.media"
       @mediaUpload="({ file, altText }) => emit('mediaUpload', { file, altText })"
       @mediaDelete="({ mediaId }) => emit('mediaDelete', { mediaId })"
@@ -322,6 +313,7 @@ import { getIconForRecordType } from '@app/utils';
 import type { DbId } from '@shared/types/api';
 import SlugField from '@app/components/SlugField.vue';
 import FileUploadButton from '@app/components/FileUploadButton.vue';
+import TitleField from '@app/components/TitleField.vue';
 
 const modelValue = defineModel<GetRecordBySlugQueryResponse>({ required: true });
 
@@ -405,13 +397,6 @@ function handleDeleteLink(linkId: DbId) {
   display: flex;
   gap: 4px;
   flex-wrap: wrap;
-}
-
-:deep(.RecordDetail__titleInput) {
-  font-size: 1.7rem;
-  margin-inline: -12px;
-  padding-block: 0;
-  text-wrap: pretty;
 }
 
 .RecordDetail__byline {

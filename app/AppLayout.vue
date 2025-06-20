@@ -24,7 +24,7 @@
 import SearchModal from '@app/components/SearchModal.vue';
 import useSearch from '@app/composables/useSearch';
 import { getIconForRecordType } from '@app/utils';
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 
 const searchQuery = ref('');
 const shouldSearch = computed(() => searchQuery.value !== '');
@@ -89,12 +89,19 @@ const searchResultItems = computed(() => {
     },
   }));
 });
+
+watch(isSearchModalOpen, () => {
+  if (!isSearchModalOpen.value) {
+    searchQuery.value = '';
+  }
+});
 </script>
 
 <style scoped>
 .App {
   isolation: isolate;
   max-height: 100vh;
+  min-height: 100vh;
   overflow: hidden;
   display: grid;
   grid-template-rows: auto minmax(0px, 1fr);

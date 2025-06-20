@@ -1,90 +1,92 @@
 <template>
-	<form
-		ref="formRef"
-		class="EditRecordForm"
-	>
-		<div>
-			<UFormField
-				aria-label="Title"
-				class="EditRecordForm__formField"
-			>
-				<UInput
-					v-model.trim="modelValue.title"
-					type="text"
-					size="lg"
-					variant="none"
-					placeholder="Untitled record"
-					:ui="{
-						base: 'EditRecordForm__titleInput',
-					}"
-				/>
-			</UFormField>
+  <form
+    ref="formRef"
+    class="EditRecordForm"
+  >
+    <TitleField v-model="modelValue.title" />
 
-			<RecordTypeSelectButton
-				v-if="modelValue.type"
-				v-model="modelValue.type"
-			/>
-		</div>
+    <RecordTypeSelectButton
+      v-if="modelValue.type"
+      v-model="modelValue.type"
+    />
 
-		<div>
-			<SlugField
-				v-model="slug"
-				class="EditRecordForm__input"
-			/>
+    <UFormField label="Content">
+      <UTextarea
+        v-model.trim="modelValue.content"
+        size="lg"
+        placeholder="Main content of the record"
+        :rows="6"
+      />
+    </UFormField>
 
-			<UFormField
-				aria-label="URL"
-				class="EditRecordForm__formField"
-			>
-				<UInput
-					v-model.trim="modelValue.url"
-					type="url"
-					size="lg"
-					placeholder="https://example.org"
-					icon="i-lucide-link"
-					variant="none"
-					class="EditRecordForm__input"
-				/>
-			</UFormField>
-		</div>
+    <div class="EditRecordForm__combinedFields">
+      <UFormField
+        aria-label="Summary"
+        size="xs"
+      >
+        <UTextarea
+          v-model.trim="modelValue.summary"
+          size="lg"
+          placeholder="A brief summary of this record"
+          variant="outline"
+          :rows="1"
+          autoresize
+        />
+      </UFormField>
 
-		<USwitch
-			v-model="modelValue.isCurated"
-			label="Curated"
-			color="neutral"
-			size="lg"
-		/>
+      <SlugField v-model="slug" />
 
-		<UFormField label="Summary">
-			<UTextarea
-				v-model.trim="modelValue.summary"
-				size="lg"
-				placeholder="A brief summary of this record"
-				:rows="3"
-			/>
-		</UFormField>
+      <UButtonGroup>
+        <UBadge
+          color="neutral"
+          variant="outline"
+          size="lg"
+          label="URL"
+        />
 
-		<UFormField label="Content">
-			<UTextarea
-				v-model.trim="modelValue.content"
-				size="lg"
-				placeholder="Main content of the record"
-				:rows="6"
-			/>
-		</UFormField>
+        <UInput
+          v-model="modelValue.url"
+          variant="outline"
+          placeholder="https://example.org"
+        />
+      </UButtonGroup>
 
-		<UButton
-			type="submit"
-			size="xl"
-			variant="outline"
-			color="neutral"
-			:disabled="!isDirty"
-			block
-			@click="handleSubmit"
-		>
-			Save record
-		</UButton>
-	</form>
+      <UButtonGroup>
+        <UBadge
+          color="neutral"
+          variant="outline"
+          size="lg"
+          label="Notes"
+        />
+
+        <UTextarea
+          v-model="modelValue.notes"
+          variant="outline"
+          placeholder="Additional notes"
+          :rows="1"
+          autoresize
+        />
+      </UButtonGroup>
+    </div>
+
+    <USwitch
+      v-model="modelValue.isCurated"
+      label="Curated"
+      color="neutral"
+      size="lg"
+    />
+
+    <UButton
+      type="submit"
+      size="xl"
+      class="EditRecordForm__submitButton"
+      :disabled="!isDirty"
+      block
+      @click="handleSubmit"
+    >
+      Save record
+    </UButton>
+  </form>
 </template>
 
 <script setup lang="ts">
@@ -93,11 +95,12 @@ import type { RecordInsert, RecordSelect } from '@db/schema';
 import { computed, ref, useTemplateRef, watch } from 'vue';
 import SlugField from '@app/components/SlugField.vue';
 import { slugify } from '@shared/lib/formatting';
+import TitleField from '@app/components/TitleField.vue';
 
 const modelValue = defineModel<RecordSelect | RecordInsert>({ required: true });
 
 const emit = defineEmits<{
-	save: [data: RecordInsert];
+  save: [data: RecordInsert];
 }>();
 
 const formRef = useTemplateRef('formRef');
@@ -105,48 +108,55 @@ const formRef = useTemplateRef('formRef');
 const isDirty = ref(false);
 
 const slug = computed(() => {
-	const { slug, title } = modelValue.value;
+  const { slug, title } = modelValue.value;
 
-	if (slug) return slug;
-	else if (title) return slugify(title);
-	else return '';
+  if (slug) return slug;
+  else if (title) return slugify(title);
+  else return '';
 });
 
 watch(
-	() => modelValue,
-	() => {
-		isDirty.value = true;
-	},
-	{ deep: true },
+  () => modelValue,
+  () => {
+    isDirty.value = true;
+  },
+  { deep: true },
 );
 
 function handleSubmit() {
-	if (formRef.value?.checkValidity()) {
-		emit('save', { ...modelValue.value, slug: slug.value });
-	}
+  if (formRef.value?.checkValidity()) {
+    emit('save', { ...modelValue.value, slug: slug.value });
+  }
 }
 </script>
 
 <style scoped>
 .EditRecordForm {
-	display: flex;
-	flex-direction: column;
-	gap: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
-.EditRecordForm__formField {
-	margin-inline: -8px;
+.EditRecordForm__combinedFields {
+  display: grid;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 1px solid var(--ui-border);
+
+  --ui-radius: 0;
+
+  & :deep(input),
+  & :deep(textarea),
+  & :deep(span) {
+    box-shadow: none;
+  }
+
+  & > * + * {
+    border-top: 1px solid var(--ui-border);
+  }
 }
 
-:deep(.EditRecordForm__titleInput) {
-	font-size: 1.5rem;
-	margin-bottom: 8px;
-}
-
-.EditRecordForm__input {
-	& :deep(svg) {
-		width: 16px;
-		height: 16px;
-	}
+:deep(.EditRecordForm__submitButton) {
+  margin-top: 24px;
 }
 </style>
