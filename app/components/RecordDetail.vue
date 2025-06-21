@@ -27,6 +27,7 @@
         color="neutral"
         variant="outline"
         class="RecordDetail__badge"
+        :icon="getIconForRecordSource(modelValue.source)"
       >
         {{ capitalize(modelValue.source) }}
       </UBadge>
@@ -307,7 +308,7 @@ import type {
 import { capitalize, formatDate } from '@shared/lib/formatting';
 import { computed } from 'vue';
 import type { LinkInsert, LinkSelect, PredicateSelect } from '@db/schema';
-import { getIconForRecordType } from '@app/utils';
+import { getIconForRecordSource, getIconForRecordType } from '@app/utils';
 import type { DbId } from '@shared/types/api';
 import SlugField from '@app/components/SlugField.vue';
 import FileUploadButton from '@app/components/FileUploadButton.vue';

@@ -193,8 +193,13 @@ function handleSubmit() {
 async function handleFileUpload(file: File) {
   const dataURL = await mediaFileToDataURL(file);
   if (!dataURL) return;
-  // TODO: handle other file types
-  files.value.push({ url: dataURL, type: 'image', file });
+
+  const type = file.type.includes('image')
+    ? 'image'
+    : file.type.includes('video')
+      ? 'video'
+      : 'pdf';
+  files.value.push({ url: dataURL, type: type, file });
 }
 
 function handleFileDelete({ url }: { url?: string }) {

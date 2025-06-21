@@ -1,6 +1,7 @@
 import type { EnrichedQuotedTweet, EnrichedTweet } from '@integrations/twitter/utils';
 import type { RecordType } from '@shared/types';
 import type { PartialMediaInsert } from '@app/views/AddRecordView.vue';
+import type { IntegrationType } from '@db/schema';
 
 export function getIconForRecordType(type: RecordType) {
   switch (type) {
@@ -10,6 +11,17 @@ export function getIconForRecordType(type: RecordType) {
       return 'i-lucide-brain';
     case 'entity':
       return 'i-lucide-users';
+  }
+}
+
+export function getIconForRecordSource(source?: IntegrationType) {
+  switch (source) {
+    case 'twitter':
+      return 'i-lucide-twitter';
+    case 'readwise':
+      return 'i-lucide-book-open';
+    default:
+      return undefined;
   }
 }
 
