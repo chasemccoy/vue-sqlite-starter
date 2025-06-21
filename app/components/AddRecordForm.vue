@@ -1,7 +1,8 @@
 <template>
   <form
     ref="formRef"
-    class="EditRecordForm"
+    class="AddRecordForm"
+    @submit.prevent
   >
     <TitleField v-model="modelValue.title" />
 
@@ -10,16 +11,22 @@
       v-model="modelValue.type"
     />
 
-    <UFormField label="Content">
+    <UFormField
+      aria-label="Content"
+      size="xs"
+      class="AddRecordForm__content"
+    >
       <UTextarea
         v-model.trim="modelValue.content"
-        size="lg"
+        size="xl"
         placeholder="Main content of the record"
-        :rows="6"
+        variant="none"
+        :rows="1"
+        autoresize
       />
     </UFormField>
 
-    <div class="EditRecordForm__combinedFields">
+    <div class="AddRecordForm__combinedFields">
       <UFormField
         aria-label="Summary"
         size="xs"
@@ -51,6 +58,22 @@
         />
       </UButtonGroup>
 
+      <UButtonGroup v-if="createdAt">
+        <UBadge
+          color="neutral"
+          variant="outline"
+          size="lg"
+          label="Published"
+        />
+
+        <UInput
+          v-model="createdAt"
+          variant="outline"
+          placeholder="May 4, 1995"
+          readonly
+        />
+      </UButtonGroup>
+
       <UButtonGroup>
         <UBadge
           color="neutral"
@@ -69,17 +92,27 @@
       </UButtonGroup>
     </div>
 
-    <USwitch
-      v-model="modelValue.isCurated"
-      label="Curated"
-      color="neutral"
-      size="lg"
+    <div class="AddRecordForm__actions">
+      <FileUploadButton @fileUpload="handleFileUpload" />
+
+      <USwitch
+        v-model="modelValue.isCurated"
+        label="Curated"
+        size="lg"
+      />
+    </div>
+
+    <AttachmentGallery
+      v-if="files && files.length > 0"
+      v-model="files"
+      @fileUpload="handleFileUpload"
+      @fileDelete="handleFileDelete"
     />
 
     <UButton
       type="submit"
       size="xl"
-      class="EditRecordForm__submitButton"
+      class="AddRecordForm__submitButton"
       :disabled="!isDirty"
       block
       @click="handleSubmit"
@@ -94,14 +127,20 @@ import RecordTypeSelectButton from '@app/components/RecordTypeSelectButton.vue';
 import type { RecordInsert, RecordSelect } from '@db/schema';
 import { computed, ref, useTemplateRef, watch } from 'vue';
 import SlugField from '@app/components/SlugField.vue';
-import { slugify } from '@shared/lib/formatting';
+import { formatDate, slugify } from '@shared/lib/formatting';
 import TitleField from '@app/components/TitleField.vue';
+import FileUploadButton from '@app/components/FileUploadButton.vue';
+import type { NewRecordData, PartialLinkInsert } from '@app/views/AddRecordView.vue';
+import AttachmentGallery from '@app/components/AttachmentGallery.vue';
 
 const modelValue = defineModel<RecordSelect | RecordInsert>({ required: true });
 
 const emit = defineEmits<{
-  save: [data: RecordInsert];
+  save: [data: NewRecordData];
 }>();
+
+const files = ref<File[]>([]);
+const links = ref<PartialLinkInsert[]>([]);
 
 const formRef = useTemplateRef('formRef');
 
@@ -115,6 +154,11 @@ const slug = computed(() => {
   else return '';
 });
 
+const createdAt = computed(() => {
+  if (!modelValue.value?.contentCreatedAt) return null;
+  return formatDate(new Date(modelValue.value.contentCreatedAt));
+});
+
 watch(
   () => modelValue,
   () => {
@@ -125,19 +169,31 @@ watch(
 
 function handleSubmit() {
   if (formRef.value?.checkValidity()) {
-    emit('save', { ...modelValue.value, slug: slug.value });
+    emit('save', {
+      record: { ...modelValue.value, slug: slug.value },
+      links: links.value,
+      files: files.value,
+    });
   }
+}
+
+function handleFileUpload(file: File) {
+  files.value.push(file);
+}
+
+function handleFileDelete() {
+  // files.value = files.value.filter((file) => file.name !== mediaId);
 }
 </script>
 
 <style scoped>
-.EditRecordForm {
+.AddRecordForm {
   display: flex;
   flex-direction: column;
   gap: 20px;
 }
 
-.EditRecordForm__combinedFields {
+.AddRecordForm__combinedFields {
   display: grid;
   border-radius: var(--radius-md);
   overflow: hidden;
@@ -156,7 +212,18 @@ function handleSubmit() {
   }
 }
 
-:deep(.EditRecordForm__submitButton) {
+:deep(.AddRecordForm__submitButton) {
   margin-top: 24px;
+}
+
+.AddRecordForm__content {
+  margin-inline: -12px;
+}
+
+.AddRecordForm__actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-top: -4px;
 }
 </style>

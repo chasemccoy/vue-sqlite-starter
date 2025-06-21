@@ -4,7 +4,7 @@
   </Head>
 
   <div class="AddRecordView">
-    <EditRecordForm
+    <AddRecordForm
       v-model="record"
       @save="handleSubmit"
     />
@@ -12,14 +12,28 @@
 </template>
 
 <script setup lang="ts">
-import EditRecordForm from '@app/components/EditRecordForm.vue';
+import AddRecordForm from '@app/components/AddRecordForm.vue';
+import useApiClient from '@app/composables/useApiClient';
 import useRecord from '@app/composables/useRecord';
-import type { RecordInsert } from '@db/schema';
+import type { LinkInsert, RecordInsert } from '@db/schema';
 import { Head } from '@unhead/vue/components';
 import { ref, onMounted } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
+import type { FetchTweetAPIResponse } from '@api/twitter';
+import { formatDateToDbString } from '@shared/lib/formatting';
+import { getImagesFromTweet } from '@app/utils';
 
+export type PartialLinkInsert = Omit<LinkInsert, 'sourceId'>;
+
+export type NewRecordData = {
+  record: RecordInsert;
+  links?: PartialLinkInsert[];
+  files?: File[];
+};
+
+const router = useRouter();
 const route = useRoute();
+const { fetch } = useApiClient();
 
 const emptyRecord: RecordInsert = {
   type: 'artifact',
@@ -31,16 +45,52 @@ const emptyRecord: RecordInsert = {
 const record = ref<RecordInsert>(emptyRecord);
 
 const { upsertRecord } = useRecord();
-const { mutate } = upsertRecord();
+const { mutate: upsertRecordMutation } = upsertRecord();
 
-function handleSubmit(data: RecordInsert) {
-  mutate(data);
+function handleSubmit(data: NewRecordData) {
+  const { record } = data;
+
+  upsertRecordMutation(record, {
+    onSuccess: () => {
+      router.push(`/${record.slug}`);
+    },
+    onError: () => {
+      // TODO: Fire toast
+    },
+  });
 }
 
-onMounted(() => {
+onMounted(async () => {
   const query = route.query;
 
   const populatedRecord = { ...emptyRecord };
+
+  if (query.tweet && typeof query.tweet === 'string') {
+    const tweet = query.tweet;
+    const tweetId = tweet.match(/\/status\/(\d+)/)?.[1];
+
+    populatedRecord.source = 'twitter';
+    populatedRecord.url = tweet;
+
+    const {
+      data: tweetDetails,
+      notFound,
+      tombstone,
+    } = await fetch<FetchTweetAPIResponse>(`/tweet/${tweetId}`);
+
+    if (notFound || tombstone || !tweetDetails) return;
+
+    const createdAt = new Date(tweetDetails.created_at);
+
+    populatedRecord.content = tweetDetails.text;
+    populatedRecord.url = tweetDetails.url;
+    populatedRecord.title = `Tweet by ${tweetDetails.user.name} (@${tweetDetails.user.screen_name})`;
+    populatedRecord.contentCreatedAt = formatDateToDbString(createdAt);
+
+    const images = await getImagesFromTweet(tweetDetails);
+
+    console.log(images);
+  }
 
   if (query.type && typeof query.type === 'string') {
     if (['entity', 'concept', 'artifact'].includes(query.type)) {

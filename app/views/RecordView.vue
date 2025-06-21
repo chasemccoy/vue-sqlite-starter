@@ -1,20 +1,20 @@
 <template>
-	<div v-if="isError">Error: {{ error }}</div>
+  <div v-if="isError">Error: {{ error }}</div>
 
-	<Head>
-		<title v-if="record?.title">{{ record.title }} | Enchiridion</title>
-	</Head>
+  <Head>
+    <title v-if="record?.title">{{ record.title }} | Enchiridion</title>
+  </Head>
 
-	<RecordDetail
-		v-if="record"
-		:modelValue="record"
-		:links="links"
-		@mediaUpload="handleMediaUpload"
-		@mediaDelete="handleMediaDelete"
-		@createLink="handleCreateLink"
-		@deleteLink="handleDeleteLink"
-		@updatePredicate="handleUpdatePredicate"
-	/>
+  <RecordDetail
+    v-if="record"
+    :modelValue="record"
+    :links="links"
+    @fileUpload="handleFileUpload"
+    @fileDelete="handleMediaDelete"
+    @createLink="handleCreateLink"
+    @deleteLink="handleDeleteLink"
+    @updatePredicate="handleUpdatePredicate"
+  />
 </template>
 
 <script setup lang="ts">
@@ -53,64 +53,63 @@ const { mutate: uploadMediaMutation } = uploadMedia();
 const { mutate: deleteMediaMutation } = deleteMedia();
 
 const debouncedMutate = useDebounceFn(
-	(data: RecordInsert) => {
-		mutateRecord(data);
-	},
-	1000,
-	{ maxWait: 5000 },
+  (data: RecordInsert) => {
+    mutateRecord(data);
+  },
+  1000,
+  { maxWait: 5000 },
 );
 
 watch(
-	data,
-	() => {
-		if (!data.value) return;
-		record.value = structuredClone(toRaw(data.value));
-	},
-	{ immediate: true },
+  data,
+  () => {
+    if (!data.value) return;
+    record.value = structuredClone(toRaw(data.value));
+  },
+  { immediate: true },
 );
 
 watch(
-	record,
-	() => {
-		if (!record.value) return;
-		debouncedMutate(record.value);
-	},
-	{ deep: true },
+  record,
+  () => {
+    if (!record.value) return;
+    debouncedMutate(record.value);
+  },
+  { deep: true },
 );
 
-function handleMediaUpload({ file, altText }: { file: File; altText?: string }) {
-	if (!recordId.value) return;
+function handleFileUpload(file: File) {
+  if (!recordId.value) return;
 
-	uploadMediaMutation({
-		file,
-		recordId: recordId.value,
-		altText,
-	});
+  uploadMediaMutation({
+    file,
+    recordId: recordId.value,
+  });
 }
 
 function handleMediaDelete({ mediaId }: { mediaId: number }) {
-	if (!recordId.value) return;
-	deleteMediaMutation(mediaId);
+  if (!recordId.value) return;
+  deleteMediaMutation(mediaId);
 }
 
 function handleCreateLink({ link }: { link: LinkInsert }) {
-	upsertLinkMutation(link);
+  upsertLinkMutation(link);
 }
 
 function handleDeleteLink({ linkId }: { linkId: DbId }) {
-	deleteLinkMutation(linkId);
+  deleteLinkMutation(linkId);
 }
 
 function handleUpdatePredicate({
-	link,
-	predicate,
+  link,
+  predicate,
 }: {
-	link: LinkSelect;
-	predicate: PredicateSelect;
+  link: LinkSelect;
+  predicate: PredicateSelect;
 }) {
-	upsertLinkMutation({
-		...link,
-		predicateId: predicate.id,
-	});
+  upsertLinkMutation({
+    ...link,
+    predicateId: predicate.id,
+  });
 }
 </script>

@@ -24,7 +24,7 @@
           icon="i-lucide-trash"
           size="md"
           class="justify-center Attachments__itemDeleteButton"
-          @click="emit('mediaDelete', { mediaId: attachment.id })"
+          @click="emit('fileDelete', { mediaId: attachment.id })"
         />
       </li>
 
@@ -61,8 +61,8 @@ import { useTemplateRef } from 'vue';
 const modelValue = defineModel<MediaSelect[]>({ required: true });
 
 const emit = defineEmits<{
-  mediaUpload: [{ file: File; altText?: string }];
-  mediaDelete: [{ mediaId: number }];
+  fileUpload: [File];
+  fileDelete: [{ mediaId: number }];
 }>();
 
 const { readonly = false } = defineProps<{
@@ -84,7 +84,7 @@ function handleFileSelect(event: Event) {
 
   if (files && files.length > 0) {
     for (const file of Array.from(files)) {
-      emit('mediaUpload', { file });
+      emit('fileUpload', file);
     }
 
     target.value = '';

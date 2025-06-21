@@ -213,9 +213,7 @@
         @createLink="handleCreateLink"
       />
 
-      <FileUploadButton
-        @fileUpload="({ file, altText }) => emit('mediaUpload', { file, altText })"
-      />
+      <FileUploadButton @fileUpload="(file) => emit('fileUpload', file)" />
 
       <USwitch
         v-model="modelValue.isCurated"
@@ -228,8 +226,8 @@
     <AttachmentGallery
       v-if="modelValue.media && modelValue.media.length > 0"
       v-model="modelValue.media"
-      @mediaUpload="({ file, altText }) => emit('mediaUpload', { file, altText })"
-      @mediaDelete="({ mediaId }) => emit('mediaDelete', { mediaId })"
+      @fileUpload="(file) => emit('fileUpload', file)"
+      @fileDelete="({ mediaId }) => emit('fileDelete', { mediaId })"
     />
 
     <div v-if="children && children.length > 0">
@@ -318,8 +316,8 @@ import TitleField from '@app/components/TitleField.vue';
 const modelValue = defineModel<GetRecordBySlugQueryResponse>({ required: true });
 
 const emit = defineEmits<{
-  mediaUpload: [{ file: File; altText?: string }];
-  mediaDelete: [{ mediaId: number }];
+  fileUpload: [File];
+  fileDelete: [{ mediaId: number }];
   createLink: [{ link: LinkInsert }];
   deleteLink: [{ linkId: DbId }];
   updatePredicate: [{ link: LinkSelect; predicate: PredicateSelect }];
