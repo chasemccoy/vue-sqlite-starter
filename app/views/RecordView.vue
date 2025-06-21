@@ -87,8 +87,8 @@ function handleFileUpload(file: File) {
   });
 }
 
-function handleMediaDelete({ mediaId }: { mediaId: number }) {
-  if (!recordId.value) return;
+function handleMediaDelete({ mediaId }: { mediaId?: number }) {
+  if (!recordId.value || !mediaId) return;
   deleteMediaMutation(mediaId);
 }
 

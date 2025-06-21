@@ -11,11 +11,17 @@
       >
         <img
           v-if="attachment.type === 'image'"
-          :src="`${backendBaseUrl}${attachment.url}`"
-          :alt="attachment.altText ?? ''"
+          :src="getSrcForAttachmentUrl(attachment.url)"
+        />
+        <video
+          v-else-if="attachment.type === 'video'"
+          :src="getSrcForAttachmentUrl(attachment.url)"
+          autoplay
+          muted
+          playsinline
+          loop
         />
         <div v-else-if="attachment.url.includes('.pdf')">PDF</div>
-        <div v-else-if="attachment.type === 'video'">Video</div>
 
         <UButton
           v-if="!readonly"
@@ -24,7 +30,7 @@
           icon="i-lucide-trash"
           size="md"
           class="justify-center Attachments__itemDeleteButton"
-          @click="emit('fileDelete', { mediaId: attachment.id })"
+          @click="emit('fileDelete', { mediaId: attachment.id, url: attachment.url })"
         />
       </li>
 
@@ -54,15 +60,16 @@
 
 <script setup lang="ts">
 import useApiClient from '@app/composables/useApiClient';
-import type { MediaSelect } from '@db/schema';
+import type { PartialMediaInsert } from '@app/views/AddRecordView.vue';
+import type { MediaInsert } from '@db/schema';
 import { SUPPORTED_MEDIA_TYPES } from '@shared/types/api';
 import { useTemplateRef } from 'vue';
 
-const modelValue = defineModel<MediaSelect[]>({ required: true });
+const modelValue = defineModel<MediaInsert[] | PartialMediaInsert[]>({ required: true });
 
 const emit = defineEmits<{
   fileUpload: [File];
-  fileDelete: [{ mediaId: number }];
+  fileDelete: [{ mediaId?: number; url?: string }];
 }>();
 
 const { readonly = false } = defineProps<{
@@ -73,6 +80,13 @@ const fileInput = useTemplateRef('fileInput');
 
 const { backendBaseUrl } = useApiClient();
 const acceptedFileTypes = SUPPORTED_MEDIA_TYPES.join(',');
+
+function getSrcForAttachmentUrl(url: string) {
+  if (url.startsWith('data:')) {
+    return url;
+  }
+  return `${backendBaseUrl}${url}`;
+}
 
 function triggerFileSelect() {
   fileInput.value?.click();
@@ -102,7 +116,8 @@ function handleFileSelect(event: Event) {
 .Attachments__item {
   position: relative;
 
-  img {
+  img,
+  video {
     object-fit: cover;
     aspect-ratio: 1 / 1;
     border-radius: 8px;

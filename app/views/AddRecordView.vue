@@ -6,6 +6,7 @@
   <div class="AddRecordView">
     <AddRecordForm
       v-model="record"
+      v-model:files="files"
       @save="handleSubmit"
     />
   </div>
@@ -15,25 +16,31 @@
 import AddRecordForm from '@app/components/AddRecordForm.vue';
 import useApiClient from '@app/composables/useApiClient';
 import useRecord from '@app/composables/useRecord';
-import type { LinkInsert, RecordInsert } from '@db/schema';
+import type { LinkInsert, MediaInsert, RecordInsert } from '@db/schema';
 import { Head } from '@unhead/vue/components';
 import { ref, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import type { FetchTweetAPIResponse } from '@api/twitter';
-import { formatDateToDbString } from '@shared/lib/formatting';
 import { getImagesFromTweet } from '@app/utils';
+import useMedia from '@app/composables/useMedia';
+import { mapTweetToRecord } from '@integrations/twitter/records';
 
 export type PartialLinkInsert = Omit<LinkInsert, 'sourceId'>;
+export type PartialMediaInsert = Omit<MediaInsert, 'recordId'> & {
+  file?: File;
+};
 
 export type NewRecordData = {
   record: RecordInsert;
   links?: PartialLinkInsert[];
-  files?: File[];
+  files?: PartialMediaInsert[];
 };
 
 const router = useRouter();
 const route = useRoute();
 const { fetch } = useApiClient();
+
+const files = ref<PartialMediaInsert[]>([]);
 
 const emptyRecord: RecordInsert = {
   type: 'artifact',
@@ -45,13 +52,24 @@ const emptyRecord: RecordInsert = {
 const record = ref<RecordInsert>(emptyRecord);
 
 const { upsertRecord } = useRecord();
+const { uploadMedia } = useMedia();
 const { mutate: upsertRecordMutation } = upsertRecord();
+const { mutate: uploadMediaMutation } = uploadMedia();
 
 function handleSubmit(data: NewRecordData) {
-  const { record } = data;
+  const { record, files = [] } = data;
 
   upsertRecordMutation(record, {
-    onSuccess: () => {
+    onSuccess: (r) => {
+      for (const file of files) {
+        if (!file.file) continue;
+
+        uploadMediaMutation({
+          file: file.file,
+          recordId: r.id,
+        });
+      }
+
       router.push(`/${record.slug}`);
     },
     onError: () => {
@@ -63,7 +81,7 @@ function handleSubmit(data: NewRecordData) {
 onMounted(async () => {
   const query = route.query;
 
-  const populatedRecord = { ...emptyRecord };
+  let populatedRecord = { ...emptyRecord };
 
   if (query.tweet && typeof query.tweet === 'string') {
     const tweet = query.tweet;
@@ -80,16 +98,8 @@ onMounted(async () => {
 
     if (notFound || tombstone || !tweetDetails) return;
 
-    const createdAt = new Date(tweetDetails.created_at);
-
-    populatedRecord.content = tweetDetails.text;
-    populatedRecord.url = tweetDetails.url;
-    populatedRecord.title = `Tweet by ${tweetDetails.user.name} (@${tweetDetails.user.screen_name})`;
-    populatedRecord.contentCreatedAt = formatDateToDbString(createdAt);
-
-    const images = await getImagesFromTweet(tweetDetails);
-
-    console.log(images);
+    files.value = await getImagesFromTweet(tweetDetails);
+    populatedRecord = mapTweetToRecord(tweetDetails);
   }
 
   if (query.type && typeof query.type === 'string') {
@@ -130,6 +140,6 @@ onMounted(async () => {
   border: 1px solid var(--ui-border);
   width: 100%;
   max-width: 40em;
-  margin: auto;
+  margin: 48px auto;
 }
 </style>

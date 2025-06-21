@@ -317,7 +317,7 @@ const modelValue = defineModel<GetRecordBySlugQueryResponse>({ required: true })
 
 const emit = defineEmits<{
   fileUpload: [File];
-  fileDelete: [{ mediaId: number }];
+  fileDelete: [{ mediaId?: number; url?: string }];
   createLink: [{ link: LinkInsert }];
   deleteLink: [{ linkId: DbId }];
   updatePredicate: [{ link: LinkSelect; predicate: PredicateSelect }];

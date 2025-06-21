@@ -130,28 +130,41 @@ import SlugField from '@app/components/SlugField.vue';
 import { formatDate, slugify } from '@shared/lib/formatting';
 import TitleField from '@app/components/TitleField.vue';
 import FileUploadButton from '@app/components/FileUploadButton.vue';
-import type { NewRecordData, PartialLinkInsert } from '@app/views/AddRecordView.vue';
+import type {
+  NewRecordData,
+  PartialLinkInsert,
+  PartialMediaInsert,
+} from '@app/views/AddRecordView.vue';
 import AttachmentGallery from '@app/components/AttachmentGallery.vue';
+import { mediaFileToDataURL } from '@app/utils';
 
 const modelValue = defineModel<RecordSelect | RecordInsert>({ required: true });
+
+const files = defineModel<PartialMediaInsert[]>('files', { default: [] });
 
 const emit = defineEmits<{
   save: [data: NewRecordData];
 }>();
 
-const files = ref<File[]>([]);
 const links = ref<PartialLinkInsert[]>([]);
 
 const formRef = useTemplateRef('formRef');
 
 const isDirty = ref(false);
 
-const slug = computed(() => {
-  const { slug, title } = modelValue.value;
-
-  if (slug) return slug;
-  else if (title) return slugify(title);
-  else return '';
+const slug = computed({
+  get() {
+    const { slug, title } = modelValue.value;
+    if (slug) return slug;
+    else if (title) return slugify(title);
+    else return '';
+  },
+  set(value: string) {
+    modelValue.value = {
+      ...modelValue.value,
+      slug: value,
+    };
+  },
 });
 
 const createdAt = computed(() => {
@@ -177,12 +190,16 @@ function handleSubmit() {
   }
 }
 
-function handleFileUpload(file: File) {
-  files.value.push(file);
+async function handleFileUpload(file: File) {
+  const dataURL = await mediaFileToDataURL(file);
+  if (!dataURL) return;
+  // TODO: handle other file types
+  files.value.push({ url: dataURL, type: 'image', file });
 }
 
-function handleFileDelete() {
-  // files.value = files.value.filter((file) => file.name !== mediaId);
+function handleFileDelete({ url }: { url?: string }) {
+  if (!url) return;
+  files.value = files.value.filter((file) => file.url !== url);
 }
 </script>
 
