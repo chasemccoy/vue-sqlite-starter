@@ -150,16 +150,16 @@ onMounted(async () => {
 <style scoped>
 .AddRecordView {
   background-color: var(--ui-bg);
-  padding: 32px;
+  padding: 24px;
   max-width: 40em;
   margin: -16px;
 
   @media (min-width: 600px) {
     border-radius: var(--radius-xl);
     border: 1px solid var(--ui-border);
-    margin-inline: auto;
-    margin-block: 40px;
+    margin: auto;
     padding: 32px 40px 40px;
+    width: 100%;
   }
 }
 </style>

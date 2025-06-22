@@ -99,6 +99,21 @@
       />
     </UFormField>
 
+    <div v-if="children && children.length > 0">
+      <h2 class="RecordDetail__sectionTitle">Children</h2>
+
+      <ul class="RecordDetail__children">
+        <li
+          v-for="child in children"
+          :key="child.id"
+        >
+          <blockquote>
+            {{ child.source.content }}
+          </blockquote>
+        </li>
+      </ul>
+    </div>
+
     <CombinedFields>
       <UFormField
         aria-label="Summary"
@@ -239,21 +254,6 @@
       @fileUpload="(file) => emit('fileUpload', file)"
       @fileDelete="({ mediaId }) => emit('fileDelete', { mediaId })"
     />
-
-    <div v-if="children && children.length > 0">
-      <h2 class="RecordDetail__sectionTitle">Children</h2>
-
-      <ul class="RecordDetail__children">
-        <li
-          v-for="child in children"
-          :key="child.id"
-        >
-          <blockquote>
-            {{ child.source.content }}
-          </blockquote>
-        </li>
-      </ul>
-    </div>
 
     <div class="RecordDetail__links">
       <div
