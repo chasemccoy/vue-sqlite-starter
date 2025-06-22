@@ -13,6 +13,10 @@
 
   --ui-radius: 0;
 
+  &:focus-within {
+    border-color: var(--ui-border-accented);
+  }
+
   & :deep(input),
   & :deep(textarea),
   & :deep(span) {

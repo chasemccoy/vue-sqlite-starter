@@ -159,7 +159,7 @@ const isDirty = ref(false);
 const slug = computed({
   get() {
     const { slug, title } = modelValue.value;
-    if (slug) return slug;
+    if (slug && slug !== '') return slug;
     else if (title) return slugify(title);
     else return '';
   },

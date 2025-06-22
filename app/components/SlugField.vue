@@ -17,6 +17,7 @@
         base: 'SlugField__input',
       }"
       :readonly
+      required
     />
   </UButtonGroup>
 </template>
