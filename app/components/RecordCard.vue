@@ -71,23 +71,14 @@
       {{ modelValue.content }}
     </div>
 
-    <div
-      v-if="modelValue.notes"
-      class="RecordCard__notes"
-    >
-      {{ modelValue.notes }}
-    </div>
-
-    <ul
-      v-if="(tags && tags.length > 0) || modelValue.notes"
-      class="RecordCard__tags"
-    >
+    <ul class="RecordCard__tags">
       <li v-if="modelValue.notes">
         <UIcon
           name="i-lucide-message-circle"
           class="size-4"
         />
       </li>
+      <li>{{ formatDate(new Date(modelValue.recordCreatedAt), { year: false }) }}</li>
       <li
         v-for="tag in tags"
         :key="tag.id"
@@ -101,13 +92,13 @@
 
 <script setup lang="ts">
 import AttachmentGallery from '@app/components/AttachmentGallery.vue';
-import type { ListRecordsQueryResponse } from '@db/queries/records';
+import type { ListRecordsAPIResponse } from '@db/queries/records';
 import { computed } from 'vue';
-import { slugify } from '@shared/lib/formatting';
+import { formatDate, slugify } from '@shared/lib/formatting';
 import useApiClient from '@app/composables/useApiClient';
 import LinkWithFavicon from '@app/components/LinkWithFavicon.vue';
 
-const modelValue = defineModel<ListRecordsQueryResponse[number]>({ required: true });
+const modelValue = defineModel<ListRecordsAPIResponse[number]>({ required: true });
 
 const { to, size = 'default' } = defineProps<{
   to?: string;
@@ -227,8 +218,7 @@ const tags = computed(() => {
 }
 
 .RecordCard__summary,
-.RecordCard__content,
-.RecordCard__notes {
+.RecordCard__content {
   font-size: 0.8rem;
   display: -webkit-box;
   -webkit-box-orient: vertical;
@@ -282,11 +272,11 @@ const tags = computed(() => {
   margin-top: 4px;
   margin-bottom: -2px;
   color: var(--ui-text-dimmed);
+  font-size: 0.8rem;
 }
 
 .RecordCard__tag {
   display: inline-block;
-  font-size: 0.8rem;
   color: var(--ui-text-dimmed);
 }
 

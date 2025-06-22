@@ -50,9 +50,11 @@ export const slugify = (str: string) => {
   });
 };
 
-export const formatDate = (date: Date) => {
+export const formatDate = (date: Date, options?: { year?: boolean }) => {
+  const { year = true } = options ?? {};
+
   return date.toLocaleDateString('en-US', {
-    year: 'numeric',
+    year: year ? 'numeric' : undefined,
     month: 'long',
     day: 'numeric',
   });

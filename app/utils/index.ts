@@ -1,7 +1,7 @@
 import type { EnrichedQuotedTweet, EnrichedTweet } from '@integrations/twitter/utils';
 import type { RecordType } from '@shared/types';
 import type { PartialMediaInsert } from '@app/views/AddRecordView.vue';
-import type { IntegrationType } from '@db/schema';
+import { type IntegrationType } from '@db/schema';
 
 export function getIconForRecordType(type: RecordType) {
   switch (type) {
@@ -71,7 +71,10 @@ export async function getImagesFromTweet(tweet: EnrichedTweet | EnrichedQuotedTw
       } as PartialMediaInsert);
     }
 
-    if (mediaDetail.type === 'video' && mediaDetail.video_info) {
+    if (
+      (mediaDetail.type === 'video' || mediaDetail.type === 'animated_gif') &&
+      mediaDetail.video_info
+    ) {
       const variants = mediaDetail.video_info.variants.filter(
         (variant) => variant.content_type === 'video/mp4',
       );
@@ -92,6 +95,24 @@ export async function getImagesFromTweet(tweet: EnrichedTweet | EnrichedQuotedTw
   if ('quoted_tweet' in tweet && tweet.quoted_tweet) {
     const quotedTweet = tweet.quoted_tweet;
     other = await getImagesFromTweet(quotedTweet);
+  }
+
+  if (tweet.card) {
+    const values = tweet.card.binding_values;
+
+    if (values && values.photo_image_full_size_original) {
+      const image = values.photo_image_full_size_original.image_value;
+      const file = await fetchMedia(image.url);
+      const dataURL = await mediaFileToDataURL(file);
+
+      images.push({
+        url: dataURL,
+        width: image.width,
+        height: image.height,
+        type: 'image',
+        file,
+      } as PartialMediaInsert);
+    }
   }
 
   return [...images, ...videos, ...other];

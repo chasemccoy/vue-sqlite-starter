@@ -110,17 +110,21 @@ function handleFileSelect(event: Event) {
 .Attachments {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(min(120px, 100%), 1fr));
-  gap: 16px;
+  gap: 8px;
 }
 
 .Attachments__item {
   position: relative;
+  box-shadow: inset 0 0 0 1px rgba(0 0 0 / 0.1);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  padding: 1px;
 
   img,
   video {
     object-fit: cover;
     aspect-ratio: 1 / 1;
-    border-radius: 8px;
+    border-radius: var(--radius-md);
   }
 }
 

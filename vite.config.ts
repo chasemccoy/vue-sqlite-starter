@@ -18,6 +18,11 @@ export default defineConfig({
         colors: {
           primary: 'indigo',
         },
+        badge: {
+          slots: {
+            base: 'Badge',
+          },
+        },
         formField: {
           slots: {
             container: 'w-full',

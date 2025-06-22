@@ -38,6 +38,7 @@ export type NewRecordData = {
 
 const router = useRouter();
 const route = useRoute();
+const toast = useToast();
 const { fetch } = useApiClient();
 
 const files = ref<PartialMediaInsert[]>([]);
@@ -72,8 +73,13 @@ function handleSubmit(data: NewRecordData) {
 
       router.push(`/${record.slug}`);
     },
-    onError: () => {
-      // TODO: Fire toast
+    onError: (e) => {
+      toast.add({
+        title: 'Error',
+        description: e.message.slice(0, 250),
+        color: 'error',
+        icon: 'i-lucide-circle-alert',
+      });
     },
   });
 }
@@ -96,7 +102,16 @@ onMounted(async () => {
       tombstone,
     } = await fetch<FetchTweetAPIResponse>(`/tweet/${tweetId}`);
 
-    if (notFound || tombstone || !tweetDetails) return;
+    if (notFound || tombstone || !tweetDetails) {
+      toast.add({
+        title: 'Failed to fetch tweet',
+        description: `Couldn’t fetch tweet at ${tweet}`,
+        color: 'error',
+        icon: 'i-lucide-circle-alert',
+      });
+
+      return;
+    }
 
     files.value = await getImagesFromTweet(tweetDetails);
     populatedRecord = mapTweetToRecord(tweetDetails);
@@ -135,11 +150,16 @@ onMounted(async () => {
 <style scoped>
 .AddRecordView {
   background-color: var(--ui-bg);
-  padding: 32px 40px 32px;
-  border-radius: var(--radius-xl);
-  border: 1px solid var(--ui-border);
-  width: 100%;
+  padding: 32px;
   max-width: 40em;
-  margin: 48px auto;
+  margin: -16px;
+
+  @media (min-width: 600px) {
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--ui-border);
+    margin-inline: auto;
+    margin-block: 40px;
+    padding: 32px 40px 40px;
+  }
 }
 </style>

@@ -21,8 +21,7 @@
 		"db:seed": "tsx backend/db/seed.ts",
 		"db:clean": "rm -f enchiridion.db enchiridion.db-shm enchiridion.db-wal",
 		"db:reset": "pnpm db:clean && pnpm db:push && pnpm db:seed",
-		"sync:readwise": "tsx backend/integrations/readwise/sync.ts",
-		"fetch:tweet": "tsx backend/integrations/twitter/main.ts"
+		"sync:readwise": "tsx backend/integrations/readwise/sync.ts"
 	},
 	"dependencies": {
 		"@nuxt/ui": "^3.1.3",

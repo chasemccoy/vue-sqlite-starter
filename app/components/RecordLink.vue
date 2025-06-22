@@ -29,7 +29,7 @@
       {{ summary }}
     </div>
 
-    <div class="RecordLink__headerMeta">
+    <div class="RecordLink__meta">
       <PredicateSelect
         v-if="localPredicate"
         v-model="localPredicate.id"
@@ -188,7 +188,7 @@ function handleDeleteLink() {
   color: var(--ui-text-muted);
 }
 
-.RecordLink__headerMeta {
+.RecordLink__meta {
   display: flex;
   align-items: center;
   margin-left: -10px;

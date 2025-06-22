@@ -1,13 +1,15 @@
+/* eslint-disable no-console */
+
 import type { Request, Response, NextFunction } from 'express';
 
 export interface AppError extends Error {
-	status?: number;
+  status?: number;
 }
 
 export const errorHandler = (err: AppError, _req: Request, res: Response, _next: NextFunction) => {
-	console.error(err);
+  console.error(err);
 
-	res.status(err.status || 500).json({
-		message: err.message || 'Internal Server Error',
-	});
+  res.status(err.status || 500).json({
+    message: err.message || 'Internal Server Error',
+  });
 };

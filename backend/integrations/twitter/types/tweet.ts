@@ -1,3 +1,4 @@
+import type { TweetCard } from '@integrations/twitter/types/card';
 import type { TweetEditControl } from './edit';
 import type { Indices, TweetEntities } from './entities';
 import type { MediaDetails } from './media';
@@ -62,6 +63,7 @@ export interface Tweet extends TweetBase {
   in_reply_to_user_id_str?: string;
   parent?: TweetParent;
   possibly_sensitive?: boolean;
+  card?: TweetCard;
 }
 
 /**
@@ -84,4 +86,5 @@ export interface QuotedTweet extends TweetBase {
   self_thread: {
     id_str: string;
   };
+  card?: TweetCard;
 }

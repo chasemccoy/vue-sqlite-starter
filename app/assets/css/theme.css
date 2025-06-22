@@ -4,17 +4,19 @@
 @import '@nuxt/ui';
 
 @theme {
-	--font-sans: 'Public Sans', sans-serif;
+  --font-sans: 'Public Sans', sans-serif;
 }
 
 :root {
-	--font-weight-medium: 500;
-	--font-size-label: 14px;
+  --font-weight-medium: 500;
+  --font-size-label: 14px;
 
-	--color-surface: white;
+  --color-surface: white;
+
+  --combinedFieldMinBadgeWidth: 88px;
 }
 
 html:not(.dark),
 html:not(.dark) body {
-	background-color: var(--ui-bg-muted);
+  background-color: var(--ui-bg-muted);
 }

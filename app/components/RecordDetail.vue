@@ -99,7 +99,7 @@
       />
     </UFormField>
 
-    <div class="RecordDetail__combinedFields">
+    <CombinedFields>
       <UFormField
         aria-label="Summary"
         size="xs"
@@ -206,7 +206,7 @@
           autoresize
         />
       </UButtonGroup>
-    </div>
+    </CombinedFields>
 
     <div class="RecordDetail__actions">
       <RelationshipSelect
@@ -215,6 +215,15 @@
       />
 
       <FileUploadButton @fileUpload="(file) => emit('fileUpload', file)" />
+
+      <UButton
+        color="neutral"
+        icon="i-lucide-trash"
+        variant="subtle"
+        label="Delete record"
+        size="sm"
+        @click="emit('deleteRecord', modelValue.id)"
+      />
 
       <USwitch
         v-model="modelValue.isCurated"
@@ -301,10 +310,7 @@
 import AttachmentGallery from '@app/components/AttachmentGallery.vue';
 import RelationshipSelect from '@app/components/RelationshipSelect.vue';
 import RecordLink from '@app/components/RecordLink.vue';
-import type {
-  GetRecordBySlugQueryResponse,
-  LinksForRecordQueryResponse,
-} from '@db/queries/records';
+import type { GetRecordBySlugAPIResponse, LinksForRecordAPIResponse } from '@db/queries/records';
 import { capitalize, formatDate } from '@shared/lib/formatting';
 import { computed } from 'vue';
 import type { LinkInsert, LinkSelect, PredicateSelect } from '@db/schema';
@@ -313,8 +319,9 @@ import type { DbId } from '@shared/types/api';
 import SlugField from '@app/components/SlugField.vue';
 import FileUploadButton from '@app/components/FileUploadButton.vue';
 import TitleField from '@app/components/TitleField.vue';
+import CombinedFields from '@app/components/CombinedFields.vue';
 
-const modelValue = defineModel<GetRecordBySlugQueryResponse>({ required: true });
+const modelValue = defineModel<GetRecordBySlugAPIResponse>({ required: true });
 
 const emit = defineEmits<{
   fileUpload: [File];
@@ -322,10 +329,11 @@ const emit = defineEmits<{
   createLink: [{ link: LinkInsert }];
   deleteLink: [{ linkId: DbId }];
   updatePredicate: [{ link: LinkSelect; predicate: PredicateSelect }];
+  deleteRecord: [DbId];
 }>();
 
 const { links } = defineProps<{
-  links?: LinksForRecordQueryResponse;
+  links?: LinksForRecordAPIResponse;
 }>();
 
 const capturedAt = computed(() => {
@@ -510,29 +518,6 @@ function handleDeleteLink(linkId: DbId) {
     height: 12px;
     color: var(--ui-text-muted);
   }
-}
-
-.RecordDetail__combinedFields {
-  display: grid;
-  border-radius: var(--radius-md);
-  overflow: hidden;
-  border: 1px solid var(--ui-border);
-
-  --ui-radius: 0;
-
-  & :deep(input),
-  & :deep(textarea),
-  & :deep(span) {
-    box-shadow: none;
-  }
-
-  & > * + * {
-    border-top: 1px solid var(--ui-border);
-  }
-}
-
-.RecordDetail__combinedFields .RecordDetail__badge {
-  min-width: 88px;
 }
 
 .RecordDetail__actions {

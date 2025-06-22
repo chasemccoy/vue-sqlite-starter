@@ -38,7 +38,7 @@ const { readonly = false } = defineProps<{
 
 <style scoped>
 .SlugField__badge {
-  min-width: 88px;
+  min-width: var(--combinedFieldMinBadgeWidth);
 }
 
 :global(.SlugField__input) {

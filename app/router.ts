@@ -3,7 +3,7 @@ import ConceptsView from '@app/views/ConceptsView.vue';
 import EntitiesView from '@app/views/EntitiesView.vue';
 import InboxView from '@app/views/InboxView.vue';
 import IndexView from '@app/views/IndexView.vue';
-import RecordView from '@app/views/RecordView.vue';
+import RecordDetailView from '@app/views/RecordDetailView.vue';
 import { createWebHistory, createRouter } from 'vue-router';
 
 export enum RouteName {
@@ -22,7 +22,7 @@ const routes = [
     children: [
       {
         path: ':slug',
-        component: RecordView,
+        component: RecordDetailView,
       },
     ],
   },
@@ -33,7 +33,7 @@ const routes = [
     children: [
       {
         path: 'record/:slug',
-        component: RecordView,
+        component: RecordDetailView,
       },
     ],
   },

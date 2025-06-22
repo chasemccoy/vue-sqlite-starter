@@ -26,7 +26,7 @@
       />
     </UFormField>
 
-    <div class="AddRecordForm__combinedFields">
+    <CombinedFields>
       <UFormField
         aria-label="Summary"
         size="xs"
@@ -49,6 +49,7 @@
           variant="outline"
           size="lg"
           label="URL"
+          class="AddRecordForm__badge"
         />
 
         <UInput
@@ -64,6 +65,7 @@
           variant="outline"
           size="lg"
           label="Published"
+          class="AddRecordForm__badge"
         />
 
         <UInput
@@ -80,6 +82,7 @@
           variant="outline"
           size="lg"
           label="Notes"
+          class="AddRecordForm__badge"
         />
 
         <UTextarea
@@ -90,7 +93,7 @@
           autoresize
         />
       </UButtonGroup>
-    </div>
+    </CombinedFields>
 
     <div class="AddRecordForm__actions">
       <FileUploadButton @fileUpload="handleFileUpload" />
@@ -137,6 +140,7 @@ import type {
 } from '@app/views/AddRecordView.vue';
 import AttachmentGallery from '@app/components/AttachmentGallery.vue';
 import { mediaFileToDataURL } from '@app/utils';
+import CombinedFields from '@app/components/CombinedFields.vue';
 
 const modelValue = defineModel<RecordSelect | RecordInsert>({ required: true });
 
@@ -213,25 +217,7 @@ function handleFileDelete({ url }: { url?: string }) {
   display: flex;
   flex-direction: column;
   gap: 20px;
-}
-
-.AddRecordForm__combinedFields {
-  display: grid;
-  border-radius: var(--radius-md);
-  overflow: hidden;
-  border: 1px solid var(--ui-border);
-
-  --ui-radius: 0;
-
-  & :deep(input),
-  & :deep(textarea),
-  & :deep(span) {
-    box-shadow: none;
-  }
-
-  & > * + * {
-    border-top: 1px solid var(--ui-border);
-  }
+  --combinedFieldMinBadgeWidth: 64px;
 }
 
 :deep(.AddRecordForm__submitButton) {

@@ -10,11 +10,11 @@ export const linkRoutes = Router();
 // ============================================================================
 
 linkRoutes.get('/predicates', async (_req, res, next) => {
-	try {
-		res.json(await predicates());
-	} catch (error) {
-		next(error);
-	}
+  try {
+    res.json(await predicates());
+  } catch (error) {
+    next(error);
+  }
 });
 
 // ============================================================================
@@ -22,14 +22,14 @@ linkRoutes.get('/predicates', async (_req, res, next) => {
 // ============================================================================
 
 linkRoutes.put('/link', async (req, res, next) => {
-	try {
-		const link = LinkInsertSchema.parse(req.body);
-		// @ts-expect-error - Bug with drizzle-zod
-		const updatedLink = await upsertLink(link);
-		res.json(updatedLink);
-	} catch (error) {
-		next(error);
-	}
+  try {
+    const link = LinkInsertSchema.parse(req.body);
+    // @ts-expect-error - Bug with drizzle-zod
+    const updatedLink = await upsertLink(link);
+    res.json(updatedLink);
+  } catch (error) {
+    next(error);
+  }
 });
 
 // ============================================================================
@@ -37,11 +37,11 @@ linkRoutes.put('/link', async (req, res, next) => {
 // ============================================================================
 
 linkRoutes.delete('/link/:id', async (req, res, next) => {
-	try {
-		const { id } = IdParamSchema.parse(req.params);
-		const deletedLink = await deleteLink(id);
-		res.json(deletedLink);
-	} catch (error) {
-		next(error);
-	}
+  try {
+    const { id } = IdParamSchema.parse(req.params);
+    const deletedLink = await deleteLink(id);
+    res.json(deletedLink);
+  } catch (error) {
+    next(error);
+  }
 });
