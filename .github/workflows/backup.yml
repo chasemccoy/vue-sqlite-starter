@@ -1,0 +1,39 @@
+name: Back up database
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+  schedule:
+    - cron: '26 */2 * * *'
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    outputs:
+      change_detected: ${{ steps.commit_and_push.outputs.change_detected }}
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: '3.10'
+      - name: Install Python dependencies
+        run: |
+          pip install sqlite-diffable
+      - name: Convert to newline-delimited JSON
+        run: |-
+          rm enchiridion/* || true
+          sqlite-diffable dump enchiridion.db enchiridion --all
+      - name: Commit any changes
+        id: commit_and_push
+        run: |-
+          git config user.name "Automated"
+          git config user.email "actions@users.noreply.github.com"
+          git add enchiridion
+          timestamp=$(date -u)
+          git commit -m "Latest data: ${timestamp}" || exit 0
+          git push
+          echo "change_detected=1" >> $GITHUB_OUTPUT
