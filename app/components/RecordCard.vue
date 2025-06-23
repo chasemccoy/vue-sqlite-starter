@@ -72,12 +72,20 @@
     </div>
 
     <ul class="RecordCard__tags">
+      <li v-if="modelValue.source === 'twitter'">
+        <UIcon
+          name="i-lucide-twitter"
+          class="size-4"
+        />
+      </li>
+
       <li v-if="modelValue.notes">
         <UIcon
           name="i-lucide-message-circle"
           class="size-4"
         />
       </li>
+
       <li>
         <RouterLink
           activeClass="RouterLink--isActive"
@@ -86,6 +94,7 @@
           {{ formatDate(new Date(modelValue.recordCreatedAt), { year: false }) }}
         </RouterLink>
       </li>
+
       <li
         v-for="tag in tags"
         :key="tag.id"
@@ -274,6 +283,7 @@ const tags = computed(() => {
 
 .RecordCard__tags {
   display: inline-flex;
+  align-items: center;
   flex-wrap: wrap;
   gap: 8px;
   margin-top: 4px;

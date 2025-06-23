@@ -56,6 +56,7 @@ export const listRecords = async (input: ListRecordsInput = {}) => {
       contentCreatedAt: true,
       notes: true,
       isCurated: true,
+      source: true,
     },
     with: {
       media: true,

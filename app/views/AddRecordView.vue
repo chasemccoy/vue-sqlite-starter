@@ -7,6 +7,7 @@
     <AddRecordForm
       v-model="record"
       v-model:files="files"
+      v-model:links="links"
       @save="handleSubmit"
     />
   </div>
@@ -24,6 +25,7 @@ import type { FetchTweetAPIResponse } from '@api/twitter';
 import { getImagesFromTweet } from '@app/utils';
 import useMedia from '@app/composables/useMedia';
 import { mapTweetToRecord } from '@integrations/twitter/records';
+import useLink from '@app/composables/useLink';
 
 export type PartialLinkInsert = Omit<LinkInsert, 'sourceId'>;
 export type PartialMediaInsert = Omit<MediaInsert, 'recordId'> & {
@@ -42,6 +44,8 @@ const toast = useToast();
 const { fetch } = useApiClient();
 
 const files = ref<PartialMediaInsert[]>([]);
+// TODO: Display links in the form, allow for removal before submit
+const links = ref<PartialLinkInsert[]>([]);
 
 const emptyRecord: RecordInsert = {
   type: 'artifact',
@@ -54,11 +58,13 @@ const record = ref<RecordInsert>(emptyRecord);
 
 const { upsertRecord } = useRecord();
 const { uploadMedia } = useMedia();
+const { upsertLink } = useLink();
+const { mutate: upsertLinkMutation } = upsertLink();
 const { mutate: upsertRecordMutation } = upsertRecord();
 const { mutate: uploadMediaMutation } = uploadMedia();
 
 function handleSubmit(data: NewRecordData) {
-  const { record, files = [] } = data;
+  const { record, files = [], links = [] } = data;
 
   upsertRecordMutation(record, {
     onSuccess: (r) => {
@@ -69,6 +75,10 @@ function handleSubmit(data: NewRecordData) {
           file: file.file,
           recordId: r.id,
         });
+      }
+
+      for (const link of links) {
+        upsertLinkMutation({ sourceId: r.id, ...link });
       }
 
       router.push(`/${record.slug}`);
@@ -115,6 +125,8 @@ onMounted(async () => {
 
     files.value = await getImagesFromTweet(tweetDetails);
     populatedRecord = mapTweetToRecord(tweetDetails);
+
+    // TODO: add link to tweet record as 'format of' predicate
   }
 
   if (query.type && typeof query.type === 'string') {

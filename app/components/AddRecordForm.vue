@@ -26,6 +26,25 @@
       />
     </UFormField>
 
+    <AttachmentGallery
+      v-if="files && files.length > 0"
+      v-model="files"
+      @fileUpload="handleFileUpload"
+      @fileDelete="handleFileDelete"
+    />
+
+    <div class="AddRecordForm__actions">
+      <RelationshipSelect @createLink="handleCreateLink" />
+
+      <FileUploadButton @fileUpload="handleFileUpload" />
+
+      <USwitch
+        v-model="modelValue.isCurated"
+        label="Curated"
+        size="lg"
+      />
+    </div>
+
     <CombinedFields>
       <UFormField
         aria-label="Summary"
@@ -95,23 +114,6 @@
       </UButtonGroup>
     </CombinedFields>
 
-    <div class="AddRecordForm__actions">
-      <FileUploadButton @fileUpload="handleFileUpload" />
-
-      <USwitch
-        v-model="modelValue.isCurated"
-        label="Curated"
-        size="lg"
-      />
-    </div>
-
-    <AttachmentGallery
-      v-if="files && files.length > 0"
-      v-model="files"
-      @fileUpload="handleFileUpload"
-      @fileDelete="handleFileDelete"
-    />
-
     <UButton
       type="submit"
       size="xl"
@@ -141,16 +143,18 @@ import type {
 import AttachmentGallery from '@app/components/AttachmentGallery.vue';
 import { mediaFileToDataURL } from '@app/utils';
 import CombinedFields from '@app/components/CombinedFields.vue';
+import RelationshipSelect from '@app/components/RelationshipSelect.vue';
+import type { DbId } from '@shared/types/api';
 
 const modelValue = defineModel<RecordSelect | RecordInsert>({ required: true });
 
 const files = defineModel<PartialMediaInsert[]>('files', { default: [] });
 
+const links = defineModel<PartialLinkInsert[]>('links', { default: [] });
+
 const emit = defineEmits<{
   save: [data: NewRecordData];
 }>();
-
-const links = ref<PartialLinkInsert[]>([]);
 
 const formRef = useTemplateRef('formRef');
 
@@ -210,6 +214,13 @@ function handleFileDelete({ url }: { url?: string }) {
   if (!url) return;
   files.value = files.value.filter((file) => file.url !== url);
 }
+
+function handleCreateLink(targetRecordId: DbId, predicateId: DbId) {
+  links.value.push({
+    targetId: targetRecordId,
+    predicateId,
+  });
+}
 </script>
 
 <style scoped>
@@ -230,8 +241,8 @@ function handleFileDelete({ url }: { url?: string }) {
 
 .AddRecordForm__actions {
   display: flex;
-  gap: 12px;
+  gap: 8px;
   align-items: center;
-  margin-top: -4px;
+  margin-bottom: -4px;
 }
 </style>

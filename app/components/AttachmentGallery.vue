@@ -46,7 +46,7 @@
           />
           <UButton
             color="neutral"
-            class="justify-center"
+            class="justify-center Attachments__fileUploadButton"
             icon="i-lucide-upload"
             variant="outline"
             size="lg"
@@ -143,6 +143,14 @@ function handleFileSelect(event: Event) {
   :deep(svg) {
     width: 16px;
     height: 16px;
+  }
+}
+
+:deep(.Attachments__fileUploadButton) {
+  background-color: transparent;
+
+  &:hover {
+    background-color: var(--ui-bg);
   }
 }
 

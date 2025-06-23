@@ -114,6 +114,38 @@
       </ul>
     </div>
 
+    <AttachmentGallery
+      v-if="modelValue.media && modelValue.media.length > 0"
+      v-model="modelValue.media"
+      @fileUpload="(file) => emit('fileUpload', file)"
+      @fileDelete="({ mediaId }) => emit('fileDelete', { mediaId })"
+    />
+
+    <div class="RecordDetail__actions">
+      <RelationshipSelect
+        :sourceRecordId="modelValue.id"
+        @createLink="handleCreateLink"
+      />
+
+      <FileUploadButton @fileUpload="(file) => emit('fileUpload', file)" />
+
+      <UButton
+        color="neutral"
+        icon="i-lucide-trash"
+        variant="subtle"
+        label="Delete record"
+        size="sm"
+        @click="emit('deleteRecord', modelValue.id)"
+      />
+
+      <USwitch
+        v-model="modelValue.isCurated"
+        label="Curated"
+        size="lg"
+        class="RecordDetail__curatedSwitch"
+      />
+    </div>
+
     <CombinedFields>
       <UFormField
         aria-label="Summary"
@@ -222,38 +254,6 @@
         />
       </UButtonGroup>
     </CombinedFields>
-
-    <div class="RecordDetail__actions">
-      <RelationshipSelect
-        :sourceRecordId="modelValue.id"
-        @createLink="handleCreateLink"
-      />
-
-      <FileUploadButton @fileUpload="(file) => emit('fileUpload', file)" />
-
-      <UButton
-        color="neutral"
-        icon="i-lucide-trash"
-        variant="subtle"
-        label="Delete record"
-        size="sm"
-        @click="emit('deleteRecord', modelValue.id)"
-      />
-
-      <USwitch
-        v-model="modelValue.isCurated"
-        label="Curated"
-        size="lg"
-        class="RecordDetail__curatedSwitch"
-      />
-    </div>
-
-    <AttachmentGallery
-      v-if="modelValue.media && modelValue.media.length > 0"
-      v-model="modelValue.media"
-      @fileUpload="(file) => emit('fileUpload', file)"
-      @fileDelete="({ mediaId }) => emit('fileDelete', { mediaId })"
-    />
 
     <div class="RecordDetail__links">
       <div
@@ -367,13 +367,7 @@ const children = computed(() => {
   return incomingLinks.value.filter((link) => link.predicate.type === 'containment');
 });
 
-function handleCreateLink({
-  targetRecordId,
-  predicateId,
-}: {
-  targetRecordId: number;
-  predicateId: number;
-}) {
+function handleCreateLink(targetRecordId: DbId, predicateId: DbId) {
   if (!modelValue.value) return;
 
   emit('createLink', {
@@ -524,7 +518,7 @@ function handleDeleteLink(linkId: DbId) {
   display: flex;
   gap: 8px;
   align-items: center;
-  margin-top: -4px;
+  margin-bottom: -4px;
 }
 
 .RecordDetail__curatedSwitch {
