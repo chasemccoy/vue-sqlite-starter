@@ -4,7 +4,7 @@ import path from 'path';
 import fs from 'fs/promises';
 import sharp from 'sharp';
 import crypto from 'crypto';
-import { insertMedia, getMedia, deleteMedia } from '@db/queries/media';
+import { insertMedia, getMedia, deleteMedia, deleteMediaForRecord } from '@db/queries/media';
 import {
   IdParamSchema,
   IdSchema,
@@ -14,6 +14,8 @@ import {
   SUPPORTED_VIDEO_TYPES,
 } from '@shared/types/api';
 import { z } from 'zod/v4';
+import { deleteMediaFile } from '@api/utils';
+import { UPLOADS_DIR } from '@shared/lib';
 
 export const mediaRoutes = Router();
 
@@ -24,7 +26,6 @@ export const MediaUploadSchema = z.object({
   altText: z.string().optional(),
 });
 
-const UPLOADS_DIR = path.join(process.cwd(), 'uploads');
 const IMAGES_DIR = path.join(UPLOADS_DIR, 'images');
 const VIDEOS_DIR = path.join(UPLOADS_DIR, 'videos');
 const PDFS_DIR = path.join(UPLOADS_DIR, 'pdfs');
@@ -190,70 +191,6 @@ mediaRoutes.post('/media', upload.single('file'), async (req, res, next) => {
   }
 });
 
-// GET /media/:id/file - Serve actual file
-// mediaRoutes.get('/media/:id/file', async (req, res, next) => {
-// 	try {
-// 		const { id } = IdParamSchema.parse(req.params);
-// 		const media = await getMedia(id);
-
-// 		if (!media) {
-// 			throw new Error('Media not found');
-// 		}
-
-// 		const filePath = path.join(UPLOADS_DIR, media.url.replace('/uploads/', ''));
-
-// 		if (!existsSync(filePath)) {
-// 			throw new Error('File not found on filesystem');
-// 		}
-
-// 		res.setHeader('Cache-Control', 'public, max-age=31536000'); // 1 year cache
-
-// 		if (media.fileSize) {
-// 			res.setHeader('Content-Length', media.fileSize);
-// 		}
-
-// 		// Handle range requests for video streaming
-// 		const range = req.headers.range;
-// 		if (range && media.fileSize) {
-// 			const parts = range.replace(/bytes=/, '').split('-');
-// 			const start = parseInt(parts[0], 10);
-// 			const end = parts[1] ? parseInt(parts[1], 10) : media.fileSize - 1;
-// 			const chunksize = end - start + 1;
-
-// 			res.status(206);
-// 			res.setHeader('Content-Range', `bytes ${start}-${end}/${media.fileSize}`);
-// 			res.setHeader('Accept-Ranges', 'bytes');
-// 			res.setHeader('Content-Length', chunksize);
-
-// 			const stream = createReadStream(filePath, { start, end });
-// 			stream.pipe(res);
-// 		} else {
-// 			// Serve full file
-// 			const stream = createReadStream(filePath);
-// 			stream.pipe(res);
-// 		}
-// 	} catch (error) {
-// 		next(error);
-// 	}
-// });
-
-// GET /media/record/:recordId - Get all media for a record
-// mediaRoutes.get('/media/record/:recordId', async (req, res, next) => {
-// 	try {
-// 		const { recordId } = req.params;
-// 		const recordIdNum = parseInt(recordId, 10);
-
-// 		if (isNaN(recordIdNum)) {
-// 			throw new Error('Invalid record ID');
-// 		}
-
-// 		const mediaList = await getMediaByRecordId(recordIdNum);
-// 		res.json(mediaList);
-// 	} catch (error) {
-// 		next(error);
-// 	}
-// });
-
 // ============================================================================
 // DELETE
 // ============================================================================
@@ -267,15 +204,7 @@ mediaRoutes.delete('/media/:id', async (req, res, next) => {
       throw new Error('Media not found');
     }
 
-    // Delete file from filesystem
-    const filePath = path.join(UPLOADS_DIR, media.url.replace('/uploads/', ''));
-    try {
-      await fs.unlink(filePath);
-    } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error('Error deleting file from filesystem:', error);
-      // Continue with database deletion even if file deletion fails
-    }
+    await deleteMediaFile(media.url);
 
     const deleted = await deleteMedia(id);
 
@@ -289,20 +218,17 @@ mediaRoutes.delete('/media/:id', async (req, res, next) => {
   }
 });
 
-// PATCH /media/:id - Update media metadata
-// mediaRoutes.patch('/media/:id', async (req, res, next) => {
-// 	try {
-// 		const { id } = IdParamSchema.parse(req.params);
-// 		const updateData = MediaUploadSchema.parse(req.body);
+mediaRoutes.delete('/media/record/:id', async (req, res, next) => {
+  try {
+    const { id } = IdParamSchema.parse(req.params);
+    const media = await deleteMediaForRecord(id);
 
-// 		const updated = await updateMedia(id, updateData);
+    for (const m of media) {
+      await deleteMediaFile(m.url);
+    }
 
-// 		if (!updated) {
-// 			throw new Error('Media not found');
-// 		}
-
-// 		res.json(updated);
-// 	} catch (error) {
-// 		next(error);
-// 	}
-// });
+    res.json(media);
+  } catch (error) {
+    next(error);
+  }
+});

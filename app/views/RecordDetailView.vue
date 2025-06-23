@@ -35,7 +35,7 @@ const router = useRouter();
 const route = useRoute();
 const toast = useToast();
 const { getRecordBySlug, getRecordLinks, upsertRecord, deleteRecord } = useRecord();
-const { uploadMedia, deleteMedia } = useMedia();
+const { uploadMedia, deleteMedia, deleteMediaForRecord } = useMedia();
 const { upsertLink, deleteLink } = useLink();
 
 const record = ref<GetRecordBySlugAPIResponse | undefined>();
@@ -54,6 +54,7 @@ const { mutate: deleteLinkMutation } = deleteLink();
 
 const { mutate: uploadMediaMutation } = uploadMedia();
 const { mutate: deleteMediaMutation } = deleteMedia();
+const { mutate: deleteMediaForRecordMutation } = deleteMediaForRecord();
 const { mutate: deleteRecordMutation } = deleteRecord();
 
 const debouncedMutate = useDebounceFn(
@@ -118,7 +119,8 @@ function handleUpdatePredicate({
 }
 
 function handleDeleteRecord(id: DbId) {
-  // TODO: Delete attached media files
+  deleteMediaForRecordMutation(id);
+
   deleteRecordMutation(id, {
     onSuccess: (record) => {
       if (route.matched.length > 1) {

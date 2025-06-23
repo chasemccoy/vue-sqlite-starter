@@ -1,4 +1,4 @@
-import { eq } from 'drizzle-orm';
+import { eq, inArray } from 'drizzle-orm';
 import { db } from '../index';
 import { media, type MediaInsert, type MediaSelect } from '@db/schema';
 import type { APIResponse } from '@shared/types/api';
@@ -20,6 +20,15 @@ export async function getMedia(id: number): Promise<MediaSelect | undefined> {
 export async function getMediaByRecordId(recordId: number): Promise<MediaSelect[]> {
   return await db.select().from(media).where(eq(media.recordId, recordId));
 }
+
+export async function deleteMediaForRecord(recordId: number): Promise<MediaSelect[]> {
+  const mediaToDelete = await db.select().from(media).where(eq(media.recordId, recordId));
+  const mediaIds = mediaToDelete.map((m) => m.id);
+
+  return db.delete(media).where(inArray(media.id, mediaIds)).returning();
+}
+
+export type DeleteMediaForRecordAPIResponse = APIResponse<typeof deleteMediaForRecord>;
 
 export async function deleteMedia(id: number) {
   const [result] = await db.delete(media).where(eq(media.id, id)).returning();
