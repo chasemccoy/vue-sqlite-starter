@@ -60,11 +60,6 @@ export default function useMedia() {
         fetch<DeleteMediaForRecordAPIResponse>(`/media/record/${id}`, {
           method: 'DELETE',
         }),
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ['get-record'] });
-        queryClient.invalidateQueries({ queryKey: ['get-record-by-slug'] });
-        queryClient.invalidateQueries({ queryKey: ['list-records'] });
-      },
     });
   }
 

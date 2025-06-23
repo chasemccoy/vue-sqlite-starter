@@ -79,7 +79,10 @@
         />
       </li>
       <li>
-        <RouterLink :to="href">
+        <RouterLink
+          activeClass="RouterLink--isActive"
+          :to="href"
+        >
           {{ formatDate(new Date(modelValue.recordCreatedAt), { year: false }) }}
         </RouterLink>
       </li>
