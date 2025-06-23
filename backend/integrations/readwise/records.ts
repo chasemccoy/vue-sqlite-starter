@@ -37,8 +37,6 @@ const mapReadwiseAuthorToRecord = (author: ReadwiseAuthorSelect): RecordInsert =
     url: author.origin,
     isCurated: true,
     source: 'readwise',
-    recordCreatedAt: author.recordCreatedAt,
-    recordUpdatedAt: author.recordUpdatedAt,
   };
 };
 
@@ -150,8 +148,6 @@ const mapReadwiseTagToRecord = (tag: ReadwiseTagSelect): RecordInsert => {
     slug: slugify(tag.tag || tag.id.toString()),
     isCurated: true,
     source: 'readwise',
-    recordCreatedAt: tag.recordCreatedAt,
-    recordUpdatedAt: tag.recordUpdatedAt,
   };
 };
 
@@ -268,8 +264,6 @@ export const mapReadwiseDocumentToRecord = (
     notes: notes ? notes.trim() : null,
     isCurated: false,
     source: 'readwise',
-    recordCreatedAt: document.recordCreatedAt,
-    recordUpdatedAt: document.recordUpdatedAt,
     contentCreatedAt: document.contentCreatedAt,
     contentUpdatedAt: document.contentUpdatedAt,
   };

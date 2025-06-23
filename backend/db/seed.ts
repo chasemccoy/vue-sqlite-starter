@@ -13,11 +13,13 @@ export const recordSeed: RecordInsert[] = [
     slug: 'chase-mccoy',
     title: 'Chase McCoy',
     type: 'entity',
+    isCurated: true,
   },
   {
     slug: 'enchiridion',
     title: 'Enchiridion',
     type: 'artifact',
+    isCurated: true,
   },
   ...[
     'aphorism',
@@ -43,6 +45,7 @@ export const recordSeed: RecordInsert[] = [
     slug: slugify(type),
     title: type,
     type: 'concept' as const,
+    isCurated: true,
   })),
 ];
 
