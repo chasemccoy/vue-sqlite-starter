@@ -119,7 +119,9 @@ function handleUpdatePredicate({
 }
 
 function handleDeleteRecord(id: DbId) {
-  deleteMediaForRecordMutation(id);
+  if (record.value?.media && record.value.media.length > 0) {
+    deleteMediaForRecordMutation(id);
+  }
 
   deleteRecordMutation(id, {
     onSuccess: (record) => {

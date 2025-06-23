@@ -78,7 +78,11 @@
           class="size-4"
         />
       </li>
-      <li>{{ formatDate(new Date(modelValue.recordCreatedAt), { year: false }) }}</li>
+      <li>
+        <RouterLink :to="href">
+          {{ formatDate(new Date(modelValue.recordCreatedAt), { year: false }) }}
+        </RouterLink>
+      </li>
       <li
         v-for="tag in tags"
         :key="tag.id"
