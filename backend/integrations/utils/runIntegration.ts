@@ -3,10 +3,10 @@
 import { eq, sql } from 'drizzle-orm';
 import { db } from '@db/index';
 import {
-	integrationRuns,
-	IntegrationStatus,
-	RunType,
-	type IntegrationType,
+  integrationRuns,
+  IntegrationStatus,
+  RunType,
+  type IntegrationType,
 } from '@db/schema/utils';
 
 /**
@@ -30,61 +30,66 @@ type IntegrationFunction = (integrationRunId: number) => Promise<number>;
  * @throws Rethrows any errors from the integration function after logging them
  */
 export async function runIntegration(
-	integrationType: IntegrationType,
-	fn: IntegrationFunction,
-	runType: RunType = RunType.enum.sync,
+  integrationType: IntegrationType,
+  fn: IntegrationFunction,
+  runType: RunType = RunType.enum.sync,
 ): Promise<void> {
-	console.log(`Starting ${integrationType} integration run for ${runType}...`);
+  console.log(`Starting ${integrationType} integration run for ${runType}...`);
 
-	// Create a new integration run record
-	const [run] = await db
-		.insert(integrationRuns)
-		.values({
-			integrationType,
-			runType,
-			runStartTime: sql`(CURRENT_TIMESTAMP)`,
-		})
-		.returning();
+  // Create a new integration run record
+  const [run] = await db
+    .insert(integrationRuns)
+    .values({
+      integrationType,
+      runType,
+      runStartTime: sql`(CURRENT_TIMESTAMP)`,
+    })
+    .returning();
 
-	if (!run) {
-		throw new Error('Failed to create integration run record');
-	}
+  if (!run) {
+    throw new Error('Failed to create integration run record');
+  }
 
-	console.log(`Created integration run with ID ${run.id}`);
+  console.log(`Created integration run with ID ${run.id}`);
 
-	try {
-		// Execute the integration function
-		console.log('Executing integration function...');
-		const entriesCreated = await fn(run.id);
-		console.log(`Successfully created ${entriesCreated} entries`);
+  try {
+    console.log('Executing integration function...');
 
-		// Update the run record with success status
-		console.log('Updating integration run status...');
-		await db
-			.update(integrationRuns)
-			.set({
-				status: IntegrationStatus.enum.success,
-				runEndTime: sql`(CURRENT_TIMESTAMP)`,
-				entriesCreated,
-			})
-			.where(eq(integrationRuns.id, run.id));
-		console.log('Integration run completed successfully');
-	} catch (error) {
-		// Handle and log any errors
-		const errorMessage = error instanceof Error ? error.message : String(error);
-		console.error('Integration run failed:', errorMessage);
+    const entriesCreated = await fn(run.id);
 
-		// Update the run record with failure status
-		await db
-			.update(integrationRuns)
-			.set({
-				status: IntegrationStatus.enum.fail,
-				runEndTime: sql`(CURRENT_TIMESTAMP)`,
-				message: errorMessage,
-			})
-			.where(eq(integrationRuns.id, run.id));
+    if (entriesCreated === 0) {
+      console.log('No entries created');
+    } else {
+      console.log(`Successfully created ${entriesCreated} entries`);
+    }
 
-		// Rethrow the error for upstream handling
-		throw error;
-	}
+    // Update the run record with success status
+    console.log('Updating integration run status...');
+    await db
+      .update(integrationRuns)
+      .set({
+        status: IntegrationStatus.enum.success,
+        runEndTime: sql`(CURRENT_TIMESTAMP)`,
+        entriesCreated,
+      })
+      .where(eq(integrationRuns.id, run.id));
+    console.log('Integration run completed successfully');
+  } catch (error) {
+    // Handle and log any errors
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('Integration run failed:', errorMessage);
+
+    // Update the run record with failure status
+    await db
+      .update(integrationRuns)
+      .set({
+        status: IntegrationStatus.enum.fail,
+        runEndTime: sql`(CURRENT_TIMESTAMP)`,
+        message: errorMessage,
+      })
+      .where(eq(integrationRuns.id, run.id));
+
+    // Rethrow the error for upstream handling
+    throw error;
+  }
 }

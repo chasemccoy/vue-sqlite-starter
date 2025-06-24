@@ -24,7 +24,7 @@ const { data } = useRecords({
   },
   orderBy: [
     {
-      field: 'recordCreatedAt',
+      field: 'contentCreatedAt',
       direction: 'desc',
     },
     {
