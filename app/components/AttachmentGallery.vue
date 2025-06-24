@@ -115,7 +115,7 @@ function handleFileSelect(event: Event) {
 
 .Attachments__item {
   position: relative;
-  box-shadow: inset 0 0 0 1px rgba(0 0 0 / 0.1);
+  box-shadow: inset 0 0 0 1px var(--ui-border-muted);
   border-radius: var(--radius-md);
   overflow: hidden;
   padding: 1px;
