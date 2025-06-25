@@ -10,7 +10,11 @@ const defaultHeaders = {
 
 export default function useApiClient() {
   const hostname = window.location.hostname;
-  const backendBaseUrl = `http://${hostname}:${BACKEND_PORT}`;
+  let backendBaseUrl = `http://${hostname}:${BACKEND_PORT}`;
+
+  if (hostname.includes('enchiridion')) {
+    backendBaseUrl = 'https://enchiridion-api.chsmc.tools';
+  }
 
   async function fetch<T>(
     endpoint: ApiEndpoints | string,
