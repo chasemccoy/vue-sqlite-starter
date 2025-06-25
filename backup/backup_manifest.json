@@ -1,0 +1,18 @@
+{
+  "timestamp": "2025-06-25T00:33:33.388Z",
+  "database_path": "./enchiridion.db",
+  "tables": [
+    "links",
+    "predicates",
+    "records",
+    "media",
+    "readwise_authors",
+    "readwise_document_tags",
+    "readwise_documents",
+    "readwise_tags",
+    "integration_runs"
+  ],
+  "total_rows": 3713,
+  "pragma_info_included": true,
+  "schema_objects_included": true
+}

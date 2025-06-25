@@ -47,7 +47,8 @@ enchiridion/
 
 ### Prerequisites
 
-- Node.js 18+
+- Node.js 22+
+- SQLite
 - pnpm (recommended) or npm
 
 ### Setup

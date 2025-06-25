@@ -10,7 +10,8 @@
 		"lint": "prettier --write . && eslint . --fix && vue-tsc --noEmit",
 		"dev:app": "vite --host",
 		"dev:backend": "tsx watch backend/api/index.ts",
-		"dev": "concurrently \"npm run dev:app\" \"npm run dev:backend\"",
+		"dev:check-db": "sh -c 'check=$(sqlite3 enchiridion.db \"PRAGMA integrity_check;\") && if [ \"$check\" != \"ok\" ]; then echo \"⚠️ Warning: Database integrity check failed\" >&2; fi'",
+		"dev": "pnpm run dev:check-db && concurrently \"pnpm run dev:app\" \"pnpm run dev:backend\"",
 		"build": "vue-tsc -b && vite build",
 		"preview": "vite preview",
 		"db:push": "drizzle-kit push",
@@ -21,6 +22,8 @@
 		"db:seed": "tsx backend/db/seed.ts",
 		"db:clean": "rm -f enchiridion.db enchiridion.db-shm enchiridion.db-wal",
 		"db:reset": "pnpm db:clean && pnpm db:push && pnpm db:seed",
+		"db:check": "sqlite3 enchiridion.db 'PRAGMA integrity_check;'",
+		"db:backup": "tsx scripts/backup-database.ts",
 		"sync:readwise": "tsx backend/integrations/readwise/sync.ts"
 	},
 	"dependencies": {
@@ -29,7 +32,7 @@
 		"@types/multer": "^1.4.13",
 		"@unhead/vue": "^2.0.10",
 		"@vueuse/core": "^13.3.0",
-		"better-sqlite3": "^11.10.0",
+		"better-sqlite3": "^12.1.0",
 		"cors": "^2.8.5",
 		"drizzle-orm": "1.0.0-beta.1-c0277c0",
 		"drizzle-zod": "^0.8.2",
@@ -60,7 +63,7 @@
 		"tsx": "^4.19.4",
 		"typescript": "~5.8.3",
 		"typescript-eslint": "^8.33.1",
-		"vite": "^6.3.5",
+		"vite": "^7.0.0",
 		"vue-tsc": "^2.2.8"
 	}
 }
