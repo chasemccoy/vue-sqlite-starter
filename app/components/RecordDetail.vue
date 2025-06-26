@@ -270,7 +270,6 @@
           >
             <RecordLink
               :modelValue="link.targetId"
-              :relationship="link.predicate.name"
               :predicate="link.predicate"
               @updatePredicate="(predicate) => handleUpdatePredicate(link, predicate)"
               @deleteLink="() => handleDeleteLink(link.id)"
@@ -295,7 +294,6 @@
               v-model:predicate="link.predicate"
               linkDirection="incoming"
               :modelValue="link.sourceId"
-              :relationship="link.predicate.inverse?.name"
               @updatePredicate="(predicate) => handleUpdatePredicate(link, predicate)"
               @deleteLink="() => handleDeleteLink(link.id)"
             />
@@ -493,7 +491,7 @@ function handleDeleteLink(linkId: DbId) {
 
 .RecordDetail__list {
   li + li {
-    margin-top: 1rem;
+    margin-top: 16px;
   }
 }
 

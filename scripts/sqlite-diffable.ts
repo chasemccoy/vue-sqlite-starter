@@ -438,7 +438,6 @@ export class SQLiteDiffable {
    * Save schema objects (indexes, views, triggers) to separate SQL files
    */
   private async saveSchemaObjects(outputDir: string): Promise<void> {
-    // Get all schema objects from sqlite_master
     const schemaStmt = this.db.prepare(`
       SELECT type, name, sql 
       FROM sqlite_master 

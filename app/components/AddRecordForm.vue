@@ -114,6 +114,22 @@
       </UButtonGroup>
     </CombinedFields>
 
+    <div v-if="links.length > 0 && predicates">
+      <ul class="AddRecordForm__links">
+        <li
+          v-for="link in links"
+          :key="link.id"
+        >
+          <RecordLink
+            :modelValue="link.targetId"
+            :predicate="getPredicateForLink(link)"
+            @updatePredicate="(predicate) => handleUpdatePredicate(link, predicate)"
+            @deleteLink="() => handleDeleteLink(link.targetId)"
+          />
+        </li>
+      </ul>
+    </div>
+
     <UButton
       type="submit"
       size="xl"
@@ -129,7 +145,7 @@
 
 <script setup lang="ts">
 import RecordTypeSelectButton from '@app/components/RecordTypeSelectButton.vue';
-import type { RecordInsert, RecordSelect } from '@db/schema';
+import type { PredicateSelect, RecordInsert, RecordSelect } from '@db/schema';
 import { computed, ref, useTemplateRef, watch } from 'vue';
 import SlugField from '@app/components/SlugField.vue';
 import { formatDate, slugify } from '@shared/lib/formatting';
@@ -145,6 +161,8 @@ import { mediaFileToDataURL } from '@app/utils';
 import CombinedFields from '@app/components/CombinedFields.vue';
 import RelationshipSelect from '@app/components/RelationshipSelect.vue';
 import type { DbId } from '@shared/types/api';
+import RecordLink from '@app/components/RecordLink.vue';
+import type { GetPredicatesAPIResponse } from '@db/queries/links';
 
 const modelValue = defineModel<RecordSelect | RecordInsert>({ required: true });
 
@@ -154,6 +172,10 @@ const links = defineModel<PartialLinkInsert[]>('links', { default: [] });
 
 const emit = defineEmits<{
   save: [data: NewRecordData];
+}>();
+
+const { predicates } = defineProps<{
+  predicates?: GetPredicatesAPIResponse;
 }>();
 
 const formRef = useTemplateRef('formRef');
@@ -188,6 +210,10 @@ watch(
   { deep: true },
 );
 
+function getPredicateForLink(link: PartialLinkInsert) {
+  return predicates?.find((predicate) => predicate.id === link.predicateId);
+}
+
 function handleSubmit() {
   if (formRef.value?.checkValidity()) {
     emit('save', {
@@ -221,6 +247,16 @@ function handleCreateLink(targetRecordId: DbId, predicateId: DbId) {
     predicateId,
   });
 }
+
+function handleDeleteLink(targetId: DbId) {
+  links.value = links.value.filter((link) => link.targetId !== targetId);
+}
+
+function handleUpdatePredicate(link: PartialLinkInsert, predicate: PredicateSelect) {
+  links.value = links.value.map((link) =>
+    link.targetId === link.targetId ? { ...link, predicateId: predicate.id } : link,
+  );
+}
 </script>
 
 <style scoped>
@@ -244,5 +280,11 @@ function handleCreateLink(targetRecordId: DbId, predicateId: DbId) {
   gap: 8px;
   align-items: center;
   margin-bottom: -4px;
+}
+
+.AddRecordForm__links {
+  li + li {
+    margin-top: 16px;
+  }
 }
 </style>

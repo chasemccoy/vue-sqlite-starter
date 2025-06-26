@@ -8,6 +8,7 @@
       v-model="record"
       v-model:files="files"
       v-model:links="links"
+      :predicates="predicates"
       @save="handleSubmit"
     />
   </div>
@@ -26,6 +27,8 @@ import { getImagesFromTweet } from '@app/utils';
 import useMedia from '@app/composables/useMedia';
 import { mapTweetToRecord } from '@integrations/twitter/records';
 import useLink from '@app/composables/useLink';
+import usePredicates from '@app/composables/usePredicates';
+import type { GetRecordBySlugAPIResponse } from '@db/queries/records';
 
 export type PartialLinkInsert = Omit<LinkInsert, 'sourceId'>;
 export type PartialMediaInsert = Omit<MediaInsert, 'recordId'> & {
@@ -44,7 +47,6 @@ const toast = useToast();
 const { fetch } = useApiClient();
 
 const files = ref<PartialMediaInsert[]>([]);
-// TODO: Display links in the form, allow for removal before submit
 const links = ref<PartialLinkInsert[]>([]);
 
 const emptyRecord: RecordInsert = {
@@ -59,9 +61,12 @@ const record = ref<RecordInsert>(emptyRecord);
 const { upsertRecord } = useRecord();
 const { uploadMedia } = useMedia();
 const { upsertLink } = useLink();
+const { getPredicates } = usePredicates();
 const { mutate: upsertLinkMutation } = upsertLink();
 const { mutate: upsertRecordMutation } = upsertRecord();
 const { mutate: uploadMediaMutation } = uploadMedia();
+
+const { data: predicates } = getPredicates();
 
 function handleSubmit(data: NewRecordData) {
   const { record, files = [], links = [] } = data;
@@ -99,9 +104,12 @@ onMounted(async () => {
 
   let populatedRecord = { ...emptyRecord };
 
-  if (query.tweet && typeof query.tweet === 'string') {
-    const tweet = query.tweet;
+  if (query.tweet || (query.url && query.url.includes('https://x.com'))) {
+    const tweet = query.tweet || query.url;
+    if (!tweet || typeof tweet !== 'string') return;
+
     const tweetId = tweet.match(/\/status\/(\d+)/)?.[1];
+    if (!tweetId) return;
 
     populatedRecord.source = 'twitter';
     populatedRecord.url = tweet;
@@ -126,7 +134,16 @@ onMounted(async () => {
     files.value = await getImagesFromTweet(tweetDetails);
     populatedRecord = mapTweetToRecord(tweetDetails);
 
-    // TODO: add link to tweet record as 'format of' predicate
+    const formatOfPredicate = predicates.value?.find((p) => p.slug === 'has_format');
+
+    const tweetRecord = await fetch<GetRecordBySlugAPIResponse>('/record/slug/tweet');
+
+    if (formatOfPredicate && tweetRecord) {
+      links.value.push({
+        targetId: tweetRecord.id,
+        predicateId: formatOfPredicate.id,
+      });
+    }
   }
 
   if (query.type && typeof query.type === 'string') {
