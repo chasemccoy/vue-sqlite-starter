@@ -219,7 +219,7 @@
     {
       "seq": 0,
       "name": "main",
-      "file": "/Users/chase/Repositories/enchiridion/enchiridion.db"
+      "file": "/Users/voyager/Repositories/enchiridion/enchiridion.db"
     }
   ],
   "encoding": [
@@ -236,7 +236,7 @@
   ],
   "freelist_count": [
     {
-      "freelist_count": 909
+      "freelist_count": 906
     }
   ],
   "fullfsync": [
@@ -271,7 +271,7 @@
   ],
   "page_count": [
     {
-      "page_count": 7063
+      "page_count": 7071
     }
   ],
   "page_size": [
@@ -441,8 +441,8 @@
   "wal_checkpoint": [
     {
       "busy": 0,
-      "log": 56,
-      "checkpointed": 56
+      "log": 159,
+      "checkpointed": 159
     }
   ],
   "writable_schema": [
