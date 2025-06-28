@@ -1,6 +1,6 @@
 # Enchiridion
 
-A full-stack knowledge graph application for managing and connecting ideas, links, and information. Built with Vue 3, Express, and SQLite.
+A full-stack knowledge graph application for managing and connecting ideas, links, and information. Built with Vue 3, Express, and SQLite. Inspired by and heavily borrowed from Nick Trombley's [Red Cliff Record](https://github.com/Aias/red-cliff-record) and [barnsworthburning](https://barnsworthburning.net/).
 
 ![CleanShot 2025-06-28 at 16 45 32@2x](https://github.com/user-attachments/assets/4f61b4b8-e756-4e83-b6fa-599d1640371a)
 
