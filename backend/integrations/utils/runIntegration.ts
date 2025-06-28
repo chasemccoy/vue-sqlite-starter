@@ -1,5 +1,4 @@
 /* eslint-disable no-console */
-
 import { eq, sql } from 'drizzle-orm';
 import { db } from '@db/index';
 import {
@@ -63,8 +62,8 @@ export async function runIntegration(
       console.log(`Successfully created ${entriesCreated} entries`);
     }
 
-    // Update the run record with success status
     console.log('Updating integration run status...');
+
     await db
       .update(integrationRuns)
       .set({
@@ -73,13 +72,12 @@ export async function runIntegration(
         entriesCreated,
       })
       .where(eq(integrationRuns.id, run.id));
+
     console.log('Integration run completed successfully');
   } catch (error) {
-    // Handle and log any errors
     const errorMessage = error instanceof Error ? error.message : String(error);
     console.error('Integration run failed:', errorMessage);
 
-    // Update the run record with failure status
     await db
       .update(integrationRuns)
       .set({
@@ -89,7 +87,6 @@ export async function runIntegration(
       })
       .where(eq(integrationRuns.id, run.id));
 
-    // Rethrow the error for upstream handling
     throw error;
   }
 }

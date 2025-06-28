@@ -435,6 +435,7 @@ export async function createRecordsFromReadwiseDocuments() {
   }
 
   const authorIds = Array.from(authorIdsSet);
+
   const authorsRows = await db.query.readwiseAuthors.findMany({
     where: {
       id: {
