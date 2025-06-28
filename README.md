@@ -1,6 +1,9 @@
 # Enchiridion
 
-A full-stack knowledge graph application for managing and connecting ideas, links, and information. Built with Vue 3, Express, and SQLite.
+A full-stack knowledge graph application for managing and connecting ideas, links, and information. Built with Vue 3, Express, and SQLite. Inspired by and heavily borrowed from Nick Trombley's [Red Cliff Record](https://github.com/Aias/red-cliff-record) and [barnsworthburning](https://barnsworthburning.net/).
+
+![CleanShot 2025-06-28 at 16 45 32@2x](https://github.com/user-attachments/assets/4f61b4b8-e756-4e83-b6fa-599d1640371a)
+
 
 ## 🏗️ Architecture
 
@@ -23,16 +26,16 @@ The application models a knowledge graph with three main entities:
 
 ```
 enchiridion/
-├── app/                    # Vue 3 frontend application
-│   ├── components/         # Reusable Vue components
-│   ├── composables/        # Vue composition functions
-│   ├── views/              # Page components
+├── app/                   # Vue frontend app
+│   ├── components/        # Reusable Vue components
+│   ├── composables/       # Vue composition functions
+│   ├── views/             # Page components
 │   └── router.ts          # Vue Router configuration
 ├── backend/               # Express.js API server
 │   ├── api/               # REST API endpoints
 │   ├── db/                # Database schema and queries
 │   │   ├── schema/        # Drizzle ORM schemas
-│   │   ├── queries/       # Database query functions
+│   │   ├── queries/       # Database queries
 │   │   └── migrations/    # Database migration files
 │   └── integrations/      # External service integrations
 │       ├── readwise/      # Readwise API integration
@@ -75,8 +78,9 @@ enchiridion/
 4. **Initialize the database**
 
    ```bash
-   pnpm db:push    # Create database schema
-   pnpm db:seed    # Seed with initial data
+   pnpm db:push         # Initialize database w/ schema
+   pnpm db:seed         # Seed with initial data
+   pnpm sync:readwise   # Sync Readwise data, optional
    ```
 
 5. **Start development servers**
@@ -87,7 +91,7 @@ enchiridion/
 The application will be available at:
 
 - Frontend: `http://localhost:3456`
-- Backend API: `http://localhost:4321`
+- API: `http://localhost:4321`
 
 ## 📚 Available scripts
 
@@ -109,6 +113,7 @@ The application will be available at:
 ### Integrations
 
 - `pnpm sync:readwise` - Sync records from Readwise integration
+- `pnpm sync` - Sync records from all integrations
 
 ## 🔧 Development
 
@@ -117,9 +122,9 @@ The application will be available at:
 Both frontend and backend use these path aliases:
 
 - `@app/*` → `./app/*`
-- `@shared/*` → `./shared/*`
 - `@db/*` → `./backend/db/*`
 - `@api/*` → `./backend/api/*`
+- `@shared/*` → `./shared/*`
 - `@integrations/*` → `./backend/integrations/*`
 
 ## 🔌 Integrations
