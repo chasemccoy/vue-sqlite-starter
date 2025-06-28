@@ -1,4 +1,3 @@
-// import '@app/assets/css/global.css';
 import '@app/assets/css/theme.css';
 import { createApp } from 'vue';
 import App from '@app/AppLayout.vue';
@@ -9,11 +8,11 @@ import { createHead } from '@unhead/vue/client';
 
 const app = createApp(App);
 const head = createHead({
-	init: [
-		{
-			title: 'Enchiridion',
-		},
-	],
+  init: [
+    {
+      title: 'Enchiridion',
+    },
+  ],
 });
 
 app.use(router);
@@ -21,7 +20,7 @@ app.use(ui);
 app.use(head);
 
 app.use(VueQueryPlugin, {
-	enableDevtoolsV6Plugin: true,
+  enableDevtoolsV6Plugin: true,
 });
 
 app.mount('#app');

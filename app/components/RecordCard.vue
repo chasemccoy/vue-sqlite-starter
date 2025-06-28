@@ -8,10 +8,7 @@
       v-if="modelValue.title"
       class="RecordCard__title"
     >
-      <RouterLink
-        activeClass="RouterLink--isActive"
-        :to="href"
-      >
+      <RouterLink :to="href">
         {{ modelValue.title }}
       </RouterLink>
     </h1>
@@ -176,10 +173,6 @@ const tags = computed(() => {
     border-color: var(--ui-primary);
     box-shadow: 0 0 0 1px var(--ui-primary);
   }
-}
-
-:global(.RouterLink--isActive) {
-  scroll-margin-top: 32px;
 }
 
 .RecordCard__title {

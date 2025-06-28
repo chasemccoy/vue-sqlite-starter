@@ -17,6 +17,8 @@
             v-model="modelValue[index]"
             size="compact"
             v-bind="getRecordCardProps(record)"
+            :data-slug="record.slug"
+            @vue:Mounted="handleRecordMounted(modelValue[index])"
           />
         </li>
       </ul>
@@ -44,35 +46,45 @@ const { isEmpty, recordCardProps } = defineProps<{
   recordCardProps?: (record: ListRecordsAPIResponse[number]) => Record<string, string>;
 }>();
 
-const getRecordCardProps = (record: ListRecordsAPIResponse[number]) => {
+const elRef = useTemplateRef('elRef');
+const route = useRoute();
+
+watch(
+  route,
+  () => {
+    scrollToSelectedRecord();
+  },
+  { flush: 'post', immediate: true },
+);
+
+function getRecordCardProps(record: ListRecordsAPIResponse[number]) {
   if (typeof recordCardProps === 'function') {
     return recordCardProps(record);
   }
 
   return recordCardProps || {};
-};
+}
 
-const elRef = useTemplateRef('elRef');
-const route = useRoute();
+function scrollToSelectedRecord() {
+  if (!elRef.value) return;
 
-watch(
-  [modelValue, route],
-  () => {
-    if (!elRef.value) return;
+  const selectedRecord = elRef.value.querySelector('[aria-current="page"]');
+  if (!selectedRecord) return;
 
-    const selectedRecord = elRef.value.querySelector('.RouterLink--isActive');
-    if (!selectedRecord) return;
+  if (
+    !selectedRecord.getBoundingClientRect().top ||
+    selectedRecord.getBoundingClientRect().top < 0 ||
+    selectedRecord.getBoundingClientRect().bottom > window.innerHeight
+  ) {
+    selectedRecord.scrollIntoView();
+  }
+}
 
-    if (
-      !selectedRecord.getBoundingClientRect().top ||
-      selectedRecord.getBoundingClientRect().top < 0 ||
-      selectedRecord.getBoundingClientRect().bottom > window.innerHeight
-    ) {
-      selectedRecord.scrollIntoView();
-    }
-  },
-  { flush: 'post' },
-);
+function handleRecordMounted(record: ListRecordsAPIResponse[number]) {
+  if (record.slug === route.params.slug) {
+    scrollToSelectedRecord();
+  }
+}
 </script>
 
 <style scoped>
