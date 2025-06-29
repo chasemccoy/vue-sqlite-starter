@@ -1,11 +1,11 @@
 chrome.action.onClicked.addListener((tab) => {
   chrome.scripting.executeScript({
     target: { tabId: tab.id },
-    function: saveToEnchiridion
+    function: main,
   });
 });
 
-function saveToEnchiridion() {
+function main() {
   const url = window.location.href;
   const title = document.title;
   const selection = window.getSelection().toString();

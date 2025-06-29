@@ -21,6 +21,14 @@ app.use(head);
 
 app.use(VueQueryPlugin, {
   enableDevtoolsV6Plugin: true,
+  queryClientConfig: {
+    defaultOptions: {
+      queries: {
+        networkMode: 'always',
+        retry: false,
+      },
+    },
+  },
 });
 
 app.mount('#app');

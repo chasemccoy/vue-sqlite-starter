@@ -1,6 +1,4 @@
 <template>
-  <div v-if="isError">Error: {{ error }}</div>
-
   <Head>
     <title v-if="record?.title">{{ record.title }} | Enchiridion</title>
   </Head>
@@ -41,7 +39,7 @@ const { upsertLink, deleteLink } = useLink();
 const record = ref<GetRecordBySlugAPIResponse | undefined>();
 
 const recordSlug = computed(() => route.params.slug as string);
-const { data, error, isError } = getRecordBySlug(recordSlug);
+const { data, isError } = getRecordBySlug(recordSlug);
 
 const recordId = computed(() => record.value?.id ?? null);
 const isRecordFetched = computed(() => !!recordId.value);
@@ -82,6 +80,16 @@ watch(
   },
   { deep: true },
 );
+
+watch(isError, () => {
+  if (isError.value) {
+    toast.add({
+      title: 'Record not found',
+      description: `Could not find a record for slug “${recordSlug.value}”`,
+      color: 'error',
+    });
+  }
+});
 
 function handleFileUpload(file: File) {
   if (!recordId.value) return;
