@@ -14,6 +14,7 @@ export default defineConfig([
       globals: {
         defineShortcuts: true,
         useToast: true,
+        chrome: true,
         ...globals.browser,
         ...globals.node,
       },
