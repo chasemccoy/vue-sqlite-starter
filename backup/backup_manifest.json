@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-06-28T23:40:34.870Z",
+  "timestamp": "2025-06-30T02:31:19.517Z",
   "database_path": "./enchiridion.db",
   "tables": [
     "links",
@@ -12,7 +12,7 @@
     "readwise_tags",
     "integration_runs"
   ],
-  "total_rows": 3732,
+  "total_rows": 3739,
   "pragma_info_included": true,
   "schema_objects_included": true
 }
