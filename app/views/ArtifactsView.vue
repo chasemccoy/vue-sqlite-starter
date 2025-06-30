@@ -2,7 +2,7 @@
   <RecordTable
     v-if="data"
     v-model="data"
-    :hideColumns="['type', 'content']"
+    :hideColumns="['id', 'type']"
   />
 </template>
 
@@ -11,13 +11,15 @@ import RecordTable from '@app/components/RecordTable.vue';
 import useRecords from '@app/composables/useRecords';
 
 const { data } = useRecords({
+  limit: 300,
   filters: {
-    type: 'entity',
+    type: 'artifact',
+    hasParent: false,
   },
   orderBy: [
     {
-      field: 'title',
-      direction: 'asc',
+      field: 'recordCreatedAt',
+      direction: 'desc',
     },
   ],
 });

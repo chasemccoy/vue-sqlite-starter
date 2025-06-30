@@ -1,4 +1,5 @@
 import AddRecordView from '@app/views/AddRecordView.vue';
+import ArtifactsView from '@app/views/ArtifactsView.vue';
 import ConceptsView from '@app/views/ConceptsView.vue';
 import EntitiesView from '@app/views/EntitiesView.vue';
 import InboxView from '@app/views/InboxView.vue';
@@ -9,6 +10,7 @@ import { createWebHistory, createRouter } from 'vue-router';
 export enum RouteName {
   index = 'index',
   inbox = 'inbox',
+  artifacts = 'artifacts',
   concepts = 'concepts',
   entities = 'entities',
   add = 'add',
@@ -36,6 +38,11 @@ const routes = [
         component: RecordDetailView,
       },
     ],
+  },
+  {
+    path: '/artifacts',
+    name: RouteName.artifacts,
+    component: ArtifactsView,
   },
   {
     path: '/concepts',

@@ -6,17 +6,18 @@
     :columnVisibility="columnVisibility"
     @select="handleRowSelect"
   >
-    <template #url-cell="{ row }">
+    <template #title-cell="{ row }">
       <a
         v-if="row.getValue('url')"
+        class="RecordTable__titleCellLink"
         target="_blank"
         :href="row.getValue('url')"
       >
-        <UIcon
-          name="i-lucide-link"
-          class="RecordLink__icon"
-        />
+        {{ row.getValue('title') }}
       </a>
+      <template v-else>
+        {{ row.getValue('title') }}
+      </template>
     </template>
   </UTable>
 </template>
@@ -44,7 +45,7 @@ const columnVisibility = computed(() => {
       acc[column] = false;
       return acc;
     },
-    { slug: false, id: false, summary: false } as Record<string, boolean>,
+    { slug: false, id: false, summary: false, url: false } as Record<string, boolean>,
   );
 });
 
@@ -102,7 +103,7 @@ const columns = [
   },
   {
     accessorKey: 'recordCreatedAt',
-    header: 'Created',
+    header: 'Saved',
     cell: ({ row }: { row: TableRow<ListRecordsAPIResponse[number]> }) => {
       return formatDate(new Date(row.getValue('recordCreatedAt')));
     },
@@ -123,5 +124,14 @@ function handleRowSelect(row: TableRow<ListRecordsAPIResponse[number]>) {
 :deep(.RecordTable__titleCell) {
   max-width: 400px;
   text-wrap: auto;
+
+  & .RecordTable__titleCellLink {
+    color: var(--ui-primary);
+    font-weight: 500;
+  }
+
+  & .RecordTable__titleCellLink:hover {
+    text-decoration: underline;
+  }
 }
 </style>
