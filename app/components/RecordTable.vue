@@ -24,7 +24,7 @@
 <script setup lang="ts">
 import type { ListRecordsAPIResponse } from '@db/queries/records';
 import type { TableRow } from '@nuxt/ui';
-import { capitalize } from '@shared/lib/formatting';
+import { capitalize, formatDate } from '@shared/lib/formatting';
 import { computed, h, resolveComponent } from 'vue';
 import { useRouter } from 'vue-router';
 
@@ -103,6 +103,9 @@ const columns = [
   {
     accessorKey: 'recordCreatedAt',
     header: 'Created',
+    cell: ({ row }: { row: TableRow<ListRecordsAPIResponse[number]> }) => {
+      return formatDate(new Date(row.getValue('recordCreatedAt')));
+    },
   },
 ];
 
