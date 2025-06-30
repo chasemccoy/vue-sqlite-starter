@@ -35,7 +35,7 @@ const mapReadwiseAuthorToRecord = (author: ReadwiseAuthorSelect): RecordInsert =
     title: author.name,
     slug: slugify(author.name || author.recordId.toString()),
     url: author.origin,
-    isCurated: true,
+    isCurated: false,
     source: 'readwise',
   };
 };
@@ -146,7 +146,7 @@ const mapReadwiseTagToRecord = (tag: ReadwiseTagSelect): RecordInsert => {
     type: 'concept',
     title: tag.tag,
     slug: slugify(tag.tag || tag.id.toString()),
-    isCurated: true,
+    isCurated: false,
     source: 'readwise',
   };
 };

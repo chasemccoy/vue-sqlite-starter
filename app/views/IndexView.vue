@@ -1,10 +1,10 @@
 <template>
-	<SplitViewLayout
-		v-model="data"
-		:isEmpty="route.name === RouteName.index"
-	>
-		<RouterView />
-	</SplitViewLayout>
+  <SplitViewLayout
+    v-model="data"
+    :isEmpty="route.name === RouteName.index"
+  >
+    <RouterView />
+  </SplitViewLayout>
 </template>
 
 <script setup lang="ts">
@@ -16,16 +16,16 @@ import { useRoute } from 'vue-router';
 const route = useRoute();
 
 const { data } = useRecords({
-	limit: 200,
-	filters: {
-		type: 'artifact',
-		hasParent: false,
-	},
-	orderBy: [
-		{
-			field: 'recordCreatedAt',
-			direction: 'desc',
-		},
-	],
+  limit: 100,
+  filters: {
+    type: 'artifact',
+    hasParent: false,
+  },
+  orderBy: [
+    {
+      field: 'recordCreatedAt',
+      direction: 'desc',
+    },
+  ],
 });
 </script>
