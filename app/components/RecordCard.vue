@@ -88,7 +88,7 @@
           activeClass="RouterLink--isActive"
           :to="href"
         >
-          {{ formatDate(new Date(modelValue.recordCreatedAt), { year: false }) }}
+          {{ formatDate(new Date(modelValue.recordCreatedAt + 'Z'), { year: false }) }}
         </RouterLink>
       </li>
 

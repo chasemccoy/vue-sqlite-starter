@@ -56,7 +56,6 @@ export default defineConfig({
       '@shared': path.resolve(__dirname, './shared'),
       '@db': path.resolve(__dirname, './backend/db'),
       '@api': path.resolve(__dirname, './backend/api'),
-      '@integrations': path.resolve(__dirname, './backend/integrations'),
     },
   },
   define: {
