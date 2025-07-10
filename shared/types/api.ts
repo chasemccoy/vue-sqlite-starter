@@ -1,4 +1,4 @@
-import { z } from 'zod/v4';
+import { z } from 'zod';
 
 export type APIResponse<T extends (...args: unknown[]) => unknown> = Awaited<ReturnType<T>>;
 

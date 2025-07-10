@@ -18,8 +18,7 @@
       "@db/*": ["./backend/db/*"],
       "@api/*": ["./backend/api/*"],
       "@shared/*": ["./shared/*"],
-      "@app/*": ["./app/*"],
-      "#build/ui": ["./node_modules/@nuxt/ui/.nuxt/ui"]
+      "@app/*": ["./app/*"]
     }
   }
 }
