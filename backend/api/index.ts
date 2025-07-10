@@ -1,13 +1,9 @@
 import 'dotenv/config';
 import express from 'express';
 import { recordRoutes } from './records';
-import { treeRoutes } from './tree';
 import { linkRoutes } from './links';
 import { errorHandler } from './errorHandler';
 import cors from 'cors';
-import { searchRoutes } from 'backend/api/search';
-import { mediaRoutes } from './media';
-import { twitterRoutes } from 'backend/api/twitter';
 
 const PORT = process.env.BACKEND_PORT;
 
@@ -19,12 +15,7 @@ app.use(cors());
 
 app.use(errorHandler);
 app.use(recordRoutes);
-app.use(treeRoutes);
 app.use(linkRoutes);
-app.use(searchRoutes);
-app.use(mediaRoutes);
-app.use(twitterRoutes);
-app.use('/uploads', express.static('uploads'));
 
 app.listen(PORT, () => {
   // eslint-disable-next-line no-console

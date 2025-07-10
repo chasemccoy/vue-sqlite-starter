@@ -1,5 +1,5 @@
 export enum ApiEndpoints {
-  records = '/records',
+  record = '/record',
 }
 
 const { BACKEND_PORT } = import.meta.env;
@@ -11,10 +11,6 @@ const defaultHeaders = {
 export default function useApiClient() {
   const hostname = window.location.hostname;
   let backendBaseUrl = `http://${hostname}:${BACKEND_PORT}`;
-
-  if (hostname.includes('enchiridion')) {
-    backendBaseUrl = 'https://enchiridion-api.chsmc.tools';
-  }
 
   async function fetch<T>(
     endpoint: ApiEndpoints | string,

@@ -3,11 +3,9 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query';
 import type {
   DeleteRecordAPIResponse,
   GetRecordAPIResponse,
-  GetRecordBySlugAPIResponse,
   LinksForRecordAPIResponse,
   UpsertRecordAPIResponse,
 } from '@db/queries/records';
-import type { GetFamilyTreeAPIResponse } from '@db/queries/tree';
 import { toValue, type MaybeRef } from 'vue';
 import type { DbId } from '@shared/types/api';
 import type { RecordInsert } from '@db/schema';
@@ -22,21 +20,6 @@ export default function useRecord() {
     return useQuery({
       queryKey: ['get-record', id],
       queryFn: () => fetch<GetRecordAPIResponse>(`/record/${toValue(id)}`),
-      enabled,
-    });
-  }
-
-  function getRecordBySlug(slug: OptionalMaybeRef<string>) {
-    return useQuery({
-      queryKey: ['get-record-by-slug', slug],
-      queryFn: () => fetch<GetRecordBySlugAPIResponse>(`/record/slug/${toValue(slug)}`),
-    });
-  }
-
-  function getRecordTree(id: OptionalMaybeRef<DbId>, enabled: MaybeRef<boolean> = true) {
-    return useQuery({
-      queryKey: ['get-record-tree', id],
-      queryFn: () => fetch<GetFamilyTreeAPIResponse>(`/record/${toValue(id)}/tree`),
       enabled,
     });
   }
@@ -76,8 +59,6 @@ export default function useRecord() {
 
   return {
     getRecord,
-    getRecordBySlug,
-    getRecordTree,
     getRecordLinks,
     upsertRecord,
     deleteRecord,
