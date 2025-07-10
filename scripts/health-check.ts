@@ -1,8 +1,8 @@
 /* eslint-disable no-console */
+import 'dotenv/config';
 import Database from 'better-sqlite3';
-import { join } from 'path';
 
-const DB_PATH = join(process.cwd(), 'enchiridion.db');
+const DB_PATH = `./${process.env.DATABASE_NAME}.db`;
 
 function checkDatabaseIntegrity(): boolean {
   try {

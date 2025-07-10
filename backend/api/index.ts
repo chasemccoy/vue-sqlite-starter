@@ -1,7 +1,6 @@
 import 'dotenv/config';
 import express from 'express';
 import { recordRoutes } from './records';
-import { linkRoutes } from './links';
 import { errorHandler } from './errorHandler';
 import cors from 'cors';
 
@@ -15,7 +14,6 @@ app.use(cors());
 
 app.use(errorHandler);
 app.use(recordRoutes);
-app.use(linkRoutes);
 
 app.listen(PORT, () => {
   // eslint-disable-next-line no-console

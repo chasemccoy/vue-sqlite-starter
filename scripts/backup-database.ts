@@ -2,9 +2,10 @@
 
 /* eslint-disable no-console */
 
+import 'dotenv/config';
 import { createBackup } from './sqlite-diffable';
 
-const DATABASE_PATH = './enchiridion.db';
+const DATABASE_PATH = `./${process.env.DATABASE_NAME}.db`;
 const BACKUP_DIR = './backup';
 
 async function main() {

@@ -3,7 +3,6 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query';
 import type {
   DeleteRecordAPIResponse,
   GetRecordAPIResponse,
-  LinksForRecordAPIResponse,
   UpsertRecordAPIResponse,
 } from '@db/queries/records';
 import { toValue, type MaybeRef } from 'vue';
@@ -20,14 +19,6 @@ export default function useRecord() {
     return useQuery({
       queryKey: ['get-record', id],
       queryFn: () => fetch<GetRecordAPIResponse>(`/record/${toValue(id)}`),
-      enabled,
-    });
-  }
-
-  function getRecordLinks(id: OptionalMaybeRef<DbId>, enabled: MaybeRef<boolean> = true) {
-    return useQuery({
-      queryKey: ['get-record-links', id],
-      queryFn: () => fetch<LinksForRecordAPIResponse>(`/record/${toValue(id)}/links`),
       enabled,
     });
   }
@@ -59,7 +50,6 @@ export default function useRecord() {
 
   return {
     getRecord,
-    getRecordLinks,
     upsertRecord,
     deleteRecord,
   };
