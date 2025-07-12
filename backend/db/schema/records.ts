@@ -1,4 +1,4 @@
-import { sqliteTable, text, int, check, index } from 'drizzle-orm/sqlite-core';
+import { sqliteTable, text, int, check } from 'drizzle-orm/sqlite-core';
 import { contentTimestamps, databaseTimestamps } from './utils';
 import { createInsertSchema } from 'drizzle-zod';
 import { sql } from 'drizzle-orm';
@@ -17,13 +17,7 @@ export const records = sqliteTable(
     ...databaseTimestamps,
     ...contentTimestamps,
   },
-  (table) => [
-    check('slug_not_empty', sql`${table.slug} != ''`),
-    index('records_slug_idx').on(table.slug),
-    index('records_record_created_at_idx').on(table.recordCreatedAt),
-    index('records_record_updated_at_idx').on(table.recordUpdatedAt),
-    index('records_is_curated_idx').on(table.isCurated),
-  ],
+  (table) => [check('slug_not_empty', sql`${table.slug} != ''`)],
 );
 
 export type RecordSelect = typeof records.$inferSelect;
