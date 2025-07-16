@@ -6,8 +6,8 @@
     "source.fixAll.eslint": "explicit",
     "source.removeUnusedImports": "always"
   },
-  "vue.complete.casing.props": "camel",
-  "vue.complete.casing.tags": "pascal",
+  "vue.suggest.componentNameCasing": "alwaysPascalCase",
+  "vue.suggest.propNameCasing": "preferCamelCase",
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "[typescript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
